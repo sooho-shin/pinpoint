@@ -1,0 +1,144 @@
+# 데이터베이스 아키텍처
+
+## 목적
+
+데이터베이스는 한국어 Pinpoint의 제품 계약이다. 백엔드 API, 관리자 도구, 랭킹 화면은 이 문서와 `schema/database-contract.json`을 기준으로 구현한다.
+
+DB 설계는 단순 저장소가 아니라 다음 정책을 강제해야 한다.
+
+- Google 로그인 사용자와 공개 닉네임을 분리한다.
+- 문제 원본과 일일 공개 이벤트를 분리한다.
+- 풀이 원장과 랭킹 노출 데이터를 분리한다.
+- 같은 문제의 최초 성공 기록만 랭킹에 반영한다.
+- 이메일은 랭킹, 그룹, 공유 화면에 직접 노출하지 않는다.
+- flagged attempt는 운영자 검토 전까지 제한적으로 노출한다.
+
+## 권장 스택
+
+MVP는 PostgreSQL을 기준으로 한다. Supabase를 쓰는 경우 Auth는 `auth.users`를 사용하고, 서비스 데이터는 `public` 스키마에 둔다.
+
+이 프로젝트는 관계형 제약이 제품 품질에 직접 연결된다. `publication_id + user_id` 유니크 제약, 날짜별 공개 유니크 제약, 그룹 멤버십 중복 방지, RLS 정책 같은 규칙을 애플리케이션 코드에만 맡기지 않는다.
+
+## 주요 엔티티
+
+```text
+auth.users
+  -> profiles
+
+puzzles
+  -> puzzle_publications
+
+puzzle_publications
+  -> attempts
+  -> leaderboard_entries
+
+groups
+  -> group_members
+  -> group_leaderboard_entries
+```
+
+## 테이블 역할
+
+### profiles
+
+앱 공개 프로필이다. Google OAuth의 이메일은 인증 식별에만 사용하고, 앱 공개 표시는 `nickname`을 사용한다.
+
+주요 컬럼:
+
+- `id`: 인증 사용자 ID
+- `nickname`: 랭킹/공유 표시명
+- `nickname_normalized`: 검색/검증용 정규화 닉네임
+- `avatar_url`: 선택 프로필 이미지
+- `created_at`, `updated_at`
+
+### puzzles
+
+문제 원본이다. 현재 `schema/puzzle.schema.json`의 핵심 필드를 DB로 옮긴다. 예약/공개 상태는 문제 원본이 아니라 `puzzle_publications`에서 관리한다.
+
+주요 컬럼:
+
+- `id`
+- `locale`
+- `answer`
+- `aliases`
+- `category`
+- `difficulty`
+- `clues`
+- `rationale`
+- `status`
+- `quality_score`
+- `issue_flags`
+- `review_reason`
+- `reviewed_at`
+- `created_at`, `updated_at`
+
+상태:
+
+```text
+generated -> approved -> rejected
+```
+
+공개가 끝났다고 문제 원본을 `published`로 바꾸지 않는다. 공개 상태는 `puzzle_publications.status`가 가진다.
+
+### puzzle_publications
+
+특정 문제를 특정 날짜에 공개하는 이벤트다. 하루 한 문제 정책은 `publish_date_kst` 유니크 제약으로 강제한다.
+
+상태:
+
+```text
+scheduled -> published
+          -> canceled
+```
+
+### attempts
+
+풀이 기록 원장이다. 실패, 비공개, 비로그인 세션, flagged 상태를 포함한다. 랭킹 노출 여부와 별개로 운영 분석과 부정 방지에 사용한다.
+
+### leaderboard_entries
+
+랭킹 조회용 데이터다. 성공했고 랭킹 등록 조건을 만족한 기록만 생성한다. 화면 표시에는 현재 `profiles.nickname`을 기본 사용하되, 공유/감사를 위해 `nickname_snapshot`도 저장한다.
+
+정렬 기준:
+
+```text
+1순위: used_clue_count asc
+2순위: elapsed_ms asc
+3순위: submitted_at asc
+```
+
+### groups
+
+공유 링크 또는 초대 코드로 만들어진 그룹 랭킹 컨테이너다. MVP에서는 특정 `puzzle_publication`에 종속된 일회성 그룹을 기본값으로 둔다.
+
+### group_members
+
+그룹 참여자 목록이다. 같은 사용자가 같은 그룹에 중복 참여할 수 없다.
+
+### group_leaderboard_entries
+
+그룹에 노출되는 랭킹 항목이다. 실제 점수와 정렬 필드는 `leaderboard_entries`를 참조한다.
+
+## 공개/비공개 정책
+
+- `profiles.email` 같은 공개 이메일 컬럼은 만들지 않는다.
+- API가 이메일을 필요로 하면 인증 제공자의 사용자 객체에서 서버 내부 용도로만 읽는다.
+- 공개 랭킹 API는 `nickname`, `used_clue_count`, `elapsed_ms`, `submitted_at`, `rank_status`만 반환한다.
+- `attempts.submitted_answer`는 기본적으로 본인과 운영자만 볼 수 있다.
+
+## 부정 방지 정책
+
+- 같은 사용자, 같은 공개 문제의 랭킹 기록은 하나만 허용한다.
+- 비정상적으로 짧은 풀이 시간은 `flagged` 또는 `rank_status = flagged`로 둔다.
+- 정답 공개 후 재도전 기록은 `attempts`에는 남기되 `leaderboard_entries`에는 넣지 않는다.
+- `device_hash`, `ip_hash`, `user_agent_hash`는 원문이 아니라 해시로만 저장한다.
+
+## 하네스 계약
+
+`schema/database-contract.json`은 이 문서의 기계 검증 가능한 계약이다. 백엔드 API 또는 DB migration 작업 전에는 반드시 다음 명령을 실행한다.
+
+```bash
+npm run db:contract
+```
+
+계약이 실패하면 API 구현을 진행하지 않는다. 필요한 변경은 먼저 제품 기획과 DB 계약을 함께 갱신한다.

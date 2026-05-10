@@ -1,0 +1,23 @@
+{
+  "name": "pinpoint",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "puzzles:add": "node scripts/add-puzzle-candidates.js",
+    "puzzles:validate": "node scripts/validate-puzzles.js",
+    "puzzles:score": "node scripts/score-puzzles.js",
+    "puzzles:review": "node scripts/review-puzzle.js",
+    "puzzles:harness": "node scripts/run-puzzle-harness.js",
+    "puzzles:schedule": "node scripts/schedule-daily-puzzle.js",
+    "puzzles:publish": "node scripts/publish-daily-puzzle.js",
+    "puzzles:check": "npm run puzzles:validate && npm run puzzles:score -- --write",
+    "puzzles:test": "node scripts/test-puzzle-harness.js",
+    "db:contract": "node scripts/validate-database-contract.js",
+    "db:migration:check": "node scripts/validate-database-migration.js",
+    "db:check": "npm run db:contract && npm run db:migration:check"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

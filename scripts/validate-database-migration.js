@@ -1,0 +1,88 @@
+#!/usr/bin/env node
+import fs from "node:fs/promises";
+
+const CONTRACT_PATH = "schema/database-contract.json";
+const MIGRATION_PATH = "supabase/migrations/20260510190000_initial_pinpoint_schema.sql";
+
+function normalizeSql(sql) {
+  return sql.toLowerCase().replace(/\s+/g, " ");
+}
+
+function addIssue(issues, code, detail) {
+  issues.push({ code, detail });
+}
+
+function includesAll(sql, values, prefix, issues) {
+  for (const value of values) {
+    if (!sql.includes(value.toLowerCase())) addIssue(issues, prefix, value);
+  }
+}
+
+async function main() {
+  const contract = JSON.parse(await fs.readFile(CONTRACT_PATH, "utf8"));
+  const migration = await fs.readFile(MIGRATION_PATH, "utf8");
+  const sql = normalizeSql(migration);
+  const issues = [];
+
+  for (const enumName of Object.keys(contract.enums || {})) {
+    if (!sql.includes(`create type public.${enumName}`)) {
+      addIssue(issues, "missing_enum_type", enumName);
+    }
+    includesAll(sql, contract.enums[enumName], `missing_enum_value:${enumName}`, issues);
+  }
+
+  for (const [tableName, table] of Object.entries(contract.tables || {})) {
+    if (!sql.includes(`create table public.${tableName}`)) {
+      addIssue(issues, "missing_table", tableName);
+      continue;
+    }
+
+    for (const columnName of Object.keys(table.columns || {})) {
+      if (!sql.includes(columnName.toLowerCase())) {
+        addIssue(issues, "missing_column", `${tableName}.${columnName}`);
+      }
+    }
+
+    if (!sql.includes(`alter table public.${tableName} enable row level security`)) {
+      addIssue(issues, "missing_rls_enable", tableName);
+    }
+  }
+
+  const requiredSnippets = [
+    "references auth.users(id)",
+    "create trigger auth_users_create_profile",
+    "constraint one_publication_per_kst_date unique (publish_date_kst)",
+    "constraint one_leaderboard_entry_per_user_publication unique (publication_id, user_id)",
+    "create unique index one_visible_or_flagged_ranked_success_per_user",
+    "where rank_status in ('visible', 'flagged')",
+    "on public.leaderboard_entries ( publication_id, rank_status, used_clue_count, elapsed_ms, submitted_at )",
+    "revoke all on public.profiles from anon, authenticated",
+    "grant select (id, nickname, avatar_url) on public.profiles to anon, authenticated"
+  ];
+  includesAll(sql, requiredSnippets, "missing_required_sql", issues);
+
+  const forbiddenPublicGrants = [
+    "grant select (email",
+    "grant select (submitted_answer",
+    "grant select (normalized_answer",
+    "grant select (ip_hash",
+    "grant select (device_hash",
+    "grant select (user_agent_hash"
+  ];
+  for (const snippet of forbiddenPublicGrants) {
+    if (sql.includes(snippet)) addIssue(issues, "forbidden_public_grant", snippet);
+  }
+
+  if (issues.length > 0) {
+    console.error(`Database migration validation failed: ${issues.length} issue(s).`);
+    for (const issue of issues) console.error(`  - ${issue.code}: ${issue.detail}`);
+    process.exit(1);
+  }
+
+  console.log("Database migration validation passed.");
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

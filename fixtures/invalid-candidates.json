@@ -1,0 +1,20 @@
+{
+  "puzzles": [
+    {
+      "answer": "한식",
+      "aliases": ["한국 음식"],
+      "category": "음식",
+      "difficulty": 2,
+      "clues": ["김치", "불고기", "비빔밥", "잡채", "한식"],
+      "rationale": ""
+    },
+    {
+      "answer": "암호화",
+      "aliases": ["암호화"],
+      "category": "기술",
+      "difficulty": 4,
+      "clues": ["암호화", "열쇠", "열쇠", "공개키"],
+      "rationale": "단서 수가 부족하고 중복 단서가 있다."
+    }
+  ]
+}

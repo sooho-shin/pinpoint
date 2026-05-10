@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pinpoint.local/schema/puzzle.schema.json",
+  "title": "Korean Pinpoint Puzzle",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id",
+    "answer",
+    "aliases",
+    "category",
+    "difficulty",
+    "clues",
+    "rationale",
+    "status",
+    "issueFlags",
+    "scheduledAt",
+    "publishedAt",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ko-[0-9]{14}-[a-z0-9]{5}$"
+    },
+    "answer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
+    "difficulty": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "clues": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 20
+      }
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["generated", "approved", "scheduled", "published", "rejected"]
+    },
+    "qualityScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "issueFlags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scheduledAt": {
+      "anyOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "publishedAt": {
+      "anyOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reviewReason": {
+      "type": "string"
+    },
+    "reviewedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

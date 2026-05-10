@@ -1,0 +1,58 @@
+{
+  "screens": [
+    {
+      "name": "Sign In",
+      "page": "02 Screens",
+      "viewport": "mobile",
+      "requiredOrganisms": ["GameHeader", "SignInPanel"]
+    },
+    {
+      "name": "Nickname Setup",
+      "page": "02 Screens",
+      "viewport": "mobile",
+      "requiredOrganisms": ["GameHeader", "NicknamePanel"]
+    },
+    {
+      "name": "Today Puzzle",
+      "page": "02 Screens",
+      "viewport": "mobile",
+      "requiredOrganisms": ["GameHeader", "PuzzleBoard"]
+    },
+    {
+      "name": "Solved Result",
+      "page": "02 Screens",
+      "viewport": "mobile",
+      "requiredOrganisms": ["GameHeader", "ResultPanel", "ShareActionGroup"]
+    },
+    {
+      "name": "Failed Result",
+      "page": "02 Screens",
+      "viewport": "mobile",
+      "requiredOrganisms": ["GameHeader", "ResultPanel", "ShareActionGroup"]
+    },
+    {
+      "name": "Admin Review",
+      "page": "03 Admin",
+      "viewport": "desktop",
+      "requiredOrganisms": ["AdminCandidateCard", "AdminReviewPanel"]
+    },
+    {
+      "name": "Daily Ranking",
+      "page": "02 Screens",
+      "viewport": "mobile",
+      "requiredOrganisms": ["GameHeader", "LeaderboardPanel"]
+    },
+    {
+      "name": "Group Ranking",
+      "page": "02 Screens",
+      "viewport": "mobile",
+      "requiredOrganisms": ["GameHeader", "LeaderboardPanel", "GroupInviteCard"]
+    },
+    {
+      "name": "Ranking Empty State",
+      "page": "02 Screens",
+      "viewport": "mobile",
+      "requiredOrganisms": ["GameHeader", "RankingPrivacyPrompt"]
+    }
+  ]
+}

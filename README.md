@@ -1,1 +1,251 @@
-# pinpoint
+# Pinpoint
+
+한국어 Pinpoint는 매일 한 문제씩 공개되는 연상 퍼즐 게임이다. 플레이어는 순서대로 공개되는 5개의 단서를 보고 하나의 정답을 맞힌다. 핵심 재미는 모호한 단서가 점점 하나의 답으로 수렴하는 순간에 있다.
+
+## 현재 상태
+
+### 제품 기획
+
+- 하루 한 문제를 KST 오후 5시에 공개한다.
+- 사용자는 5개 단서 안에 정답을 맞힌다.
+- 적은 단서로 맞힐수록 결과 공유와 랭킹 가치가 높다.
+- MVP 랭킹은 `오늘의 랭킹`과 `그룹 랭킹`을 우선한다.
+- Google 로그인 후 닉네임을 연결한다.
+- 이메일은 랭킹/그룹/공유 화면에 노출하지 않는다.
+
+관련 문서:
+
+- `docs/product-plan.md`
+- `docs/design-plan.md`
+
+### Figma 디자인
+
+Figma 디자인 파일:
+
+```text
+https://www.figma.com/design/2ItGTte1dpGtKzTjCOQFhW
+```
+
+현재 반영된 화면:
+
+- Today Puzzle
+- Solved Result
+- Failed Result
+- Share Preview
+- Daily Ranking
+- Group Ranking
+- Ranking Empty State
+- Admin Review
+- Sign In
+- Nickname Setup
+
+로그인 기반 화면도 추가되어 있다.
+
+- Google 로그인 화면
+- 닉네임 설정 화면
+- Google 로그인/닉네임 연동 prototype note
+
+관련 파일:
+
+- `docs/figma-architecture.md`
+- `docs/figma-operations.md`
+- `design/tokens.json`
+- `design/components.json`
+- `design/screens.json`
+- `reports/figma-design-report.json`
+- `reports/figma-screens/`
+
+### 데이터베이스
+
+Supabase 프로젝트가 생성되었고, 실제 원격 Supabase DB에 초기 테이블 migration이 적용되었다.
+
+프로젝트:
+
+```text
+project ref: ktbwxwzxsljjhtallios
+project url: https://ktbwxwzxsljjhtallios.supabase.co
+```
+
+생성된 테이블:
+
+- `profiles`
+- `puzzles`
+- `puzzle_publications`
+- `attempts`
+- `leaderboard_entries`
+- `groups`
+- `group_members`
+- `group_leaderboard_entries`
+
+RLS는 위 8개 테이블 모두 활성화되어 있다.
+
+적용된 migration:
+
+```text
+supabase/migrations/20260510190000_initial_pinpoint_schema.sql
+```
+
+DB 설계 원칙:
+
+- Google Auth 사용자와 공개 프로필을 분리한다.
+- 문제 원본과 일일 공개 이벤트를 분리한다.
+- 풀이 기록과 랭킹 노출 데이터를 분리한다.
+- 같은 공개 문제에서 사용자별 랭킹 기록은 하나만 허용한다.
+- 이메일, 제출 답안, device/ip/user-agent hash는 공개 API에 노출하지 않는다.
+
+관련 문서:
+
+- `docs/database-architecture.md`
+- `docs/database-setup.md`
+- `schema/database-contract.json`
+
+## 다음에 필요한 작업
+
+### 1. Google OAuth 설정
+
+DB는 만들어졌지만 Google 로그인은 아직 Supabase Auth Provider 설정이 필요하다.
+
+해야 할 일:
+
+1. Google Cloud에서 OAuth Client ID/Secret 생성
+2. Supabase Dashboard에서 `Authentication > Providers > Google` 열기
+3. Google Provider 활성화
+4. Client ID와 Client Secret 입력
+5. Redirect URL 확인
+
+Supabase callback URL:
+
+```text
+https://ktbwxwzxsljjhtallios.supabase.co/auth/v1/callback
+```
+
+### 2. 프론트엔드 구현
+
+Figma 기준으로 다음 화면을 구현한다.
+
+- Today Puzzle
+- Result
+- Ranking
+- Sign In
+- Nickname Setup
+
+로그인 구현 기준:
+
+- Supabase Auth Google OAuth 사용
+- 로그인 후 `profiles`의 닉네임 확인
+- 닉네임이 없거나 수정이 필요하면 Nickname Setup으로 이동
+- 랭킹 등록과 그룹 참여는 로그인 + 닉네임이 필요하다
+
+### 3. 백엔드/API 구현
+
+API 구현 전 반드시 DB 계약을 확인한다.
+
+```bash
+npm run db:check
+```
+
+API는 다음 DB 구조를 기준으로 만든다.
+
+- 문제 조회: `puzzle_publications` + `puzzles`
+- 풀이 기록: `attempts`
+- 오늘의 랭킹: `leaderboard_entries`
+- 그룹 랭킹: `groups`, `group_members`, `group_leaderboard_entries`
+
+## 명령어
+
+### 퍼즐 하네스
+
+후보 검증 dry-run:
+
+```bash
+npm run puzzles:harness -- --input tmp/candidates.json --dry-run
+```
+
+후보 저장:
+
+```bash
+npm run puzzles:harness -- --input tmp/candidates.json
+```
+
+fixture 테스트:
+
+```bash
+npm run puzzles:test
+```
+
+후보 승인:
+
+```bash
+npm run puzzles:review -- --id <id> --status approved
+```
+
+후보 예약:
+
+```bash
+npm run puzzles:schedule -- --id <id>
+```
+
+후보 공개:
+
+```bash
+npm run puzzles:publish
+```
+
+### DB 하네스
+
+DB 계약 검증:
+
+```bash
+npm run db:contract
+```
+
+Migration SQL 검증:
+
+```bash
+npm run db:migration:check
+```
+
+전체 DB 검증:
+
+```bash
+npm run db:check
+```
+
+### Supabase migration 적용
+
+Supabase CLI는 설치되어 있고, 이 repo는 프로젝트에 연결되어 있다.
+
+새 migration을 실제 Supabase DB에 반영:
+
+```bash
+supabase db push
+```
+
+새 migration을 만들거나 수정한 뒤에는 먼저 다음을 실행한다.
+
+```bash
+npm run db:check
+```
+
+## 주요 디렉터리
+
+```text
+.agents/skills/                 프로젝트 로컬 Codex 스킬
+config/                          퍼즐 품질 정책
+data/                            JSON 기반 후보/일일 퍼즐 저장소
+design/                          디자인 토큰/컴포넌트/화면 계약
+docs/                            제품, 디자인, DB, 운영 문서
+fixtures/                        하네스 테스트 fixture
+reports/                         하네스/디자인/DB 리포트
+schema/                          퍼즐 및 DB 계약
+scripts/                         퍼즐/DB 하네스 스크립트
+supabase/migrations/             실제 Supabase DB migration
+```
+
+## 주의
+
+- `.env`와 Supabase secret key는 커밋하지 않는다.
+- `supabase/.temp/`는 로컬 연결 캐시이며 커밋하지 않는다.
+- 초기 Figma 디자인 단계에서는 Code Connect를 실행하지 않는다.
+- 백엔드 API 작업 전에는 `npm run db:check`를 먼저 실행한다.
+- 문제 후보 저장은 직접 JSON을 수정하지 말고 `puzzles:harness`를 사용한다.
