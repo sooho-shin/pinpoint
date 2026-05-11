@@ -44,7 +44,7 @@ npm run app:contract
 7. `schema/app-contract.json`의 API route handler를 만든다.
 8. Today Puzzle 플레이 흐름을 구현한다.
 9. Result와 공유 텍스트를 구현한다.
-10. Google 로그인과 닉네임 설정을 구현한다.
+10. Google 로그인, 가입 시작 닉네임 입력, 닉네임 설정을 구현한다.
 11. Daily Ranking과 winner message를 구현한다.
 12. `npm run app:check`를 실행한다.
 13. 구현 파일이 모두 생긴 뒤 `npm run app:implementation:check`를 실행한다.
@@ -52,6 +52,8 @@ npm run app:contract
 ## 금지 사항
 
 - 브라우저 Supabase client로 `puzzles` 테이블을 직접 조회하지 않는다.
+- Today Puzzle, Result, Daily Ranking, 플레이 API는 로그인 필수 정책을 우회하지 않는다.
+- 회원가입 시작 화면은 Google OAuth 전에 닉네임을 필수로 입력받는다.
 - terminal result 전 정답, aliases, rationale, 잠긴 단서를 반환하지 않는다.
 - client component에서 `SUPABASE_SERVICE_ROLE_KEY`를 참조하지 않는다.
 - 랭킹 API에서 email, submitted answer, hash 식별자를 반환하지 않는다.

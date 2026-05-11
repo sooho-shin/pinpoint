@@ -293,7 +293,7 @@
       { "column": "elapsed_ms", "direction": "asc" },
       { "column": "submitted_at", "direction": "asc" }
     ],
-    "anonymousPlayAllowed": true,
+    "anonymousPlayAllowed": false,
     "rankingRequiresAuthenticatedProfile": true,
     "groupParticipationRequiresAuthenticatedProfile": true,
     "dailyWinnerMessage": {

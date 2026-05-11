@@ -3,8 +3,14 @@ import { AuthTemplate } from "@/components/templates/AuthTemplate";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { saveNickname } from "@/app/nickname/actions";
 
-export default async function NicknamePage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+function safeNextPath(value?: string) {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";
+  return value;
+}
+
+export default async function NicknamePage({ searchParams }: { searchParams: Promise<{ error?: string; next?: string }> }) {
   const params = await searchParams;
+  const next = safeNextPath(params.next);
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
@@ -26,7 +32,5 @@ export default async function NicknamePage({ searchParams }: { searchParams: Pro
         ? "닉네임을 저장하지 못했습니다."
         : undefined;
 
-  return (
-    <AuthTemplate kind="nickname" action={saveNickname} defaultNickname={profile?.nickname ?? fallbackName} error={error} />
-  );
+  return <AuthTemplate kind="nickname" action={saveNickname} defaultNickname={profile?.nickname ?? fallbackName} error={error} next={next} />;
 }

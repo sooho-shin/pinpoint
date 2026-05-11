@@ -94,7 +94,7 @@ scheduled -> published
 
 ### attempts
 
-풀이 기록 원장이다. 실패, 비공개, 비로그인 세션, flagged 상태를 포함한다. 랭킹 노출 여부와 별개로 운영 분석과 부정 방지에 사용한다.
+풀이 기록 원장이다. 실패, 비공개, 로그인 사용자 세션, flagged 상태를 포함한다. 랭킹 노출 여부와 별개로 운영 분석과 부정 방지에 사용한다. MVP 플레이 흐름은 로그인 필수이므로 새 attempt는 `user_id`를 반드시 가진다.
 
 ### leaderboard_entries
 

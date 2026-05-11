@@ -19,7 +19,8 @@
     "do_not_expose_answer_before_terminal_result",
     "do_not_expose_locked_clues",
     "do_not_read_puzzles_directly_from_browser_supabase_client",
-    "anonymous_play_allowed",
+    "authenticated_play_required",
+    "signup_nickname_required",
     "ranking_requires_authenticated_profile",
     "email_is_never_public",
     "service_role_key_is_server_only"
@@ -47,7 +48,7 @@
         "name": "Today Puzzle",
         "path": "/",
         "file": "src/app/page.tsx",
-        "auth": "optional",
+        "auth": "required",
         "states": ["loading", "no_puzzle", "ready", "playing", "solved", "failed", "already_completed"],
         "designScreen": "Today Puzzle"
       },
@@ -55,7 +56,7 @@
         "name": "Result",
         "path": "/result",
         "file": "src/app/result/page.tsx",
-        "auth": "optional",
+        "auth": "required",
         "states": ["solved", "failed", "ranking_cta", "share_ready"],
         "designScreens": ["Solved Result", "Failed Result"]
       },
@@ -63,7 +64,7 @@
         "name": "Daily Ranking",
         "path": "/ranking",
         "file": "src/app/ranking/page.tsx",
-        "auth": "optional",
+        "auth": "required",
         "states": ["loading", "ready", "empty", "privacy_prompt"],
         "designScreens": ["Daily Ranking", "Ranking Empty State"]
       },
@@ -72,7 +73,7 @@
         "path": "/signin",
         "file": "src/app/signin/page.tsx",
         "auth": "guest",
-        "states": ["ready", "oauth_pending", "oauth_error"],
+        "states": ["ready", "nickname_required", "oauth_pending", "oauth_error"],
         "designScreen": "Sign In"
       },
       {
@@ -127,7 +128,7 @@
         "method": "GET",
         "path": "/api/today",
         "file": "src/app/api/today/route.ts",
-        "auth": "optional",
+        "auth": "required",
         "mustNotExpose": ["answer", "aliases", "rationale", "locked_clues", "submitted_answer", "normalized_answer"]
       },
       {
@@ -135,15 +136,15 @@
         "method": "POST",
         "path": "/api/attempts/start",
         "file": "src/app/api/attempts/start/route.ts",
-        "auth": "optional",
-        "serverAuthoritativeFields": ["started_at", "anonymous_session_id", "user_id"]
+        "auth": "required",
+        "serverAuthoritativeFields": ["started_at", "user_id"]
       },
       {
         "name": "Reveal Clue",
         "method": "POST",
         "path": "/api/attempts/reveal",
         "file": "src/app/api/attempts/reveal/route.ts",
-        "auth": "optional",
+        "auth": "required",
         "mustNotExpose": ["answer", "aliases", "rationale", "locked_clues"]
       },
       {
@@ -151,7 +152,7 @@
         "method": "POST",
         "path": "/api/attempts/submit",
         "file": "src/app/api/attempts/submit/route.ts",
-        "auth": "optional",
+        "auth": "required",
         "serverAuthoritativeFields": ["is_correct", "used_clue_count", "elapsed_ms", "is_ranked", "rank_status"]
       },
       {
@@ -159,7 +160,7 @@
         "method": "GET",
         "path": "/api/leaderboard/daily",
         "file": "src/app/api/leaderboard/daily/route.ts",
-        "auth": "optional",
+        "auth": "required",
         "order": [
           { "column": "used_clue_count", "direction": "asc" },
           { "column": "elapsed_ms", "direction": "asc" },

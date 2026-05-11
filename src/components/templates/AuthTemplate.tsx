@@ -5,13 +5,16 @@ import { SignInPanel } from "@/components/organisms/SignInPanel";
 type AuthTemplateProps =
   | {
       kind: "signin";
-      action: () => Promise<void>;
+      action: (formData: FormData) => Promise<void>;
+      next?: string;
+      error?: string;
     }
   | {
       kind: "nickname";
       action: (formData: FormData) => Promise<void>;
       defaultNickname?: string;
       error?: string;
+      next?: string;
     };
 
 export function AuthTemplate(props: AuthTemplateProps) {
@@ -23,9 +26,9 @@ export function AuthTemplate(props: AuthTemplateProps) {
       <div className="screen-frame">
         <GameHeader eyebrow={eyebrow} title={title} />
         {props.kind === "signin" ? (
-          <SignInPanel action={props.action} />
+          <SignInPanel action={props.action} next={props.next} error={props.error} />
         ) : (
-          <NicknamePanel action={props.action} defaultNickname={props.defaultNickname} error={props.error} />
+          <NicknamePanel action={props.action} defaultNickname={props.defaultNickname} error={props.error} next={props.next} />
         )}
       </div>
     </main>

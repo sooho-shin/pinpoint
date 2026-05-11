@@ -18,7 +18,8 @@ const REQUIRED_PRINCIPLES = [
   "do_not_expose_answer_before_terminal_result",
   "do_not_expose_locked_clues",
   "do_not_read_puzzles_directly_from_browser_supabase_client",
-  "anonymous_play_allowed",
+  "authenticated_play_required",
+  "signup_nickname_required",
   "ranking_requires_authenticated_profile",
   "email_is_never_public",
   "service_role_key_is_server_only"
@@ -287,6 +288,32 @@ function validateRouteHandlers(contract, issues) {
       addIssue(issues, "winner_message_length_mismatch", "POST /api/winner-message");
     }
   }
+
+  const requiredAuthRoutes = new Set([
+    "/api/today",
+    "/api/attempts/start",
+    "/api/attempts/reveal",
+    "/api/attempts/submit",
+    "/api/leaderboard/daily"
+  ]);
+  for (const route of routes) {
+    if (requiredAuthRoutes.has(route.path) && route.auth !== "required") {
+      addIssue(issues, "route_auth_must_be_required", routeKey(route));
+    }
+  }
+}
+
+function validateAuthPolicy(contract, dbContract, issues) {
+  const pages = contract.frontend?.pages || [];
+  for (const page of pages) {
+    if (["/", "/result", "/ranking"].includes(page.path) && page.auth !== "required") {
+      addIssue(issues, "page_auth_must_be_required", page.path);
+    }
+  }
+
+  if (dbContract.apiRequirements?.anonymousPlayAllowed !== false) {
+    addIssue(issues, "database_contract_allows_anonymous_play", "apiRequirements.anonymousPlayAllowed");
+  }
 }
 
 function validatePrivacy(contract, dbContract, issues) {
@@ -431,6 +458,7 @@ async function main() {
   validatePages(contract, screens, issues);
   validateFigmaParityContract(contract, components, tokens, issues);
   validateRouteHandlers(contract, issues);
+  validateAuthPolicy(contract, dbContract, issues);
   validatePrivacy(contract, dbContract, issues);
   validateEnvironment(contract, issues);
   validateRanking(contract, dbContract, issues);

@@ -1,5 +1,3 @@
-import { cookies } from "next/headers";
-import { randomUUID } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { normalizeAnswer } from "@/lib/puzzle/normalize";
@@ -37,12 +35,17 @@ type AttemptRow = {
 };
 
 type Actor = {
-  userId: string | null;
-  anonymousSessionId: string;
+  userId: string;
 };
 
-const ANONYMOUS_COOKIE = "pinpoint_anonymous_session";
 const TERMINAL_STATUSES = new Set(["succeeded", "failed", "abandoned"]);
+
+export class AuthenticationRequiredError extends Error {
+  constructor() {
+    super("로그인이 필요합니다.");
+    this.name = "AuthenticationRequiredError";
+  }
+}
 
 function asClues(value: unknown) {
   if (!Array.isArray(value)) return [];
@@ -65,23 +68,11 @@ async function getActor(): Promise<Actor> {
   const {
     data: { user }
   } = await supabase.auth.getUser();
-  const cookieStore = await cookies();
-  const existing = cookieStore.get(ANONYMOUS_COOKIE)?.value;
-  const anonymousSessionId = existing || randomUUID();
 
-  if (!existing) {
-    cookieStore.set(ANONYMOUS_COOKIE, anonymousSessionId, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 120
-    });
-  }
+  if (!user) throw new AuthenticationRequiredError();
 
   return {
-    userId: user?.id ?? null,
-    anonymousSessionId
+    userId: user.id
   };
 }
 
@@ -125,9 +116,7 @@ async function getAttempt(publicationId: string, actor: Actor) {
     .order("created_at", { ascending: false })
     .limit(1);
 
-  query = actor.userId
-    ? query.eq("user_id", actor.userId)
-    : query.eq("anonymous_session_id", actor.anonymousSessionId);
+  query = query.eq("user_id", actor.userId);
 
   const { data, error } = await query.maybeSingle();
   if (error) throw error;
@@ -210,7 +199,7 @@ export async function startAttempt(): Promise<PuzzlePlayState | NoPuzzleState> {
   const insertPayload = {
     publication_id: publication.id,
     user_id: actor.userId,
-    anonymous_session_id: actor.userId ? null : actor.anonymousSessionId,
+    anonymous_session_id: null,
     used_clue_count: 1,
     status: "playing",
     visibility: "private"
@@ -306,7 +295,7 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
   const nextVisibleCount = isCorrect || terminalFailure ? 5 : Math.min(5, usedClueCount + 1);
   const nextStatus = isCorrect ? "succeeded" : terminalFailure ? "failed" : "playing";
   const submittedAt = new Date().toISOString();
-  const profile = actor.userId ? await getProfile(actor.userId) : null;
+  const profile = await getProfile(actor.userId);
   const canRank = Boolean(isCorrect && profile);
   const rankStatus = elapsedMs < 1000 ? "flagged" : "visible";
 
@@ -380,7 +369,7 @@ export async function getDailyLeaderboard() {
     usedClueCount: Number(row.used_clue_count),
     elapsedMs: Number(row.elapsed_ms),
     submittedAt: String(row.submitted_at),
-    isMe: actor.userId ? row.user_id === actor.userId : false
+    isMe: row.user_id === actor.userId
   }));
   const myRank = rows.find((row) => row.isMe) ?? null;
 
@@ -404,8 +393,6 @@ export async function writeWinnerMessage(message: string) {
   }
 
   const actor = await getActor();
-  if (!actor.userId) return { ok: false, error: "로그인이 필요합니다." };
-
   const { publication } = await getTodayPublication();
   if (!publication) return { ok: false, error: "오늘 공개된 문제가 없습니다." };
 

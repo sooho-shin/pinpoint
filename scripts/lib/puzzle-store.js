@@ -120,8 +120,10 @@ export function validatePuzzle(puzzle, existing = [], policy = { weakAnswers: []
   const clueSet = new Set(normalizedClues);
   if (clueSet.size !== normalizedClues.length) issues.push("duplicate_clues");
 
+  const normalizedAliases = (puzzle.aliases || []).map(normalizeText).filter(Boolean);
+  const forbiddenAnswerTerms = [normalizedAnswer, ...normalizedAliases].filter(Boolean);
   for (const clue of normalizedClues) {
-    if (normalizedAnswer && clue.includes(normalizedAnswer)) {
+    if (forbiddenAnswerTerms.some((term) => clue.includes(term))) {
       issues.push("answer_appears_in_clue");
       break;
     }
@@ -133,7 +135,7 @@ export function validatePuzzle(puzzle, existing = [], policy = { weakAnswers: []
   const existingAnswers = new Set(existing.filter((item) => item.id !== puzzle.id).map((item) => normalizeText(item.answer)));
   if (normalizedAnswer && existingAnswers.has(normalizedAnswer)) issues.push("duplicate_answer");
 
-  const allAcceptedAnswers = [puzzle.answer, ...(puzzle.aliases || [])].map(normalizeText).filter(Boolean);
+  const allAcceptedAnswers = [normalizedAnswer, ...normalizedAliases].filter(Boolean);
   if (new Set(allAcceptedAnswers).size !== allAcceptedAnswers.length) issues.push("duplicate_alias");
 
   return issues;
