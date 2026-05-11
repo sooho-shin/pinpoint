@@ -15,7 +15,14 @@
     "puzzles:test": "node scripts/test-puzzle-harness.js",
     "db:contract": "node scripts/validate-database-contract.js",
     "db:migration:check": "node scripts/validate-database-migration.js",
-    "db:check": "npm run db:contract && npm run db:migration:check"
+    "db:check": "npm run db:contract && npm run db:migration:check",
+    "figma:layout:contract": "node scripts/validate-figma-layout-report.js --contract-only",
+    "figma:layout:check": "node scripts/validate-figma-layout-report.js",
+    "figma:composition:contract": "node scripts/validate-figma-composition-report.js --contract-only",
+    "figma:composition:check": "node scripts/validate-figma-composition-report.js",
+    "app:contract": "node scripts/validate-app-contract.js --contract-only",
+    "app:check": "node scripts/validate-app-contract.js",
+    "app:implementation:check": "node scripts/validate-app-contract.js --require-implementation"
   },
   "engines": {
     "node": ">=20"

@@ -94,12 +94,51 @@ npm run db:check
 - 하루 한 문제 공개 제약이 있는가
 - 같은 공개 문제에서 사용자별 랭킹 기록이 하나만 허용되는가
 - 랭킹 정렬 기준이 제품 기획과 일치하는가
+- 오늘의 1등 확성기 메시지가 랭킹 projection과 분리되어 있는가
+- 확성기 메시지가 100자 제한, publication별 유니크 제약, 다음 공개 전까지의 노출 기간을 가지는가
 - 이메일, 제출 답안, device/ip/user-agent hash가 공개 랭킹 API에 노출되지 않는가
 - 그룹 랭킹 참여 테이블이 중복 참여를 막는가
 
 계약이 실패하면 API 구현을 진행하지 않는다. 필요한 변경은 먼저 제품 기획, DB 아키텍처, `schema/database-contract.json`을 함께 갱신한다.
 
-실제 DB 적용 SQL은 `supabase/migrations/20260510190000_initial_pinpoint_schema.sql`에 둔다. 적용 절차는 `docs/database-setup.md`를 따른다.
+실제 DB 적용 SQL은 `supabase/migrations/`의 migration 파일들에 둔다. 적용 절차는 `docs/database-setup.md`를 따른다.
+
+## 프론트엔드/백엔드 앱 계약
+
+사용자가 프론트엔드, 백엔드, Next.js 앱, Supabase API 구현을 요청하면 프로젝트 로컬 스킬 `$make-pinpoint-app`를 사용한다.
+
+```text
+$make-pinpoint-app
+```
+
+구현 전에 다음 문서와 계약을 확인한다.
+
+1. `docs/app-architecture.md`
+2. `docs/app-harness-architecture.md`
+3. `schema/app-contract.json`
+4. `docs/product-plan.md`
+5. `docs/database-architecture.md`
+6. `docs/design-plan.md`
+
+앱 구현 전 계약 검증:
+
+```bash
+npm run app:contract
+```
+
+앱 구현 중 또는 구현 후 검증:
+
+```bash
+npm run app:check
+```
+
+구현 파일까지 반드시 존재해야 하는 단계에서는 다음 명령을 사용한다.
+
+```bash
+npm run app:implementation:check
+```
+
+앱 구현은 Next.js App Router와 Route Handler를 기준으로 한다. 브라우저 Supabase client로 `puzzles`를 직접 읽거나, terminal result 전 정답/별칭/잠긴 단서를 응답하는 구현은 금지한다.
 
 ## Figma 디자인 요청
 

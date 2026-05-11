@@ -31,6 +31,7 @@ puzzles
 puzzle_publications
   -> attempts
   -> leaderboard_entries
+  -> daily_winner_messages
 
 groups
   -> group_members
@@ -107,6 +108,20 @@ scheduled -> published
 3순위: submitted_at asc
 ```
 
+### daily_winner_messages
+
+오늘의 1등 확성기 메시지 projection이다. 특정 `puzzle_publication`의 오늘의 랭킹 1등에게 하루 동안 메인 화면 최상단에 노출되는 100자 메시지 권한을 준다.
+
+주요 정책:
+
+- `publication_id`당 visible 메시지는 하나만 허용한다.
+- 메시지는 `leaderboard_entries`를 참조해 1등 랭킹 기록과 연결한다.
+- `message`는 1~100자다.
+- `visible_from`부터 `visible_until` 전까지 공개한다. 기본적으로 `visible_until`은 다음 문제 공개 시각이다.
+- 공개 API는 `nickname_snapshot`, `message`, `visible_until`만 노출한다.
+- 운영자는 `message_status = hidden`으로 부적절한 메시지를 숨길 수 있다.
+- 이메일, 제출 답안, 해시 식별자는 이 테이블과 공개 API에 포함하지 않는다.
+
 ### groups
 
 공유 링크 또는 초대 코드로 만들어진 그룹 랭킹 컨테이너다. MVP에서는 특정 `puzzle_publication`에 종속된 일회성 그룹을 기본값으로 둔다.
@@ -124,6 +139,7 @@ scheduled -> published
 - `profiles.email` 같은 공개 이메일 컬럼은 만들지 않는다.
 - API가 이메일을 필요로 하면 인증 제공자의 사용자 객체에서 서버 내부 용도로만 읽는다.
 - 공개 랭킹 API는 `nickname`, `used_clue_count`, `elapsed_ms`, `submitted_at`, `rank_status`만 반환한다.
+- 공개 확성기 API는 `nickname`, `message`, `visible_until`만 반환한다.
 - `attempts.submitted_answer`는 기본적으로 본인과 운영자만 볼 수 있다.
 
 ## 부정 방지 정책

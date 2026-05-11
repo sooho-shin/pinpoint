@@ -36,6 +36,17 @@ Organisms
 Templates
 ```
 
+Atomic Design은 이름만 계층화하는 것이 아니라 인스턴스 조립 구조까지 포함한다.
+
+```text
+Molecules -> Atoms instance
+Organisms -> Molecules/Atoms instance
+Templates -> Organisms instance
+Screens -> Templates/Organisms instance
+```
+
+상위 계층에서 Button, Text Input, Ranking Row, Leaderboard Tabs, Panel 같은 UI를 rectangle/text/frame으로 다시 만들지 않는다.
+
 ### 02 Screens
 
 사용자 플레이 화면을 둔다.
@@ -49,6 +60,8 @@ Templates
 - Daily Ranking
 - Group Ranking
 - Ranking Empty State
+
+각 화면 frame은 `design/screens.json`의 `requiredInstances`를 만족해야 한다. `02 Screens` 페이지가 비어 있거나 화면 frame이 component instance 없이 직접 그린 UI로만 구성되면 실패다.
 
 ### 03 Admin
 
@@ -111,6 +124,24 @@ Templates
 - Result Template
 - Admin Review Template
 - Ranking Template
+
+## 검증 계약
+
+Figma 파일은 두 가지 자동 검증 계약을 통과해야 한다.
+
+```bash
+npm run figma:layout:contract
+npm run figma:composition:contract
+```
+
+Figma MCP에서 생성한 리포트가 있으면 다음 검증도 통과해야 한다.
+
+```bash
+npm run figma:layout:check
+npm run figma:composition:check
+```
+
+`figma:layout:check`는 화면/패널/컨트롤의 bounds overflow를 검사한다. `figma:composition:check`는 Screens와 상위 컴포넌트가 하위 컴포넌트 instance로 조립되었는지 검사한다.
 
 ## Code Connect 위치
 

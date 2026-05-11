@@ -1,57 +1,182 @@
 {
+  "sharedLayout": {
+    "mobile": {
+      "frameWidth": 390,
+      "frameHeight": 844,
+      "screenPaddingX": 32,
+      "panelWidth": 326,
+      "panelPaddingX": 24,
+      "panelContentWidth": 278,
+      "authRhythm": {
+        "brandY": 40,
+        "titleY": 88,
+        "subtitleY": 132,
+        "panelY": 252,
+        "minTitleSubtitleGap": 14,
+        "minPanelBottomPadding": 24
+      },
+      "requiredChecks": [
+        "screen_exists",
+        "no_child_overflow",
+        "no_panel_control_overflow",
+        "no_text_overlap",
+        "auth_header_not_duplicated",
+        "auth_panel_spacing"
+      ]
+    },
+    "desktop": {
+      "requiredChecks": [
+        "screen_exists",
+        "no_child_overflow",
+        "no_panel_control_overflow",
+        "no_text_overlap"
+      ]
+    }
+  },
   "screens": [
     {
       "name": "Sign In",
       "page": "02 Screens",
       "viewport": "mobile",
+      "layout": {
+        "frameWidth": 390,
+        "frameHeight": 844,
+        "screenPaddingX": 32,
+        "panelWidth": 326,
+        "panelPaddingX": 24,
+        "panelContentWidth": 278
+      },
+      "layoutChecks": ["screen_exists", "no_child_overflow", "no_panel_control_overflow", "no_text_overlap", "auth_header_not_duplicated", "auth_panel_spacing"],
+      "compositionChecks": ["screen_exists", "required_instances_present", "no_direct_drawn_ui"],
+      "requiredInstances": ["Organisms/SignInPanel"],
       "requiredOrganisms": ["GameHeader", "SignInPanel"]
     },
     {
       "name": "Nickname Setup",
       "page": "02 Screens",
       "viewport": "mobile",
+      "layout": {
+        "frameWidth": 390,
+        "frameHeight": 844,
+        "screenPaddingX": 32,
+        "panelWidth": 326,
+        "panelPaddingX": 24,
+        "panelContentWidth": 278
+      },
+      "layoutChecks": ["screen_exists", "no_child_overflow", "no_panel_control_overflow", "no_text_overlap", "auth_header_not_duplicated", "auth_panel_spacing"],
+      "compositionChecks": ["screen_exists", "required_instances_present", "no_direct_drawn_ui"],
+      "requiredInstances": ["Organisms/NicknamePanel"],
       "requiredOrganisms": ["GameHeader", "NicknamePanel"]
     },
     {
       "name": "Today Puzzle",
       "page": "02 Screens",
       "viewport": "mobile",
+      "layout": {
+        "frameWidth": 390,
+        "frameHeight": 844,
+        "screenPaddingX": 32,
+        "panelWidth": 326,
+        "panelPaddingX": 24,
+        "panelContentWidth": 278
+      },
+      "layoutChecks": ["screen_exists", "no_child_overflow", "no_panel_control_overflow", "no_text_overlap"],
+      "compositionChecks": ["screen_exists", "required_instances_present", "no_direct_drawn_ui"],
+      "requiredInstances": ["Templates/DailyPuzzleTemplate", "Organisms/PuzzleBoard"],
       "requiredOrganisms": ["GameHeader", "PuzzleBoard"]
     },
     {
       "name": "Solved Result",
       "page": "02 Screens",
       "viewport": "mobile",
+      "layout": {
+        "frameWidth": 390,
+        "frameHeight": 844,
+        "screenPaddingX": 32,
+        "panelWidth": 326,
+        "panelPaddingX": 24,
+        "panelContentWidth": 278
+      },
+      "layoutChecks": ["screen_exists", "no_child_overflow", "no_panel_control_overflow", "no_text_overlap"],
+      "compositionChecks": ["screen_exists", "required_instances_present", "no_direct_drawn_ui"],
+      "requiredInstances": ["Templates/ResultTemplate", "Organisms/ResultPanel/Solved", "Molecules/ShareActionGroup"],
       "requiredOrganisms": ["GameHeader", "ResultPanel", "ShareActionGroup"]
     },
     {
       "name": "Failed Result",
       "page": "02 Screens",
       "viewport": "mobile",
+      "layout": {
+        "frameWidth": 390,
+        "frameHeight": 844,
+        "screenPaddingX": 32,
+        "panelWidth": 326,
+        "panelPaddingX": 24,
+        "panelContentWidth": 278
+      },
+      "layoutChecks": ["screen_exists", "no_child_overflow", "no_panel_control_overflow", "no_text_overlap"],
+      "compositionChecks": ["screen_exists", "required_instances_present", "no_direct_drawn_ui"],
+      "requiredInstances": ["Templates/ResultTemplate", "Organisms/ResultPanel/Solved", "Molecules/ShareActionGroup"],
       "requiredOrganisms": ["GameHeader", "ResultPanel", "ShareActionGroup"]
     },
     {
       "name": "Admin Review",
       "page": "03 Admin",
       "viewport": "desktop",
+      "layoutChecks": ["screen_exists", "no_child_overflow", "no_panel_control_overflow", "no_text_overlap"],
+      "compositionChecks": ["screen_exists", "required_instances_present", "no_direct_drawn_ui"],
+      "requiredInstances": ["Templates/AdminReviewTemplate", "Organisms/AdminCandidateCard", "Organisms/AdminReviewPanel"],
       "requiredOrganisms": ["AdminCandidateCard", "AdminReviewPanel"]
     },
     {
       "name": "Daily Ranking",
       "page": "02 Screens",
       "viewport": "mobile",
+      "layout": {
+        "frameWidth": 390,
+        "frameHeight": 844,
+        "screenPaddingX": 32,
+        "panelWidth": 326,
+        "panelPaddingX": 24,
+        "panelContentWidth": 278
+      },
+      "layoutChecks": ["screen_exists", "no_child_overflow", "no_panel_control_overflow", "no_text_overlap"],
+      "compositionChecks": ["screen_exists", "required_instances_present", "no_direct_drawn_ui"],
+      "requiredInstances": ["Templates/RankingTemplate", "Organisms/LeaderboardPanel"],
       "requiredOrganisms": ["GameHeader", "LeaderboardPanel"]
     },
     {
       "name": "Group Ranking",
       "page": "02 Screens",
       "viewport": "mobile",
+      "layout": {
+        "frameWidth": 390,
+        "frameHeight": 844,
+        "screenPaddingX": 32,
+        "panelWidth": 326,
+        "panelPaddingX": 24,
+        "panelContentWidth": 278
+      },
+      "layoutChecks": ["screen_exists", "no_child_overflow", "no_panel_control_overflow", "no_text_overlap"],
+      "compositionChecks": ["screen_exists", "required_instances_present", "no_direct_drawn_ui"],
+      "requiredInstances": ["Templates/RankingTemplate", "Organisms/LeaderboardPanel", "Molecules/GroupInviteCard"],
       "requiredOrganisms": ["GameHeader", "LeaderboardPanel", "GroupInviteCard"]
     },
     {
       "name": "Ranking Empty State",
       "page": "02 Screens",
       "viewport": "mobile",
+      "layout": {
+        "frameWidth": 390,
+        "frameHeight": 844,
+        "screenPaddingX": 32,
+        "panelWidth": 326,
+        "panelPaddingX": 24,
+        "panelContentWidth": 278
+      },
+      "layoutChecks": ["screen_exists", "no_child_overflow", "no_panel_control_overflow", "no_text_overlap"],
+      "compositionChecks": ["screen_exists", "required_instances_present", "no_direct_drawn_ui"],
+      "requiredInstances": ["Templates/RankingTemplate", "Organisms/RankingPrivacyPrompt"],
       "requiredOrganisms": ["GameHeader", "RankingPrivacyPrompt"]
     }
   ]

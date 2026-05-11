@@ -1,4 +1,217 @@
 {
+  "layoutContracts": {
+    "mobile": {
+      "frameWidth": 390,
+      "screenPaddingX": 32,
+      "panelWidth": 326,
+      "panelPaddingX": 24,
+      "panelContentWidth": 278
+    },
+    "atoms": {
+      "TextInput": {
+        "height": 56,
+        "width": "fill-parent-content",
+        "mustStayInsideParentContentBounds": true,
+        "mustStayInsideParentBounds": true,
+        "minHorizontalPadding": 16
+      },
+      "Button": {
+        "height": 52,
+        "width": "fill-parent-content",
+        "mustStayInsideParentContentBounds": true,
+        "mustStayInsideParentBounds": true,
+        "forbidSemanticMismatch": true
+      },
+      "GoogleSignInButton": {
+        "height": 52,
+        "width": "fill-parent-content",
+        "mustStayInsideParentContentBounds": true,
+        "mustStayInsideParentBounds": true
+      }
+    },
+    "molecules": {
+      "GuessInputGroup": {
+        "width": 278,
+        "minHeight": 160,
+        "contentWidth": 278,
+        "containedControls": ["Atoms/TextInput", "Atoms/Button/Primary"],
+        "mustStayInsideParentBounds": true
+      },
+      "ShareActionGroup": {
+        "width": 278,
+        "slotCount": 2,
+        "slotWidth": 132,
+        "gap": 14,
+        "containedControls": ["Atoms/Button/Primary"],
+        "mustStayInsideParentBounds": true
+      },
+      "LeaderboardTabs": {
+        "width": 278,
+        "slotCount": 2,
+        "slotWidth": 132,
+        "gap": 14,
+        "containedControls": ["Atoms/Button/Primary"],
+        "mustStayInsideParentBounds": true
+      },
+      "RankingRow": {
+        "width": 278,
+        "height": 64,
+        "badgeMaxWidth": 92,
+        "containedControls": ["Atoms/Badge"],
+        "mustStayInsideParentBounds": true
+      }
+    },
+    "organisms": {
+      "PuzzleBoard": {
+        "surfaceWidth": 326,
+        "minHeight": 590,
+        "contentPaddingX": 24,
+        "contentPaddingBottom": 24,
+        "contentWidth": 278,
+        "containedControls": ["Molecules/GuessInputGroup"],
+        "mustStayInsideScreenBounds": true
+      },
+      "NicknamePanel": {
+        "surfaceWidth": 326,
+        "minHeight": 406,
+        "contentPaddingX": 24,
+        "contentPaddingTop": 30,
+        "contentPaddingBottom": 24,
+        "contentWidth": 278,
+        "containedControls": ["Atoms/TextInput", "Atoms/Button/Primary"],
+        "mustStayInsideScreenBounds": true
+      },
+      "SignInPanel": {
+        "surfaceWidth": 326,
+        "minHeight": 360,
+        "contentPaddingX": 24,
+        "contentPaddingTop": 30,
+        "contentPaddingBottom": 24,
+        "contentWidth": 278,
+        "mustStayInsideScreenBounds": true
+      },
+      "LeaderboardPanel": {
+        "surfaceWidth": 326,
+        "minHeight": 544,
+        "contentPaddingX": 24,
+        "contentPaddingBottom": 24,
+        "contentWidth": 278,
+        "visibleRowCount": 5,
+        "rowHeight": 64,
+        "rowGap": 4,
+        "tabsHeight": 52,
+        "tabsToRowsGap": 22,
+        "mustStayInsideScreenBounds": true
+      }
+    }
+  },
+  "compositionContracts": {
+    "rules": {
+      "moleculesMustUseAtomInstances": true,
+      "organismsMustUseMoleculeOrAtomInstances": true,
+      "templatesMustUseOrganismInstances": true,
+      "screensMustUseTemplateOrOrganismInstances": true,
+      "forbidDirectDrawnUiInHigherLevels": true
+    },
+    "directDrawnUiNamePatterns": [
+      "Button",
+      "Input",
+      "Field",
+      "Panel",
+      "Card",
+      "Row",
+      "Tabs",
+      "Surface",
+      "Nickname",
+      "Google",
+      "Ranking",
+      "Clue",
+      "Share",
+      "Result"
+    ],
+    "components": {
+      "Molecules/ClueRow/Open": {
+        "layer": "molecule",
+        "mustUseInstances": ["Atoms/ClueNumber"]
+      },
+      "Molecules/GuessInputGroup": {
+        "layer": "molecule",
+        "mustUseInstances": ["Atoms/TextInput", "Atoms/Button/Primary"]
+      },
+      "Molecules/ShareActionGroup": {
+        "layer": "molecule",
+        "mustUseInstances": ["Atoms/Button/Primary"]
+      },
+      "Molecules/RankingRow": {
+        "layer": "molecule",
+        "mustUseInstances": ["Atoms/Badge"]
+      },
+      "Molecules/LeaderboardTabs": {
+        "layer": "molecule",
+        "mustUseInstances": ["Atoms/Button/Primary"]
+      },
+      "Molecules/GroupInviteCard": {
+        "layer": "molecule",
+        "mustUseInstances": ["Atoms/Button/Primary"]
+      },
+      "Organisms/PuzzleBoard": {
+        "layer": "organism",
+        "mustUseInstances": ["Molecules/ClueRow/Open", "Molecules/GuessInputGroup"]
+      },
+      "Organisms/ResultPanel/Solved": {
+        "layer": "organism",
+        "mustUseInstances": ["Molecules/ClueRow/Open", "Molecules/ScoreBadge"]
+      },
+      "Organisms/GameHeader": {
+        "layer": "organism",
+        "mustUseInstances": []
+      },
+      "Organisms/SignInPanel": {
+        "layer": "organism",
+        "mustUseInstances": ["Atoms/GoogleSignInButton", "Molecules/AuthStatusMessage"]
+      },
+      "Organisms/NicknamePanel": {
+        "layer": "organism",
+        "mustUseInstances": ["Atoms/TextInput", "Atoms/Button/Primary"]
+      },
+      "Organisms/LeaderboardPanel": {
+        "layer": "organism",
+        "mustUseInstances": ["Molecules/LeaderboardTabs", "Molecules/RankingRow"]
+      },
+      "Organisms/RankingPrivacyPrompt": {
+        "layer": "organism",
+        "mustUseInstances": ["Atoms/TextInput", "Atoms/Button/Primary"]
+      },
+      "Organisms/AdminCandidateCard": {
+        "layer": "organism",
+        "mustUseInstances": ["Molecules/ClueRow/Open"]
+      },
+      "Organisms/AdminReviewPanel": {
+        "layer": "organism",
+        "mustUseInstances": ["Molecules/ClueRow/Open", "Atoms/Button/Primary"]
+      },
+      "Templates/DailyPuzzleTemplate": {
+        "layer": "template",
+        "mustUseInstances": ["Organisms/GameHeader", "Organisms/PuzzleBoard"]
+      },
+      "Templates/AuthTemplate": {
+        "layer": "template",
+        "mustUseInstances": ["Organisms/GameHeader"]
+      },
+      "Templates/ResultTemplate": {
+        "layer": "template",
+        "mustUseInstances": ["Organisms/GameHeader", "Organisms/ResultPanel/Solved", "Molecules/ShareActionGroup"]
+      },
+      "Templates/AdminReviewTemplate": {
+        "layer": "template",
+        "mustUseInstances": ["Organisms/AdminCandidateCard", "Organisms/AdminReviewPanel"]
+      },
+      "Templates/RankingTemplate": {
+        "layer": "template",
+        "mustUseInstances": ["Organisms/GameHeader", "Organisms/LeaderboardPanel"]
+      }
+    }
+  },
   "atoms": [
     "Button",
     "GoogleSignInButton",

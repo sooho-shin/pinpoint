@@ -10,6 +10,7 @@
 - 사용자는 5개 단서 안에 정답을 맞힌다.
 - 적은 단서로 맞힐수록 결과 공유와 랭킹 가치가 높다.
 - MVP 랭킹은 `오늘의 랭킹`과 `그룹 랭킹`을 우선한다.
+- 오늘의 랭킹 1등은 다음 문제가 공개될 때까지 메인 최상단에 100자 메시지를 고정할 수 있다.
 - Google 로그인 후 닉네임을 연결한다.
 - 이메일은 랭킹/그룹/공유 화면에 노출하지 않는다.
 
@@ -73,16 +74,18 @@ project url: https://ktbwxwzxsljjhtallios.supabase.co
 - `puzzle_publications`
 - `attempts`
 - `leaderboard_entries`
+- `daily_winner_messages`
 - `groups`
 - `group_members`
 - `group_leaderboard_entries`
 
-RLS는 위 8개 테이블 모두 활성화되어 있다.
+RLS는 위 9개 테이블 모두 활성화되어 있다.
 
-적용된 migration:
+Migration 파일:
 
 ```text
 supabase/migrations/20260510190000_initial_pinpoint_schema.sql
+supabase/migrations/20260511120000_add_daily_winner_messages.sql
 ```
 
 DB 설계 원칙:
@@ -91,6 +94,7 @@ DB 설계 원칙:
 - 문제 원본과 일일 공개 이벤트를 분리한다.
 - 풀이 기록과 랭킹 노출 데이터를 분리한다.
 - 같은 공개 문제에서 사용자별 랭킹 기록은 하나만 허용한다.
+- 공개 문제별 1등 확성기 메시지는 하나만 노출한다.
 - 이메일, 제출 답안, device/ip/user-agent hash는 공개 API에 노출하지 않는다.
 
 관련 문서:
@@ -144,11 +148,25 @@ API 구현 전 반드시 DB 계약을 확인한다.
 npm run db:check
 ```
 
+프론트엔드/백엔드 앱 계약도 먼저 확인한다.
+
+```bash
+npm run app:contract
+```
+
+앱 구현 기준:
+
+- `docs/app-architecture.md`
+- `docs/app-harness-architecture.md`
+- `schema/app-contract.json`
+- `.agents/skills/make-pinpoint-app/SKILL.md`
+
 API는 다음 DB 구조를 기준으로 만든다.
 
 - 문제 조회: `puzzle_publications` + `puzzles`
 - 풀이 기록: `attempts`
 - 오늘의 랭킹: `leaderboard_entries`
+- 오늘의 1등 확성기: `daily_winner_messages`
 - 그룹 랭킹: `groups`, `group_members`, `group_leaderboard_entries`
 
 ## 명령어
@@ -210,6 +228,51 @@ npm run db:migration:check
 ```bash
 npm run db:check
 ```
+
+### 앱 하네스
+
+구현 전 계약 검증:
+
+```bash
+npm run app:contract
+```
+
+계약 및 구현 파일 검증:
+
+```bash
+npm run app:check
+```
+
+구현 파일 존재를 필수로 하는 검증:
+
+```bash
+npm run app:implementation:check
+```
+
+### Figma 검증
+
+Figma 디자인 작업 후에는 layout contract와 composition contract를 확인한다.
+
+```bash
+npm run figma:layout:contract
+npm run figma:composition:contract
+```
+
+Figma MCP로 audit 리포트를 만든 뒤에는 실제 리포트 검증도 실행한다.
+
+```bash
+npm run figma:layout:check
+npm run figma:composition:check
+```
+
+검증 리포트:
+
+```text
+reports/figma-layout-report.json
+reports/figma-composition-report.json
+```
+
+`figma:layout:check`는 화면과 컨트롤의 overflow를 막는다. `figma:composition:check`는 `02 Screens`와 `03 Admin`이 비어 있거나, 화면/상위 컴포넌트가 Atomic Design component instance를 쓰지 않는 경우 실패한다.
 
 ### Supabase migration 적용
 

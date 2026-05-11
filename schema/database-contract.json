@@ -9,6 +9,7 @@
     "auth_identity_and_public_profile_are_separate",
     "puzzle_source_and_publication_are_separate",
     "attempt_log_and_leaderboard_projection_are_separate",
+    "daily_winner_message_is_separate_from_leaderboard_projection",
     "email_is_not_public_profile_data",
     "one_ranked_success_per_user_per_publication"
   ],
@@ -17,7 +18,8 @@
     "publication_status": ["scheduled", "published", "canceled"],
     "attempt_status": ["playing", "succeeded", "failed", "abandoned"],
     "visibility": ["private", "daily", "group"],
-    "rank_status": ["visible", "flagged", "hidden"]
+    "rank_status": ["visible", "flagged", "hidden"],
+    "winner_message_status": ["draft", "visible", "hidden"]
   },
   "tables": {
     "profiles": {
@@ -177,6 +179,49 @@
         "adminSelect": true
       }
     },
+    "daily_winner_messages": {
+      "description": "오늘의 랭킹 1등이 다음 문제 공개 전까지 메인 최상단에 노출할 수 있는 100자 확성기 메시지.",
+      "columns": {
+        "id": { "type": "uuid", "primaryKey": true },
+        "publication_id": { "type": "uuid", "required": true, "references": "puzzle_publications.id" },
+        "leaderboard_entry_id": { "type": "uuid", "required": true, "references": "leaderboard_entries.id" },
+        "user_id": { "type": "uuid", "required": true, "references": "profiles.id" },
+        "nickname_snapshot": { "type": "text", "required": true, "public": true },
+        "message": { "type": "text", "required": true, "public": true, "maxLength": 100 },
+        "message_status": { "type": "winner_message_status", "required": true, "default": "draft", "public": true },
+        "visible_from": { "type": "timestamptz", "required": true, "public": true },
+        "visible_until": { "type": "timestamptz", "required": true, "public": true },
+        "created_at": { "type": "timestamptz", "required": true },
+        "updated_at": { "type": "timestamptz", "required": true }
+      },
+      "constraints": [
+        { "type": "unique", "name": "one_winner_message_per_publication", "columns": ["publication_id"] },
+        { "type": "unique", "name": "one_winner_message_per_leaderboard_entry", "columns": ["leaderboard_entry_id"] },
+        { "type": "check", "name": "winner_message_length", "expression": "char_length(message) between 1 and 100" },
+        { "type": "check", "name": "winner_message_visible_window", "expression": "visible_until > visible_from" }
+      ],
+      "indexes": [
+        { "name": "daily_winner_messages_current_idx", "columns": ["message_status", "visible_from", "visible_until"] },
+        {
+          "name": "one_visible_winner_message_per_publication",
+          "columns": ["publication_id"],
+          "unique": true,
+          "partialWhere": "message_status = 'visible'"
+        }
+      ],
+      "rankAuthorization": {
+        "requiresLeaderboardRank": 1,
+        "rankOrder": ["used_clue_count", "elapsed_ms", "submitted_at"],
+        "enforcedBy": "trigger:daily_winner_message_requires_rank_one"
+      },
+      "rls": {
+        "required": true,
+        "publicSelectWhen": "message_status = visible and visible_from <= now() and visible_until > now()",
+        "ownerWritable": true,
+        "adminSelect": true,
+        "adminWritable": true
+      }
+    },
     "groups": {
       "description": "공유 링크 또는 초대 코드로 만들어지는 그룹 랭킹 컨테이너.",
       "columns": {
@@ -250,6 +295,14 @@
     ],
     "anonymousPlayAllowed": true,
     "rankingRequiresAuthenticatedProfile": true,
-    "groupParticipationRequiresAuthenticatedProfile": true
+    "groupParticipationRequiresAuthenticatedProfile": true,
+    "dailyWinnerMessage": {
+      "maxLength": 100,
+      "requiresAuthenticatedProfile": true,
+      "requiresDailyRank": 1,
+      "visibleUntilNextPublication": true,
+      "publicFields": ["nickname_snapshot", "message", "visible_until"],
+      "hiddenWhenEmpty": true
+    }
   }
 }

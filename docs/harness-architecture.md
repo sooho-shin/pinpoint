@@ -72,3 +72,4 @@ agent-authored candidate JSON
 - JSON 저장소를 DB로 교체한다.
 - 사용자 풀이 로그로 문제 난이도를 보정한다.
 - report를 CI artifact로 남긴다.
+- 제품/API 계약 하네스는 `schema/database-contract.json`과 `npm run db:check`로 관리한다. 랭킹, 1등 확성기, 인증/공개 필드 같은 제품 규칙은 DB 계약과 migration 검증에 먼저 추가한 뒤 구현한다.

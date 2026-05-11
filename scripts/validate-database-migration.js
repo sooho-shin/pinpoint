@@ -2,7 +2,7 @@
 import fs from "node:fs/promises";
 
 const CONTRACT_PATH = "schema/database-contract.json";
-const MIGRATION_PATH = "supabase/migrations/20260510190000_initial_pinpoint_schema.sql";
+const MIGRATIONS_DIR = "supabase/migrations";
 
 function normalizeSql(sql) {
   return sql.toLowerCase().replace(/\s+/g, " ");
@@ -20,7 +20,12 @@ function includesAll(sql, values, prefix, issues) {
 
 async function main() {
   const contract = JSON.parse(await fs.readFile(CONTRACT_PATH, "utf8"));
-  const migration = await fs.readFile(MIGRATION_PATH, "utf8");
+  const migrationFiles = (await fs.readdir(MIGRATIONS_DIR))
+    .filter((fileName) => fileName.endsWith(".sql"))
+    .sort();
+  const migration = (await Promise.all(
+    migrationFiles.map((fileName) => fs.readFile(`${MIGRATIONS_DIR}/${fileName}`, "utf8"))
+  )).join("\n");
   const sql = normalizeSql(migration);
   const issues = [];
 
@@ -55,6 +60,12 @@ async function main() {
     "constraint one_leaderboard_entry_per_user_publication unique (publication_id, user_id)",
     "create unique index one_visible_or_flagged_ranked_success_per_user",
     "where rank_status in ('visible', 'flagged')",
+    "create type public.winner_message_status",
+    "create table public.daily_winner_messages",
+    "constraint winner_message_length check (char_length(message) between 1 and 100)",
+    "create trigger daily_winner_message_requires_rank_one",
+    "raise exception 'daily winner message requires the rank 1 leaderboard entry'",
+    "grant select (nickname_snapshot, message, visible_until) on public.daily_winner_messages to anon, authenticated",
     "on public.leaderboard_entries ( publication_id, rank_status, used_clue_count, elapsed_ms, submitted_at )",
     "revoke all on public.profiles from anon, authenticated",
     "grant select (id, nickname, avatar_url) on public.profiles to anon, authenticated"

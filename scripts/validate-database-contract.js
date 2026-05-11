@@ -9,6 +9,7 @@ const REQUIRED_TABLES = [
   "puzzle_publications",
   "attempts",
   "leaderboard_entries",
+  "daily_winner_messages",
   "groups",
   "group_members",
   "group_leaderboard_entries"
@@ -19,7 +20,8 @@ const REQUIRED_ENUMS = {
   publication_status: ["scheduled", "published", "canceled"],
   attempt_status: ["playing", "succeeded", "failed", "abandoned"],
   visibility: ["private", "daily", "group"],
-  rank_status: ["visible", "flagged", "hidden"]
+  rank_status: ["visible", "flagged", "hidden"],
+  winner_message_status: ["draft", "visible", "hidden"]
 };
 
 const REQUIRED_COLUMNS = {
@@ -56,6 +58,19 @@ const REQUIRED_COLUMNS = {
     "elapsed_ms",
     "submitted_at",
     "rank_status"
+  ],
+  daily_winner_messages: [
+    "id",
+    "publication_id",
+    "leaderboard_entry_id",
+    "user_id",
+    "nickname_snapshot",
+    "message",
+    "message_status",
+    "visible_from",
+    "visible_until",
+    "created_at",
+    "updated_at"
   ],
   groups: ["id", "owner_user_id", "publication_id", "invite_code", "created_at"],
   group_members: ["group_id", "user_id", "joined_at"],
@@ -206,6 +221,81 @@ function validateLeaderboard(contract, issues) {
   }
 }
 
+function validateDailyWinnerMessages(contract, issues) {
+  const messages = contract.tables?.daily_winner_messages;
+  if (!messages) return;
+
+  if (!messages.columns?.publication_id?.references?.startsWith("puzzle_publications.")) {
+    addIssue(issues, "winner_message_missing_publication_reference", "daily_winner_messages.publication_id");
+  }
+
+  if (!messages.columns?.leaderboard_entry_id?.references?.startsWith("leaderboard_entries.")) {
+    addIssue(issues, "winner_message_missing_leaderboard_reference", "daily_winner_messages.leaderboard_entry_id");
+  }
+
+  if (!messages.columns?.user_id?.references?.startsWith("profiles.")) {
+    addIssue(issues, "winner_message_missing_profile_reference", "daily_winner_messages.user_id");
+  }
+
+  if (Number(messages.columns?.message?.maxLength) !== 100) {
+    addIssue(issues, "winner_message_max_length_mismatch", "daily_winner_messages.message");
+  }
+
+  if (!hasConstraint(messages, "unique", ["publication_id"])) {
+    addIssue(issues, "missing_one_winner_message_per_publication_constraint", "daily_winner_messages(publication_id)");
+  }
+
+  const hasVisibleMessageIndex = hasIndex(messages, (index) => (
+    index.unique === true &&
+    Array.isArray(index.columns) &&
+    index.columns.join(",") === "publication_id" &&
+    typeof index.partialWhere === "string" &&
+    index.partialWhere.includes("message_status") &&
+    index.partialWhere.includes("visible")
+  ));
+  if (!hasVisibleMessageIndex) {
+    addIssue(issues, "missing_visible_winner_message_unique_index", "daily_winner_messages");
+  }
+
+  const rankAuthorization = messages.rankAuthorization || {};
+  if (rankAuthorization.requiresLeaderboardRank !== 1) {
+    addIssue(issues, "winner_message_must_require_rank_one", "daily_winner_messages.rankAuthorization.requiresLeaderboardRank");
+  }
+  const expectedRankOrder = ["used_clue_count", "elapsed_ms", "submitted_at"];
+  const actualRankOrder = rankAuthorization.rankOrder || [];
+  if (actualRankOrder.join(",") !== expectedRankOrder.join(",")) {
+    addIssue(issues, "winner_message_rank_order_mismatch", `expected ${expectedRankOrder.join(" -> ")}`);
+  }
+  if (rankAuthorization.enforcedBy !== "trigger:daily_winner_message_requires_rank_one") {
+    addIssue(issues, "winner_message_missing_rank_one_trigger_contract", "daily_winner_messages.rankAuthorization.enforcedBy");
+  }
+
+  const apiContract = contract.apiRequirements?.dailyWinnerMessage;
+  if (!apiContract) {
+    addIssue(issues, "missing_daily_winner_message_api_contract", "apiRequirements.dailyWinnerMessage");
+    return;
+  }
+
+  if (Number(apiContract.maxLength) !== 100) {
+    addIssue(issues, "daily_winner_message_api_max_length_mismatch", "apiRequirements.dailyWinnerMessage.maxLength");
+  }
+  if (apiContract.requiresDailyRank !== 1) {
+    addIssue(issues, "daily_winner_message_requires_rank_one", "apiRequirements.dailyWinnerMessage.requiresDailyRank");
+  }
+  if (apiContract.visibleUntilNextPublication !== true) {
+    addIssue(issues, "daily_winner_message_missing_next_publication_expiry", "apiRequirements.dailyWinnerMessage.visibleUntilNextPublication");
+  }
+
+  const allowedPublicFields = ["nickname_snapshot", "message", "visible_until"];
+  const publicFields = apiContract.publicFields || [];
+  for (const field of allowedPublicFields) {
+    if (!publicFields.includes(field)) addIssue(issues, "daily_winner_message_missing_public_field", field);
+  }
+  for (const field of publicFields) {
+    if (!allowedPublicFields.includes(field)) addIssue(issues, "daily_winner_message_forbidden_public_field", field);
+  }
+}
+
 function validateGroups(contract, issues) {
   const groups = contract.tables?.groups;
   const members = contract.tables?.group_members;
@@ -249,6 +339,7 @@ async function main() {
   validateAuthAndPrivacy(contract, issues);
   validatePublications(contract, issues);
   validateLeaderboard(contract, issues);
+  validateDailyWinnerMessages(contract, issues);
   validateGroups(contract, issues);
 
   if (issues.length > 0) {
