@@ -16,15 +16,42 @@
     "db:contract": "node scripts/validate-database-contract.js",
     "db:migration:check": "node scripts/validate-database-migration.js",
     "db:check": "npm run db:contract && npm run db:migration:check",
+    "db:seed:today": "node --env-file=.env.local scripts/seed-today-puzzle.js",
     "figma:layout:contract": "node scripts/validate-figma-layout-report.js --contract-only",
     "figma:layout:check": "node scripts/validate-figma-layout-report.js",
     "figma:composition:contract": "node scripts/validate-figma-composition-report.js --contract-only",
     "figma:composition:check": "node scripts/validate-figma-composition-report.js",
     "app:contract": "node scripts/validate-app-contract.js --contract-only",
     "app:check": "node scripts/validate-app-contract.js",
-    "app:implementation:check": "node scripts/validate-app-contract.js --require-implementation"
+    "app:implementation:check": "node scripts/validate-app-contract.js --require-implementation",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.105.4",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.14.0",
+    "next": "^16.2.6",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.0",
+    "@types/node": "^25.6.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.6",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "postcss": "^8.5.14"
   }
 }

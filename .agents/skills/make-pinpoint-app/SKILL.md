@@ -37,14 +37,17 @@ npm run app:contract
 
 1. Next.js App Router, TypeScript, Tailwind 기반을 만든다.
 2. Supabase SSR client를 구성한다.
-3. `schema/app-contract.json`의 page route를 만든다.
-4. `schema/app-contract.json`의 API route handler를 만든다.
-5. Today Puzzle 플레이 흐름을 구현한다.
-6. Result와 공유 텍스트를 구현한다.
-7. Google 로그인과 닉네임 설정을 구현한다.
-8. Daily Ranking과 winner message를 구현한다.
-9. `npm run app:check`를 실행한다.
-10. 구현 파일이 모두 생긴 뒤 `npm run app:implementation:check`를 실행한다.
+3. `design/components.json`의 atoms/molecules/organisms/templates를 `src/components`에 1:1 파일로 만든다.
+4. `design/tokens.json`의 색상/spacing/radius/typography를 `src/app/globals.css`와 컴포넌트 스타일에 반영한다.
+5. page route는 organism을 직접 조립하지 않고 template 컴포넌트를 통해 화면을 구성한다.
+6. `schema/app-contract.json`의 page route를 만든다.
+7. `schema/app-contract.json`의 API route handler를 만든다.
+8. Today Puzzle 플레이 흐름을 구현한다.
+9. Result와 공유 텍스트를 구현한다.
+10. Google 로그인과 닉네임 설정을 구현한다.
+11. Daily Ranking과 winner message를 구현한다.
+12. `npm run app:check`를 실행한다.
+13. 구현 파일이 모두 생긴 뒤 `npm run app:implementation:check`를 실행한다.
 
 ## 금지 사항
 
@@ -53,6 +56,8 @@ npm run app:contract
 - client component에서 `SUPABASE_SERVICE_ROLE_KEY`를 참조하지 않는다.
 - 랭킹 API에서 email, submitted answer, hash 식별자를 반환하지 않는다.
 - 그룹 랭킹과 관리자 UI를 MVP 1차에 끼워 넣지 않는다.
+- Figma Atomic layer를 건너뛰어 page에서 atoms/molecules/organisms를 임의 조립하지 않는다.
+- `design/tokens.json`에 없는 색상을 새 dominant palette로 추가하지 않는다.
 
 ## 보고 원칙
 

@@ -1,0 +1,32 @@
+import { redirect } from "next/navigation";
+import { AuthTemplate } from "@/components/templates/AuthTemplate";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { saveNickname } from "@/app/nickname/actions";
+
+export default async function NicknamePage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const params = await searchParams;
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/signin");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("nickname")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const fallbackName = String(user.user_metadata?.name ?? user.user_metadata?.full_name ?? "").slice(0, 12);
+  const error =
+    params.error === "invalid"
+      ? "닉네임은 2~12자의 한국어, 영문, 숫자로 입력해 주세요."
+      : params.error === "save"
+        ? "닉네임을 저장하지 못했습니다."
+        : undefined;
+
+  return (
+    <AuthTemplate kind="nickname" action={saveNickname} defaultNickname={profile?.nickname ?? fallbackName} error={error} />
+  );
+}

@@ -27,6 +27,20 @@
 
 ## 핵심 원칙
 
+### Figma Atomic Design 일치
+
+앱 UI는 Figma의 `design/components.json`, `design/screens.json`, `design/tokens.json`를 코드 계약으로 사용한다. 코드 컴포넌트 구조는 Figma Atomic layer와 1:1로 대응해야 한다.
+
+- `src/components/atoms/*`는 `design/components.json`의 `atoms` 항목을 모두 가진다.
+- `src/components/molecules/*`는 `design/components.json`의 `molecules` 항목을 모두 가진다.
+- `src/components/organisms/*`는 `design/components.json`의 `organisms` 항목을 모두 가진다.
+- `src/components/templates/*`는 `design/components.json`의 `templates` 항목을 모두 가진다.
+- page route는 organism을 직접 배치하지 않고 template 컴포넌트를 통해 화면을 구성한다.
+- 스타일 색상은 `design/tokens.json` 값을 `src/app/globals.css` CSS 변수로 반영한다.
+- 핵심 모바일 수치인 `390 / 32 / 326 / 24 / 278`, atom height `52 / 56`, ranking row `64`는 Figma layout contract와 어긋나면 안 된다.
+
+Figma에 없는 새 UI primitive를 만들지 않는다. 필요한 경우 먼저 Figma 계약과 `schema/app-contract.json`을 갱신한다.
+
 ### 서버 권위
 
 퍼즐 진행 상태, 공개된 단서 수, 정답 판정, 경과 시간, 랭킹 등록은 서버가 결정한다. 클라이언트가 보낸 `used_clue_count`, `elapsed_ms`, `is_correct` 값은 신뢰하지 않는다.

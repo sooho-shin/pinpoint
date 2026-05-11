@@ -11,6 +11,9 @@
     "supabaseSsrPackage": "@supabase/ssr"
   },
   "principles": [
+    "figma_atomic_design_is_source_of_truth",
+    "figma_tokens_are_source_of_truth",
+    "pages_use_template_components",
     "server_authoritative_clue_progression",
     "server_authoritative_answer_checking",
     "do_not_expose_answer_before_terminal_result",
@@ -83,9 +86,26 @@
     ],
     "componentLayers": {
       "atoms": ["Button", "GoogleSignInButton", "IconButton", "TextInput", "Badge", "ClueNumber", "StatusDot", "Divider"],
-      "molecules": ["ClueRow", "GuessInputGroup", "ScoreBadge", "FeedbackMessage", "AuthStatusMessage", "ShareActionGroup", "RankingRow", "LeaderboardTabs"],
-      "organisms": ["PuzzleBoard", "ResultPanel", "SignInPanel", "NicknamePanel", "GameHeader", "LeaderboardPanel", "RankingPrivacyPrompt"],
-      "templates": ["DailyPuzzleTemplate", "AuthTemplate", "ResultTemplate", "RankingTemplate"]
+      "molecules": ["ClueRow", "GuessInputGroup", "ScoreBadge", "FeedbackMessage", "AuthStatusMessage", "ShareActionGroup", "RankingRow", "LeaderboardTabs", "GroupInviteCard"],
+      "organisms": ["PuzzleBoard", "ResultPanel", "SignInPanel", "NicknamePanel", "GameHeader", "AdminCandidateCard", "AdminReviewPanel", "LeaderboardPanel", "RankingPrivacyPrompt"],
+      "templates": ["DailyPuzzleTemplate", "AuthTemplate", "ResultTemplate", "AdminReviewTemplate", "RankingTemplate"]
+    },
+    "figmaParity": {
+      "sourceFiles": ["design/components.json", "design/screens.json", "design/tokens.json"],
+      "componentRoot": "src/components",
+      "globalsCss": "src/app/globals.css",
+      "requiredCssVariablesFromTokens": true,
+      "pagesMustUseTemplates": true,
+      "layoutNumbers": {
+        "mobileFrameWidth": 390,
+        "screenPaddingX": 32,
+        "panelWidth": 326,
+        "panelPaddingX": 24,
+        "panelContentWidth": 278,
+        "buttonHeight": 52,
+        "textInputHeight": 56,
+        "rankingRowHeight": 64
+      }
     },
     "forbiddenClientPatterns": [
       "from('puzzles')",

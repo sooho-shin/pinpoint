@@ -5,8 +5,14 @@ import path from "node:path";
 const CONTRACT_PATH = "schema/app-contract.json";
 const DB_CONTRACT_PATH = "schema/database-contract.json";
 const SCREENS_PATH = "design/screens.json";
+const COMPONENTS_PATH = "design/components.json";
+const TOKENS_PATH = "design/tokens.json";
+const GLOBALS_CSS_PATH = "src/app/globals.css";
 
 const REQUIRED_PRINCIPLES = [
+  "figma_atomic_design_is_source_of_truth",
+  "figma_tokens_are_source_of_truth",
+  "pages_use_template_components",
   "server_authoritative_clue_progression",
   "server_authoritative_answer_checking",
   "do_not_expose_answer_before_terminal_result",
@@ -117,6 +123,15 @@ function orderKey(item) {
   return `${item.column}:${item.direction}`;
 }
 
+function kebabCase(value) {
+  return String(value).replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+}
+
+function componentFileFor(layer, componentName) {
+  const normalized = componentName.split("/")[0];
+  return `src/components/${layer}/${normalized}.tsx`;
+}
+
 function validateStack(contract, issues) {
   const stack = contract.stack || {};
   const expected = {
@@ -168,6 +183,68 @@ function validatePages(contract, screens, issues) {
         addIssue(issues, "page_references_missing_design_screen", `${page.name}: ${screenName}`);
       }
     }
+  }
+}
+
+function validateFigmaParityContract(contract, components, tokens, issues) {
+  const layers = contract.frontend?.componentLayers || {};
+  for (const layer of ["atoms", "molecules", "organisms", "templates"]) {
+    const expected = components[layer] || [];
+    const actual = layers[layer] || [];
+    for (const componentName of expected) {
+      if (!actual.includes(componentName)) {
+        addIssue(issues, "component_layer_missing_figma_component", `${layer}.${componentName}`);
+      }
+    }
+  }
+
+  const parity = contract.frontend?.figmaParity;
+  if (!parity) {
+    addIssue(issues, "missing_figma_parity_contract", "frontend.figmaParity");
+    return;
+  }
+
+  for (const sourceFile of [COMPONENTS_PATH, SCREENS_PATH, TOKENS_PATH]) {
+    if (!parity.sourceFiles?.includes(sourceFile)) {
+      addIssue(issues, "missing_figma_parity_source_file", sourceFile);
+    }
+  }
+
+  if (parity.componentRoot !== "src/components") {
+    addIssue(issues, "invalid_component_root", "frontend.figmaParity.componentRoot");
+  }
+  if (parity.globalsCss !== GLOBALS_CSS_PATH) {
+    addIssue(issues, "invalid_globals_css_path", "frontend.figmaParity.globalsCss");
+  }
+  if (parity.requiredCssVariablesFromTokens !== true) {
+    addIssue(issues, "css_variables_from_tokens_not_required", "frontend.figmaParity.requiredCssVariablesFromTokens");
+  }
+  if (parity.pagesMustUseTemplates !== true) {
+    addIssue(issues, "pages_must_use_templates_not_required", "frontend.figmaParity.pagesMustUseTemplates");
+  }
+
+  const layoutNumbers = parity.layoutNumbers || {};
+  const mobile = components.layoutContracts?.mobile || {};
+  const atoms = components.layoutContracts?.atoms || {};
+  const rankingRow = components.layoutContracts?.molecules?.RankingRow || {};
+  const expectedNumbers = {
+    mobileFrameWidth: mobile.frameWidth,
+    screenPaddingX: mobile.screenPaddingX,
+    panelWidth: mobile.panelWidth,
+    panelPaddingX: mobile.panelPaddingX,
+    panelContentWidth: mobile.panelContentWidth,
+    buttonHeight: atoms.Button?.height,
+    textInputHeight: atoms.TextInput?.height,
+    rankingRowHeight: rankingRow.height
+  };
+  for (const [key, expected] of Object.entries(expectedNumbers)) {
+    if (Number(layoutNumbers[key]) !== Number(expected)) {
+      addIssue(issues, "figma_layout_number_mismatch", `${key}: expected ${expected}`);
+    }
+  }
+
+  if (!tokens.color || Object.keys(tokens.color).length === 0) {
+    addIssue(issues, "missing_design_color_tokens", TOKENS_PATH);
   }
 }
 
@@ -272,6 +349,12 @@ async function validateImplementation(contract, options, issues) {
     ...(contract.frontend?.pages || []).map((page) => page.file),
     ...(contract.backend?.routeHandlers || []).map((route) => route.file)
   ];
+  const layers = contract.frontend?.componentLayers || {};
+  for (const layer of ["atoms", "molecules", "organisms", "templates"]) {
+    for (const componentName of layers[layer] || []) {
+      expectedFiles.push(componentFileFor(layer, componentName));
+    }
+  }
 
   for (const filePath of expectedFiles) {
     if (!await pathExists(filePath)) {
@@ -281,6 +364,7 @@ async function validateImplementation(contract, options, issues) {
 
   const sourceFiles = (await listFiles("src"))
     .filter((filePath) => /\.(ts|tsx|js|jsx)$/.test(filePath));
+  const globalsCss = await fs.readFile(GLOBALS_CSS_PATH, "utf8").catch(() => "");
 
   for (const filePath of sourceFiles) {
     const source = await fs.readFile(filePath, "utf8");
@@ -309,6 +393,26 @@ async function validateImplementation(contract, options, issues) {
     }
   }
 
+  const pageFiles = contract.frontend?.pages || [];
+  for (const page of pageFiles) {
+    if (!await pathExists(page.file)) continue;
+    const source = await fs.readFile(page.file, "utf8");
+    if (!source.includes("@/components/templates/")) {
+      addIssue(issues, "page_does_not_use_template_layer", page.file);
+    }
+    if (source.includes("@/components/organisms/") || source.includes("@/components/molecules/") || source.includes("@/components/atoms/")) {
+      addIssue(issues, "page_imports_lower_atomic_layer_directly", page.file);
+    }
+  }
+
+  const tokens = await readJson(TOKENS_PATH);
+  for (const [tokenName, tokenValue] of Object.entries(tokens.color || {})) {
+    const cssVar = `--${kebabCase(tokenName)}`;
+    if (!globalsCss.includes(`${cssVar}: ${tokenValue}`)) {
+      addIssue(issues, "css_color_token_mismatch", `${cssVar}: ${tokenValue}`);
+    }
+  }
+
   return { checked: true };
 }
 
@@ -319,10 +423,13 @@ async function main() {
   const contract = await readJson(CONTRACT_PATH);
   const dbContract = await readJson(DB_CONTRACT_PATH);
   const screens = await readJson(SCREENS_PATH);
+  const components = await readJson(COMPONENTS_PATH);
+  const tokens = await readJson(TOKENS_PATH);
 
   validateStack(contract, issues);
   validatePrinciples(contract, issues);
   validatePages(contract, screens, issues);
+  validateFigmaParityContract(contract, components, tokens, issues);
   validateRouteHandlers(contract, issues);
   validatePrivacy(contract, dbContract, issues);
   validateEnvironment(contract, issues);

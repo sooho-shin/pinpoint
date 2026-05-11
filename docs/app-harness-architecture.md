@@ -31,6 +31,8 @@ npm run app:contract
 - Supabase Auth/SSR 사용 선언
 - Today Puzzle, Result, Ranking, Sign In, Nickname 화면 존재
 - 필수 API endpoint 존재
+- Figma Atomic Design layer와 코드 컴포넌트 파일 1:1 매핑 선언
+- `design/tokens.json` 색상과 `src/app/globals.css` CSS 변수 일치 선언
 - 잠긴 단서와 정답 비노출 정책 선언
 - 랭킹 정렬 기준 선언
 - 공개 API forbidden field 선언
@@ -54,6 +56,9 @@ npm run app:implementation:check
 
 - 계약에 선언된 page route 파일 존재
 - 계약에 선언된 API route 파일 존재
+- Figma atoms/molecules/organisms/templates 코드 파일 존재
+- route page가 template 컴포넌트를 통해 화면을 구성하는지 검사
+- `globals.css`가 Figma color token을 CSS 변수로 포함하는지 검사
 - forbidden direct Supabase puzzle read 패턴 검사
 - `SUPABASE_SERVICE_ROLE_KEY`가 client component에서 사용되지 않는지 검사
 - API route가 forbidden response fields를 직접 반환하지 않는지 검사
