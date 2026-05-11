@@ -54,6 +54,8 @@ npm run app:contract
 - 브라우저 Supabase client로 `puzzles` 테이블을 직접 조회하지 않는다.
 - Today Puzzle, Result, Daily Ranking, 플레이 API는 로그인 필수 정책을 우회하지 않는다.
 - 회원가입 시작 화면은 Google OAuth 전에 닉네임을 필수로 입력받는다.
+- 오늘 공개 문제는 하나지만 모든 로그인 사용자가 `publication_id + user_id` 기준의 독립 attempt로 풀 수 있어야 한다.
+- 랭킹 1등, winner message, 다른 사용자의 terminal attempt를 이유로 현재 사용자의 풀이 시작/제출을 막지 않는다.
 - terminal result 전 정답, aliases, rationale, 잠긴 단서를 반환하지 않는다.
 - client component에서 `SUPABASE_SERVICE_ROLE_KEY`를 참조하지 않는다.
 - 랭킹 API에서 email, submitted answer, hash 식별자를 반환하지 않는다.

@@ -324,6 +324,23 @@ function validatePublications(contract, issues) {
   }
 }
 
+function validateUserScopedPlayModel(contract, issues) {
+  const api = contract.apiRequirements || {};
+  const expected = {
+    dailyPublicationScope: "one_published_puzzle_per_kst_date",
+    attemptScope: "publication_id+user_id",
+    allAuthenticatedUsersCanPlaySamePublication: true,
+    leaderboardDoesNotLockPlay: true,
+    winnerDoesNotLockPlay: true
+  };
+
+  for (const [key, value] of Object.entries(expected)) {
+    if (api[key] !== value) {
+      addIssue(issues, "user_scoped_play_model_mismatch", `${key}: expected ${value}`);
+    }
+  }
+}
+
 async function main() {
   const raw = await fs.readFile(CONTRACT_PATH, "utf8");
   const contract = JSON.parse(raw);
@@ -338,6 +355,7 @@ async function main() {
   validateSeparation(contract, issues);
   validateAuthAndPrivacy(contract, issues);
   validatePublications(contract, issues);
+  validateUserScopedPlayModel(contract, issues);
   validateLeaderboard(contract, issues);
   validateDailyWinnerMessages(contract, issues);
   validateGroups(contract, issues);

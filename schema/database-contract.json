@@ -8,6 +8,7 @@
   "principles": [
     "auth_identity_and_public_profile_are_separate",
     "puzzle_source_and_publication_are_separate",
+    "daily_publication_and_user_attempts_are_separate",
     "attempt_log_and_leaderboard_projection_are_separate",
     "daily_winner_message_is_separate_from_leaderboard_projection",
     "email_is_not_public_profile_data",
@@ -294,6 +295,11 @@
       { "column": "submitted_at", "direction": "asc" }
     ],
     "anonymousPlayAllowed": false,
+    "dailyPublicationScope": "one_published_puzzle_per_kst_date",
+    "attemptScope": "publication_id+user_id",
+    "allAuthenticatedUsersCanPlaySamePublication": true,
+    "leaderboardDoesNotLockPlay": true,
+    "winnerDoesNotLockPlay": true,
     "rankingRequiresAuthenticatedProfile": true,
     "groupParticipationRequiresAuthenticatedProfile": true,
     "dailyWinnerMessage": {

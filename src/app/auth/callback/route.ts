@@ -18,6 +18,13 @@ function safeDecode(value: string) {
   }
 }
 
+function isRecentAuthUser(createdAt?: string) {
+  if (!createdAt) return false;
+  const createdTime = new Date(createdAt).getTime();
+  if (!Number.isFinite(createdTime)) return false;
+  return Date.now() - createdTime < 15 * 60 * 1000;
+}
+
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
@@ -35,11 +42,11 @@ export async function GET(request: NextRequest) {
       const signupNickname = safeDecode(String(cookieStore.get(SIGNUP_NICKNAME_COOKIE)?.value ?? "")).trim();
       const { data: profile } = await supabase
         .from("profiles")
-        .select("nickname")
+        .select("nickname,created_at")
         .eq("id", user.id)
         .maybeSingle();
 
-      if (!profile?.nickname && isValidNickname(signupNickname)) {
+      if ((!profile?.nickname || isRecentAuthUser(user.created_at)) && isValidNickname(signupNickname)) {
         const { error } = await supabase.from("profiles").upsert({
           id: user.id,
           nickname: signupNickname,

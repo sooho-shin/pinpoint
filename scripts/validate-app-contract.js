@@ -15,6 +15,7 @@ const REQUIRED_PRINCIPLES = [
   "pages_use_template_components",
   "server_authoritative_clue_progression",
   "server_authoritative_answer_checking",
+  "daily_publication_has_user_scoped_attempts",
   "do_not_expose_answer_before_terminal_result",
   "do_not_expose_locked_clues",
   "do_not_read_puzzles_directly_from_browser_supabase_client",
@@ -316,6 +317,31 @@ function validateAuthPolicy(contract, dbContract, issues) {
   }
 }
 
+function validatePlayModel(contract, dbContract, issues) {
+  const model = contract.backend?.playModel || {};
+  const dbRequirements = dbContract.apiRequirements || {};
+  const expected = {
+    dailyPublicationScope: "one_published_puzzle_per_kst_date",
+    attemptScope: "publication_id+user_id",
+    allAuthenticatedUsersCanPlaySamePublication: true,
+    leaderboardDoesNotLockPlay: true,
+    winnerDoesNotLockPlay: true
+  };
+
+  for (const [key, value] of Object.entries(expected)) {
+    if (model[key] !== value) {
+      addIssue(issues, "app_play_model_mismatch", `${key}: expected ${value}`);
+    }
+    if (dbRequirements[key] !== value) {
+      addIssue(issues, "db_play_model_mismatch", `${key}: expected ${value}`);
+    }
+  }
+
+  if (model.oneRankedEntryPerUserPublication !== true) {
+    addIssue(issues, "app_play_model_missing_rank_uniqueness", "oneRankedEntryPerUserPublication");
+  }
+}
+
 function validatePrivacy(contract, dbContract, issues) {
   const forbidden = contract.backend?.forbiddenPublicResponseFields || [];
   for (const field of FORBIDDEN_PUBLIC_RESPONSE_FIELDS) {
@@ -459,6 +485,7 @@ async function main() {
   validateFigmaParityContract(contract, components, tokens, issues);
   validateRouteHandlers(contract, issues);
   validateAuthPolicy(contract, dbContract, issues);
+  validatePlayModel(contract, dbContract, issues);
   validatePrivacy(contract, dbContract, issues);
   validateEnvironment(contract, issues);
   validateRanking(contract, dbContract, issues);

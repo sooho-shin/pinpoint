@@ -16,6 +16,7 @@
     "pages_use_template_components",
     "server_authoritative_clue_progression",
     "server_authoritative_answer_checking",
+    "daily_publication_has_user_scoped_attempts",
     "do_not_expose_answer_before_terminal_result",
     "do_not_expose_locked_clues",
     "do_not_read_puzzles_directly_from_browser_supabase_client",
@@ -115,6 +116,14 @@
     ]
   },
   "backend": {
+    "playModel": {
+      "dailyPublicationScope": "one_published_puzzle_per_kst_date",
+      "attemptScope": "publication_id+user_id",
+      "allAuthenticatedUsersCanPlaySamePublication": true,
+      "leaderboardDoesNotLockPlay": true,
+      "winnerDoesNotLockPlay": true,
+      "oneRankedEntryPerUserPublication": true
+    },
     "routeHandlers": [
       {
         "name": "OAuth Callback",

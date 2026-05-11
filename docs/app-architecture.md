@@ -69,6 +69,16 @@ Google OAuth는 인증 전용이다. 가입 시작 화면에서 닉네임을 먼
 
 오늘 문제 진행 상태는 `publication_id + user_id` 기준으로 조회한다. httpOnly anonymous session은 MVP 플레이 흐름에서 사용하지 않는다. 랭킹 등록, 그룹 참여, 1등 확성기 메시지는 로그인과 닉네임 설정을 요구한다.
 
+### 사용자별 일일 풀이
+
+KST 기준 하루에 공개되는 `puzzle_publications`는 하나지만, attempt는 사용자별로 독립된다.
+
+- 같은 `publication_id`를 모든 로그인 사용자가 각자 풀 수 있어야 한다.
+- 한 사용자의 성공, 실패, terminal attempt, 랭킹 1등 달성은 다른 사용자의 `/api/attempts/start`, `/api/attempts/reveal`, `/api/attempts/submit`을 막지 않는다.
+- attempt 조회와 이어풀기는 `publication_id + user_id` 기준으로만 한다.
+- `leaderboard_entries`는 성공 기록의 projection이며, 게임 플레이 가능 여부를 판단하는 잠금 테이블로 사용하지 않는다.
+- 같은 사용자의 같은 공개 문제 랭킹 기록은 하나만 허용한다.
+
 ## 화면 범위
 
 ### `/`
@@ -178,6 +188,7 @@ Google OAuth 시작 전에 닉네임을 필수로 입력받는다. 닉네임은 
 - 비로그인 요청은 401을 반환
 - `started_at`은 서버 시각 사용
 - 이미 terminal attempt가 있으면 기존 상태 반환
+- 다른 사용자의 terminal attempt나 랭킹 기록은 현재 사용자의 시작 가능 여부에 영향을 주지 않음
 
 ### `POST /api/attempts/reveal`
 
