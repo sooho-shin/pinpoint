@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 import { FormEvent, useEffect, useState } from "react";
 import { Button, ButtonLink } from "@/components/atoms/Button";
 import { TextInput } from "@/components/atoms/TextInput";
+import { GroupInviteCard } from "@/components/molecules/GroupInviteCard";
 import { LeaderboardTabs } from "@/components/molecules/LeaderboardTabs";
 import { RankingRow, type RankingRowData } from "@/components/molecules/RankingRow";
 import { formatKoreanDate } from "@/lib/format";
@@ -29,6 +30,25 @@ type LeaderboardState =
       puzzleFeedback: PuzzleFeedbackState;
     };
 
+type GroupLeaderboardState =
+  | { status: "loading" }
+  | { status: "error"; message: string }
+  | {
+      status: "ready" | "no_puzzle" | "missing_code" | "not_found" | "requires_sign_in" | "requires_nickname";
+      publishDateKst: string;
+      rows: RankingRowData[];
+      group: { id: string; name: string; inviteCode: string } | null;
+      message?: string;
+      requiresSignIn?: boolean;
+      requiresNickname?: boolean;
+    };
+
+type CreatedGroup = {
+  name: string;
+  inviteCode: string;
+  inviteUrl: string;
+};
+
 async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     ...init,
@@ -42,17 +62,33 @@ async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
   return payload as T;
 }
 
-export function LeaderboardPanel() {
+function getGroupUrl(inviteCode: string) {
+  if (typeof window === "undefined") return `/ranking?group=${encodeURIComponent(inviteCode)}`;
+  return `${window.location.origin}/ranking?group=${encodeURIComponent(inviteCode)}`;
+}
+
+export function LeaderboardPanel({ groupCode }: { groupCode?: string }) {
+  const isGroupMode = Boolean(groupCode);
   const [state, setState] = useState<LeaderboardState>({ status: "loading" });
+  const [groupState, setGroupState] = useState<GroupLeaderboardState>({ status: "loading" });
   const [message, setMessage] = useState("");
   const [feedback, setFeedback] = useState("");
   const [feedbackReaction, setFeedbackReaction] = useState<PuzzleFeedbackReaction>("good");
   const [feedbackComment, setFeedbackComment] = useState("");
   const [feedbackSubmitMessage, setFeedbackSubmitMessage] = useState("");
+  const [createdGroup, setCreatedGroup] = useState<CreatedGroup | null>(null);
+  const [groupMessage, setGroupMessage] = useState("");
   const [pending, setPending] = useState(false);
   const [feedbackPending, setFeedbackPending] = useState(false);
+  const [groupPending, setGroupPending] = useState(false);
 
   async function load() {
+    if (isGroupMode) {
+      const group = await getJson<GroupLeaderboardState>(`/api/leaderboard/group?code=${encodeURIComponent(groupCode ?? "")}`);
+      setGroupState(group);
+      return;
+    }
+
     const [leaderboard, winnerMessage, puzzleFeedback] = await Promise.all([
       getJson<Extract<LeaderboardState, { status: "ready" | "no_puzzle" }> & { winnerMessage?: WinnerMessage | null }>("/api/leaderboard/daily"),
       getJson<WinnerMessage | null>("/api/winner-message/current"),
@@ -66,8 +102,40 @@ export function LeaderboardPanel() {
   }
 
   useEffect(() => {
-    load().catch((error: Error) => setState({ status: "error", message: error.message }));
-  }, []);
+    load().catch((error: Error) => {
+      if (isGroupMode) {
+        setGroupState({ status: "error", message: error.message });
+      } else {
+        setState({ status: "error", message: error.message });
+      }
+    });
+  }, [groupCode]);
+
+  async function createGroup() {
+    setGroupPending(true);
+    setGroupMessage("");
+    try {
+      const result = await getJson<{ ok: true; group: { name: string; inviteCode: string } }>("/api/groups", {
+        method: "POST",
+        body: JSON.stringify({})
+      });
+      const inviteUrl = getGroupUrl(result.group.inviteCode);
+      setCreatedGroup({ ...result.group, inviteUrl });
+      await navigator.clipboard?.writeText(inviteUrl);
+      setGroupMessage("그룹 링크를 만들고 복사했습니다.");
+    } catch (error) {
+      setGroupMessage(error instanceof Error ? error.message : "그룹을 만들지 못했습니다.");
+    } finally {
+      setGroupPending(false);
+    }
+  }
+
+  async function copyGroupLink(inviteUrl?: string) {
+    const url = inviteUrl ?? (createdGroup ? createdGroup.inviteUrl : "");
+    if (!url) return;
+    await navigator.clipboard?.writeText(url);
+    setGroupMessage("그룹 링크를 복사했습니다.");
+  }
 
   async function submitMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -111,6 +179,63 @@ export function LeaderboardPanel() {
     }
   }
 
+  if (isGroupMode) {
+    if (groupState.status === "loading") {
+      return <section className="surface min-h-[544px] p-6 text-sm text-[var(--text-secondary)]">그룹 랭킹을 불러오는 중입니다.</section>;
+    }
+
+    if (groupState.status === "error") {
+      return <section className="surface min-h-[360px] p-6 text-sm text-[var(--danger)]">{groupState.message}</section>;
+    }
+
+    const inviteUrl = groupState.group ? getGroupUrl(groupState.group.inviteCode) : "";
+    return (
+      <section className="surface min-h-[544px] p-6">
+        <div className="mb-5">
+          <div className="text-xs font-semibold text-[var(--text-secondary)]">{formatKoreanDate(groupState.publishDateKst)}</div>
+          <h2 className="mt-1 text-[22px] font-bold leading-[30px]">{groupState.group?.name ?? "그룹 랭킹"}</h2>
+        </div>
+
+        <div className="mb-[22px]">
+          <LeaderboardTabs active="group" groupHref={groupState.group ? `/ranking?group=${encodeURIComponent(groupState.group.inviteCode)}` : "/ranking#group"} />
+        </div>
+
+        {groupState.status === "ready" ? (
+          <>
+            <GroupInviteCard
+              inviteUrl={inviteUrl}
+              pending={false}
+              message={groupMessage || "이 링크를 공유하면 친구들이 같은 그룹 랭킹에 참여합니다."}
+              onCreate={() => {}}
+              onCopy={() => copyGroupLink(inviteUrl)}
+            />
+            <div className="mt-6 space-y-1">
+              {groupState.rows.length === 0 ? (
+                <div className="muted-surface p-4 text-sm text-[var(--text-secondary)]">아직 이 그룹에 랭킹 기록이 없습니다.</div>
+              ) : (
+                groupState.rows.map((row) => <RankingRow key={row.id} row={row} />)
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="muted-surface p-4">
+            <p className="text-sm leading-5 text-[var(--text-secondary)]">{groupState.message ?? "그룹 랭킹에 참여할 수 없습니다."}</p>
+            {groupState.requiresSignIn ? (
+              <div className="mt-4">
+                <ButtonLink href={`/signin?next=${encodeURIComponent(`/ranking?group=${groupCode ?? ""}`)}`} variant="secondary">로그인하기</ButtonLink>
+              </div>
+            ) : null}
+            {groupState.requiresNickname ? (
+              <div className="mt-4">
+                <ButtonLink href={`/nickname?next=${encodeURIComponent(`/ranking?group=${groupCode ?? ""}`)}`} variant="secondary">닉네임 설정</ButtonLink>
+              </div>
+            ) : null}
+          </div>
+        )}
+      </section>
+    );
+  }
+
   if (state.status === "loading") {
     return <section className="surface min-h-[544px] p-6 text-sm text-[var(--text-secondary)]">랭킹을 불러오는 중입니다.</section>;
   }
@@ -143,7 +268,17 @@ export function LeaderboardPanel() {
       </div>
 
       <div className="mb-[22px]">
-        <LeaderboardTabs active="daily" />
+        <LeaderboardTabs active="daily" groupHref={createdGroup ? `/ranking?group=${encodeURIComponent(createdGroup.inviteCode)}` : "/ranking#group"} />
+      </div>
+
+      <div className="mb-6">
+        <GroupInviteCard
+          inviteUrl={createdGroup?.inviteUrl}
+          pending={groupPending}
+          message={groupMessage}
+          onCreate={createGroup}
+          onCopy={() => copyGroupLink()}
+        />
       </div>
 
       <div className="mb-6 space-y-1">

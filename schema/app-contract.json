@@ -35,10 +35,10 @@
       "google_sign_in",
       "nickname_setup",
       "daily_winner_message",
-      "daily_puzzle_feedback"
+      "daily_puzzle_feedback",
+      "group_ranking_full_flow"
     ],
     "deferred": [
-      "group_ranking_full_flow",
       "admin_review_web_ui",
       "season_ranking",
       "puzzle_generation_ui",
@@ -68,8 +68,8 @@
         "path": "/ranking",
         "file": "src/app/ranking/page.tsx",
         "auth": "optional",
-        "states": ["loading", "ready", "empty", "privacy_prompt", "feedback_locked", "feedback_ready"],
-        "designScreens": ["Daily Ranking", "Ranking Empty State"]
+        "states": ["loading", "ready", "empty", "privacy_prompt", "feedback_locked", "feedback_ready", "group_ready", "group_join_required"],
+        "designScreens": ["Daily Ranking", "Group Ranking", "Ranking Empty State"]
       },
       {
         "name": "Sign In",
@@ -182,6 +182,36 @@
           { "column": "submitted_at", "direction": "asc" }
         ],
         "mustNotExpose": ["email", "submitted_answer", "normalized_answer", "device_hash", "ip_hash", "user_agent_hash"]
+      },
+      {
+        "name": "Group Leaderboard",
+        "method": "GET",
+        "path": "/api/leaderboard/group",
+        "file": "src/app/api/leaderboard/group/route.ts",
+        "auth": "optional",
+        "requires": ["invite_code"],
+        "order": [
+          { "column": "used_clue_count", "direction": "asc" },
+          { "column": "elapsed_ms", "direction": "asc" },
+          { "column": "submitted_at", "direction": "asc" }
+        ],
+        "mustNotExpose": ["email", "submitted_answer", "normalized_answer", "device_hash", "ip_hash", "user_agent_hash"]
+      },
+      {
+        "name": "Create Ranking Group",
+        "method": "POST",
+        "path": "/api/groups",
+        "file": "src/app/api/groups/route.ts",
+        "auth": "required",
+        "requires": ["profile", "active_publication"]
+      },
+      {
+        "name": "Join Ranking Group",
+        "method": "POST",
+        "path": "/api/groups/join",
+        "file": "src/app/api/groups/join/route.ts",
+        "auth": "required",
+        "requires": ["profile", "invite_code", "active_publication"]
       },
       {
         "name": "Current Winner Message",

@@ -347,6 +347,13 @@
     "winnerDoesNotLockPlay": true,
     "rankingRequiresAuthenticatedProfile": true,
     "groupParticipationRequiresAuthenticatedProfile": true,
+    "groupRanking": {
+      "requiresAuthenticatedProfile": true,
+      "inviteCodeLink": true,
+      "scopedToActivePublication": true,
+      "publicFields": ["nickname_snapshot", "used_clue_count", "elapsed_ms", "submitted_at"],
+      "hiddenWhenEmpty": false
+    },
     "dailyWinnerMessage": {
       "maxLength": 100,
       "requiresAuthenticatedProfile": true,

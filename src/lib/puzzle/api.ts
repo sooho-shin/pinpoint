@@ -53,6 +53,14 @@ type PuzzleFeedbackRow = {
   created_at: string;
 };
 
+type GroupRow = {
+  id: string;
+  owner_user_id: string;
+  publication_id: string;
+  name: string | null;
+  invite_code: string;
+};
+
 type Actor = {
   userId: string | null;
   anonymousSessionId: string | null;
@@ -62,6 +70,11 @@ const TERMINAL_STATUSES = new Set(["succeeded", "failed", "abandoned"]);
 const COMPLETED_FEEDBACK_STATUSES = new Set(["succeeded", "failed"]);
 const FEEDBACK_REACTIONS = new Set<PuzzleFeedbackReaction>(["easy", "good", "hard", "tricky", "fun"]);
 const ANONYMOUS_SESSION_COOKIE = "pinpoint_anon_session";
+
+function createInviteCode() {
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  return Array.from(bytes, (byte) => byte.toString(36).padStart(2, "0")).join("").slice(0, 10);
+}
 
 function asClues(value: unknown) {
   if (!Array.isArray(value)) return [];
@@ -357,6 +370,52 @@ async function createLeaderboardEntry(attempt: AttemptRow, nickname: string, ran
   throw error;
 }
 
+async function getVisibleLeaderboardEntry(publicationId: string, userId: string) {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("leaderboard_entries")
+    .select("id")
+    .eq("publication_id", publicationId)
+    .eq("user_id", userId)
+    .eq("rank_status", "visible")
+    .maybeSingle();
+  if (error) throw error;
+  return data ? String(data.id) : null;
+}
+
+async function syncUserGroupLeaderboardEntries(publicationId: string, userId: string) {
+  const leaderboardEntryId = await getVisibleLeaderboardEntry(publicationId, userId);
+  if (!leaderboardEntryId) return;
+
+  const admin = createAdminClient();
+  const { data: memberships, error: membershipError } = await admin
+    .from("group_members")
+    .select("group_id")
+    .eq("user_id", userId);
+  if (membershipError) throw membershipError;
+
+  const groupIds = [...new Set((memberships ?? []).map((row) => String(row.group_id)))];
+  if (groupIds.length === 0) return;
+
+  const { data: groups, error: groupError } = await admin
+    .from("groups")
+    .select("id")
+    .eq("publication_id", publicationId)
+    .in("id", groupIds);
+  if (groupError) throw groupError;
+
+  const rows = (groups ?? []).map((group) => ({
+    group_id: String(group.id),
+    leaderboard_entry_id: leaderboardEntryId
+  }));
+  if (rows.length === 0) return;
+
+  const { error } = await admin
+    .from("group_leaderboard_entries")
+    .upsert(rows, { onConflict: "group_id,leaderboard_entry_id", ignoreDuplicates: true });
+  if (error) throw error;
+}
+
 async function canWriteWinnerMessage(publicationId: string, userId?: string | null) {
   if (!userId) return false;
   const admin = createAdminClient();
@@ -421,7 +480,10 @@ async function claimAnonymousAttempt(publicationId: string, actor: Actor) {
     if (profile) {
       const elapsedMs = Number(claimed.elapsed_ms ?? 0);
       const rankStatus = elapsedMs < 1000 ? "flagged" : "visible";
-      await createLeaderboardEntry(claimed, profile.nickname, rankStatus);
+      const created = await createLeaderboardEntry(claimed, profile.nickname, rankStatus);
+      if (created && rankStatus === "visible") {
+        await syncUserGroupLeaderboardEntries(publicationId, actor.userId);
+      }
       const { data: ranked, error: rankUpdateError } = await admin
         .from("attempts")
         .update({
@@ -508,7 +570,10 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
   const updatedAttempt = updated as AttemptRow;
 
   if (canRank && profile) {
-    await createLeaderboardEntry(updatedAttempt, profile.nickname, rankStatus);
+    const created = await createLeaderboardEntry(updatedAttempt, profile.nickname, rankStatus);
+    if (created && rankStatus === "visible" && actor.userId) {
+      await syncUserGroupLeaderboardEntries(publication.id, actor.userId);
+    }
   }
 
   const terminal = nextStatus !== "playing";
@@ -569,6 +634,201 @@ export async function getDailyLeaderboard() {
     rows,
     myRank,
     canWriteWinnerMessage: await canWriteWinnerMessage(publication.id, actor.userId)
+  };
+}
+
+async function getGroupByInviteCode(inviteCode: string) {
+  const { publication } = await getTodayPublication();
+  if (!publication) return { publication: null, group: null };
+
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("groups")
+    .select("id,owner_user_id,publication_id,name,invite_code")
+    .eq("publication_id", publication.id)
+    .eq("invite_code", inviteCode)
+    .maybeSingle();
+  if (error) throw error;
+
+  return {
+    publication,
+    group: data as GroupRow | null
+  };
+}
+
+async function addGroupMemberAndProjection(group: GroupRow, userId: string) {
+  const admin = createAdminClient();
+  const { error: memberError } = await admin
+    .from("group_members")
+    .upsert({ group_id: group.id, user_id: userId }, { onConflict: "group_id,user_id", ignoreDuplicates: true });
+  if (memberError) throw memberError;
+
+  await syncUserGroupLeaderboardEntries(group.publication_id, userId);
+}
+
+export async function createRankingGroup(input: { name?: string }) {
+  const actor = await getActor();
+  if (!actor.userId) return { ok: false, error: "로그인이 필요합니다.", requiresSignIn: true };
+
+  const { publication } = await getTodayPublication();
+  if (!publication) return { ok: false, error: "오늘 공개된 문제가 없습니다." };
+
+  const profile = await getProfile(actor.userId);
+  if (!profile) return { ok: false, error: "닉네임 설정이 필요합니다.", requiresNickname: true };
+
+  const trimmedName = String(input.name ?? "").trim();
+  const groupName = trimmedName.length > 0 ? trimmedName.slice(0, 24) : `${profile.nickname}의 그룹`;
+  const admin = createAdminClient();
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const inviteCode = createInviteCode();
+    const { data, error } = await admin
+      .from("groups")
+      .insert({
+        owner_user_id: actor.userId,
+        publication_id: publication.id,
+        name: groupName,
+        invite_code: inviteCode
+      })
+      .select("id,owner_user_id,publication_id,name,invite_code")
+      .single();
+
+    if (error && String(error.code) === "23505") continue;
+    if (error) throw error;
+
+    const group = data as GroupRow;
+    await addGroupMemberAndProjection(group, actor.userId);
+    return {
+      ok: true,
+      group: {
+        id: group.id,
+        name: group.name ?? "그룹 랭킹",
+        inviteCode: group.invite_code
+      }
+    };
+  }
+
+  return { ok: false, error: "초대 코드를 만들지 못했습니다. 다시 시도해 주세요." };
+}
+
+export async function joinRankingGroup(inviteCode: string) {
+  const code = inviteCode.trim();
+  if (!code) return { ok: false, error: "초대 코드가 필요합니다." };
+
+  const actor = await getActor();
+  if (!actor.userId) return { ok: false, error: "로그인이 필요합니다.", requiresSignIn: true };
+
+  const profile = await getProfile(actor.userId);
+  if (!profile) return { ok: false, error: "닉네임 설정이 필요합니다.", requiresNickname: true };
+
+  const { group } = await getGroupByInviteCode(code);
+  if (!group) return { ok: false, error: "오늘 문제의 그룹 초대 링크가 아닙니다." };
+
+  await addGroupMemberAndProjection(group, actor.userId);
+  return {
+    ok: true,
+    group: {
+      id: group.id,
+      name: group.name ?? "그룹 랭킹",
+      inviteCode: group.invite_code
+    }
+  };
+}
+
+export async function getGroupLeaderboard(inviteCode: string) {
+  const code = inviteCode.trim();
+  const actor = await getActor();
+  const { publishDateKst, publication } = await getTodayPublication();
+  if (!publication) {
+    return { status: "no_puzzle", publishDateKst, rows: [], group: null };
+  }
+  if (!code) {
+    return { status: "missing_code", publishDateKst, rows: [], group: null, message: "그룹 초대 링크가 필요합니다." };
+  }
+
+  const { group } = await getGroupByInviteCode(code);
+  if (!group) {
+    return {
+      status: "not_found",
+      publishDateKst: publication.publish_date_kst,
+      rows: [],
+      group: null,
+      message: "오늘 문제의 그룹 초대 링크가 아닙니다."
+    };
+  }
+
+  if (!actor.userId) {
+    return {
+      status: "requires_sign_in",
+      publishDateKst: publication.publish_date_kst,
+      rows: [],
+      group: { id: group.id, name: group.name ?? "그룹 랭킹", inviteCode: group.invite_code },
+      message: "로그인하면 이 그룹 랭킹에 참여할 수 있습니다.",
+      requiresSignIn: true
+    };
+  }
+
+  const profile = await getProfile(actor.userId);
+  if (!profile) {
+    return {
+      status: "requires_nickname",
+      publishDateKst: publication.publish_date_kst,
+      rows: [],
+      group: { id: group.id, name: group.name ?? "그룹 랭킹", inviteCode: group.invite_code },
+      message: "닉네임을 설정하면 이 그룹 랭킹에 참여할 수 있습니다.",
+      requiresNickname: true
+    };
+  }
+
+  await addGroupMemberAndProjection(group, actor.userId);
+
+  const admin = createAdminClient();
+  const { data: links, error: linkError } = await admin
+    .from("group_leaderboard_entries")
+    .select("leaderboard_entry_id")
+    .eq("group_id", group.id);
+  if (linkError) throw linkError;
+
+  const leaderboardEntryIds = (links ?? []).map((row) => String(row.leaderboard_entry_id));
+  if (leaderboardEntryIds.length === 0) {
+    return {
+      status: "ready",
+      publishDateKst: publication.publish_date_kst,
+      rows: [],
+      group: { id: group.id, name: group.name ?? "그룹 랭킹", inviteCode: group.invite_code },
+      isMember: true,
+      myRank: null
+    };
+  }
+
+  const { data, error } = await admin
+    .from("leaderboard_entries")
+    .select("id,user_id,nickname_snapshot,used_clue_count,elapsed_ms,submitted_at")
+    .in("id", leaderboardEntryIds)
+    .eq("rank_status", "visible")
+    .order("used_clue_count", { ascending: true })
+    .order("elapsed_ms", { ascending: true })
+    .order("submitted_at", { ascending: true })
+    .limit(50);
+  if (error) throw error;
+
+  const rows = (data ?? []).map((row, index) => ({
+    id: String(row.id),
+    rank: index + 1,
+    nickname: String(row.nickname_snapshot),
+    usedClueCount: Number(row.used_clue_count),
+    elapsedMs: Number(row.elapsed_ms),
+    submittedAt: String(row.submitted_at),
+    isMe: row.user_id === actor.userId
+  }));
+
+  return {
+    status: "ready",
+    publishDateKst: publication.publish_date_kst,
+    rows,
+    group: { id: group.id, name: group.name ?? "그룹 랭킹", inviteCode: group.invite_code },
+    isMember: true,
+    myRank: rows.find((row) => row.isMe) ?? null
   };
 }
 

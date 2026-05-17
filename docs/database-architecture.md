@@ -175,15 +175,15 @@ scheduled -> published
 
 ### groups
 
-공유 링크 또는 초대 코드로 만들어진 그룹 랭킹 컨테이너다. MVP에서는 특정 `puzzle_publication`에 종속된 일회성 그룹을 기본값으로 둔다.
+공유 링크 또는 초대 코드로 만들어진 그룹 랭킹 컨테이너다. MVP에서는 특정 `puzzle_publication`에 종속된 일회성 그룹을 기본값으로 둔다. 그룹 생성자는 로그인 + 닉네임 설정을 완료해야 하며, `invite_code`는 `/ranking?group={invite_code}` 링크에 사용한다.
 
 ### group_members
 
-그룹 참여자 목록이다. 같은 사용자가 같은 그룹에 중복 참여할 수 없다.
+그룹 참여자 목록이다. 같은 사용자가 같은 그룹에 중복 참여할 수 없다. 초대 링크로 들어온 로그인 + 닉네임 사용자는 이 테이블에 upsert된다.
 
 ### group_leaderboard_entries
 
-그룹에 노출되는 랭킹 항목이다. 실제 점수와 정렬 필드는 `leaderboard_entries`를 참조한다.
+그룹에 노출되는 랭킹 항목이다. 실제 점수와 정렬 필드는 `leaderboard_entries`를 참조한다. 멤버가 이미 오늘 visible 랭킹 기록을 갖고 있으면 그룹 참여 시 연결하고, 그룹 참여 후 문제를 성공하면 성공 시점에 속한 그룹들에 연결한다.
 
 ## 공개/비공개 정책
 
