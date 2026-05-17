@@ -8,7 +8,7 @@ export function GameGuideTooltip() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative mb-4 flex justify-end">
+    <div className="relative">
       <IconButton
         type="button"
         aria-expanded={open}
