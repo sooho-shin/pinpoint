@@ -13,6 +13,24 @@ function safeNextPath(value: FormDataEntryValue | null) {
   return next;
 }
 
+function getRequestOrigin(headerStore: Headers) {
+  const origin = headerStore.get("origin");
+  if (origin && !origin.includes("localhost")) return origin;
+
+  const forwardedHost = headerStore.get("x-forwarded-host");
+  const forwardedProto = headerStore.get("x-forwarded-proto") ?? "https";
+  if (forwardedHost) return `${forwardedProto}://${forwardedHost}`;
+
+  const host = headerStore.get("host");
+  if (host) {
+    const protocol = host.includes("localhost") ? "http" : "https";
+    return `${protocol}://${host}`;
+  }
+
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
+}
+
 export async function signInWithGoogle(formData: FormData) {
   const nickname = String(formData.get("nickname") ?? "").trim();
   const next = safeNextPath(formData.get("next"));
@@ -31,7 +49,7 @@ export async function signInWithGoogle(formData: FormData) {
 
   const supabase = await createSupabaseServerClient();
   const headerStore = await headers();
-  const origin = headerStore.get("origin") ?? "http://localhost:3000";
+  const origin = getRequestOrigin(headerStore);
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
