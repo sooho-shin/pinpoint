@@ -67,8 +67,8 @@ function getGroupUrl(inviteCode: string) {
   return `${window.location.origin}/ranking?group=${encodeURIComponent(inviteCode)}`;
 }
 
-export function LeaderboardPanel({ groupCode }: { groupCode?: string }) {
-  const isGroupMode = Boolean(groupCode);
+export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode?: string; activeTab?: "daily" | "group" }) {
+  const isGroupMode = activeTab === "group";
   const [state, setState] = useState<LeaderboardState>({ status: "loading" });
   const [groupState, setGroupState] = useState<GroupLeaderboardState>({ status: "loading" });
   const [message, setMessage] = useState("");
@@ -109,7 +109,7 @@ export function LeaderboardPanel({ groupCode }: { groupCode?: string }) {
         setState({ status: "error", message: error.message });
       }
     });
-  }, [groupCode]);
+  }, [activeTab, groupCode]);
 
   async function createGroup() {
     setGroupPending(true);
@@ -197,7 +197,7 @@ export function LeaderboardPanel({ groupCode }: { groupCode?: string }) {
         </div>
 
         <div className="mb-[22px]">
-          <LeaderboardTabs active="group" groupHref={groupState.group ? `/ranking?group=${encodeURIComponent(groupState.group.inviteCode)}` : "/ranking#group"} />
+          <LeaderboardTabs active="group" groupHref={groupState.group ? `/ranking?group=${encodeURIComponent(groupState.group.inviteCode)}` : "/ranking?tab=group"} />
         </div>
 
         {groupState.status === "ready" ? (
@@ -217,6 +217,14 @@ export function LeaderboardPanel({ groupCode }: { groupCode?: string }) {
               )}
             </div>
           </>
+        ) : groupState.status === "missing_code" ? (
+          <GroupInviteCard
+            inviteUrl={createdGroup?.inviteUrl}
+            pending={groupPending}
+            message={groupMessage || "초대 링크를 만들면 친구들과 오늘 기록을 비교할 수 있습니다."}
+            onCreate={createGroup}
+            onCopy={() => copyGroupLink()}
+          />
         ) : (
           <div className="muted-surface p-4">
             <p className="text-sm leading-5 text-[var(--text-secondary)]">{groupState.message ?? "그룹 랭킹에 참여할 수 없습니다."}</p>
@@ -268,17 +276,7 @@ export function LeaderboardPanel({ groupCode }: { groupCode?: string }) {
       </div>
 
       <div className="mb-[22px]">
-        <LeaderboardTabs active="daily" groupHref={createdGroup ? `/ranking?group=${encodeURIComponent(createdGroup.inviteCode)}` : "/ranking#group"} />
-      </div>
-
-      <div className="mb-6">
-        <GroupInviteCard
-          inviteUrl={createdGroup?.inviteUrl}
-          pending={groupPending}
-          message={groupMessage}
-          onCreate={createGroup}
-          onCopy={() => copyGroupLink()}
-        />
+        <LeaderboardTabs active="daily" groupHref="/ranking?tab=group" />
       </div>
 
       <div className="mb-6 space-y-1">
