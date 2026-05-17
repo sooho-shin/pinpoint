@@ -3,6 +3,8 @@ import Link from "next/link";
 import Script from "next/script";
 import "./globals.css";
 
+const DEFAULT_ADSENSE_CLIENT = "ca-pub-4621241846705196";
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://pinpoint-seven.vercel.app"),
   title: {
@@ -36,10 +38,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-  const adsenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT;
+  const adsenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT ?? DEFAULT_ADSENSE_CLIENT;
 
   return (
     <html lang="ko">
+      <head>
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>
         {gaMeasurementId ? (
           <>
@@ -56,13 +65,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               `}
             </Script>
           </>
-        ) : null}
-        {adsenseClient ? (
-          <Script
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
-            strategy="afterInteractive"
-            crossOrigin="anonymous"
-          />
         ) : null}
         {children}
         <footer className="site-footer" aria-label="사이트 정보">
