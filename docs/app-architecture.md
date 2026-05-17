@@ -130,6 +130,9 @@ Today Puzzle 화면이다.
 - visible 랭킹 목록
 - 내 기록 강조
 - 로그인 사용자라면 내 기록 강조
+- 오늘 문제를 완료한 로그인 사용자에게 문제 평가/한마디 작성 영역
+- 오늘 문제를 완료한 사용자에게 visible 평가 목록
+- 아직 완료하지 않은 사용자에게는 평가 목록 대신 완료 후 확인 가능 안내
 
 정렬:
 
@@ -138,6 +141,15 @@ used_clue_count asc
 elapsed_ms asc
 submitted_at asc
 ```
+
+평가/한마디 정책:
+
+- 작성은 로그인 + 닉네임 + 오늘 문제 완료 attempt가 필요하다.
+- 조회도 오늘 문제 완료자에게만 허용한다.
+- 한 사용자는 같은 공개 문제에 하나의 평가만 남긴다.
+- 다시 제출하면 기존 평가를 수정한다.
+- `comment`는 1~140자다.
+- 정답, aliases, 제출 답안, 이메일, 해시 식별자는 평가 응답에 포함하지 않는다.
 
 ### `/signin`
 
@@ -257,6 +269,55 @@ Google OAuth를 먼저 시작한다. 신규 사용자처럼 프로필 닉네임�
 - daily rank 1 검증
 - `visible_until`은 다음 공개 전까지로 설정
 
+### `GET /api/puzzle-feedback/daily`
+
+오늘 문제의 visible 평가 목록을 반환한다.
+
+서버 책임:
+
+- 오늘 publication 조회
+- 현재 사용자의 로그인 상태 확인
+- 현재 사용자가 오늘 문제를 완료했는지 확인
+- 완료하지 않은 사용자는 목록 대신 작성/조회 불가 상태를 반환
+- visible 평가만 최신순으로 반환
+
+반환 가능:
+
+- `canRead`
+- `canWrite`
+- `items[].id`
+- `items[].nickname`
+- `items[].rating` 또는 `items[].reaction`
+- `items[].comment`
+- `items[].created_at`
+- `myFeedback`
+
+반환 금지:
+
+- email
+- answer
+- aliases
+- submitted_answer
+- normalized_answer
+- device_hash
+- ip_hash
+- user_agent_hash
+
+### `POST /api/puzzle-feedback`
+
+오늘 문제를 완료한 로그인 사용자가 평가와 한마디를 작성하거나 수정한다.
+
+서버 책임:
+
+- 로그인 확인
+- 닉네임 확인
+- 오늘 publication 조회
+- 현재 사용자의 오늘 문제 완료 attempt 확인
+- `rating/reaction` 허용값 검증
+- `comment` 1~140자 검증
+- `publication_id, user_id` 기준 upsert
+- 응답에서 정답, 제출 답안, 이메일, 해시 식별자를 제외
+
 ## 구현 파일 구조
 
 권장 구조:
@@ -276,6 +337,8 @@ src/app/
   api/leaderboard/daily/route.ts
   api/winner-message/current/route.ts
   api/winner-message/route.ts
+  api/puzzle-feedback/daily/route.ts
+  api/puzzle-feedback/route.ts
 src/components/
   atoms/
   molecules/

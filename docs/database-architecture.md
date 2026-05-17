@@ -144,6 +144,34 @@ scheduled -> published
 - 운영자는 `message_status = hidden`으로 부적절한 메시지를 숨길 수 있다.
 - 이메일, 제출 답안, 해시 식별자는 이 테이블과 공개 API에 포함하지 않는다.
 
+### daily_puzzle_feedback
+
+오늘 문제를 완료한 로그인 사용자가 랭킹 화면에서 남기는 평가와 한마디다. `daily_winner_messages`가 1등 전용 보상이라면, 이 테이블은 완료자끼리 문제 경험을 공유하는 소통 데이터다.
+
+권장 컬럼:
+
+- `id`
+- `publication_id`: `puzzle_publications.id` 참조
+- `user_id`: `profiles.id` 참조
+- `attempt_id`: `attempts.id` 참조. 해당 사용자가 오늘 문제를 완료했는지 검증하는 기준으로 사용한다.
+- `nickname_snapshot`: 작성 시점의 표시명
+- `rating` 또는 `reaction`: 문제 평가 값. 예: `easy`, `good`, `hard`, `tricky`, `fun`
+- `comment`: 1~140자 한마디
+- `feedback_status`: `visible`, `hidden`
+- `created_at`
+- `updated_at`
+
+주요 정책:
+
+- `publication_id, user_id` 조합은 unique다. 같은 사용자는 같은 공개 문제에 하나의 평가만 남긴다.
+- 작성은 로그인 + 닉네임 + 오늘 문제 완료 attempt가 있는 사용자에게만 허용한다.
+- 조회도 오늘 문제를 완료한 사용자에게만 허용한다. 비완료자에게는 목록을 반환하지 않는다.
+- 공개 API는 `nickname_snapshot`, `rating/reaction`, `comment`, `created_at`만 반환한다.
+- `comment`는 1~140자로 제한한다.
+- 운영자는 `feedback_status = hidden`으로 부적절하거나 스포일러가 포함된 평가를 숨길 수 있다.
+- 이메일, 제출 답안, 정답, aliases, 해시 식별자는 이 테이블과 공개 API에 포함하지 않는다.
+- dev reset은 오늘 publication의 평가 row를 함께 삭제한다.
+
 ### groups
 
 공유 링크 또는 초대 코드로 만들어진 그룹 랭킹 컨테이너다. MVP에서는 특정 `puzzle_publication`에 종속된 일회성 그룹을 기본값으로 둔다.
@@ -162,6 +190,7 @@ scheduled -> published
 - API가 이메일을 필요로 하면 인증 제공자의 사용자 객체에서 서버 내부 용도로만 읽는다.
 - 공개 랭킹 API는 `nickname`, `used_clue_count`, `elapsed_ms`, `submitted_at`, `rank_status`만 반환한다.
 - 공개 확성기 API는 `nickname`, `message`, `visible_until`만 반환한다.
+- 완료자 전용 평가 API는 `nickname`, `rating/reaction`, `comment`, `created_at`만 반환한다.
 - `attempts.submitted_answer`는 기본적으로 본인과 운영자만 볼 수 있다.
 
 ## 부정 방지 정책
