@@ -124,6 +124,17 @@ Supabase callback URL:
 https://ktbwxwzxsljjhtallios.supabase.co/auth/v1/callback
 ```
 
+Supabase Auth URL 설정:
+
+```text
+Site URL: https://pinpoint-seven.vercel.app
+Additional Redirect URLs:
+https://pinpoint-seven.vercel.app/auth/callback
+http://localhost:3000/auth/callback
+```
+
+Vercel 환경 변수 `NEXT_PUBLIC_SITE_URL`도 운영에서는 반드시 `https://pinpoint-seven.vercel.app`로 둔다.
+
 ### 2. 프론트엔드 구현
 
 Figma 기준으로 다음 화면을 구현한다.

@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { getPublicSiteOrigin } from "@/lib/site-url";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function safeNextPath(value: string | null) {
@@ -8,12 +9,17 @@ function safeNextPath(value: string | null) {
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
+  const origin = getPublicSiteOrigin(request.headers);
   const code = url.searchParams.get("code");
   const next = safeNextPath(url.searchParams.get("next"));
 
   if (code) {
     const supabase = await createSupabaseServerClient();
-    await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) {
+      return NextResponse.redirect(new URL(`/signin?error=oauth&next=${encodeURIComponent(next)}`, origin));
+    }
+
     const {
       data: { user }
     } = await supabase.auth.getUser();
@@ -26,12 +32,12 @@ export async function GET(request: NextRequest) {
         .maybeSingle();
 
       if (!profile?.nickname) {
-        return NextResponse.redirect(new URL(`/nickname?next=${encodeURIComponent(next)}`, url.origin));
+        return NextResponse.redirect(new URL(`/nickname?next=${encodeURIComponent(next)}`, origin));
       }
 
-      return NextResponse.redirect(new URL(next, url.origin));
+      return NextResponse.redirect(new URL(next, origin));
     }
   }
 
-  return NextResponse.redirect(new URL(next, url.origin));
+  return NextResponse.redirect(new URL(next, origin));
 }
