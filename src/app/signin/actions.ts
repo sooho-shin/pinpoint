@@ -21,13 +21,20 @@ function getRequestOrigin(headerStore: Headers) {
   const forwardedProto = headerStore.get("x-forwarded-proto") ?? "https";
   if (forwardedHost) return `${forwardedProto}://${forwardedHost}`;
 
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+
   const host = headerStore.get("host");
   if (host) {
+    if (process.env.NODE_ENV === "production" && host.includes("localhost")) {
+      throw new Error("Production sign-in request resolved to localhost.");
+    }
     const protocol = host.includes("localhost") ? "http" : "https";
     return `${protocol}://${host}`;
   }
 
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Production sign-in request is missing origin headers.");
+  }
   return "http://localhost:3000";
 }
 
