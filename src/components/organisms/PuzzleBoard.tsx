@@ -68,6 +68,7 @@ export function PuzzleBoard() {
           "비로그인 상태에서는 오늘의 랭킹 등록과 1등 확성기 메시지를 사용할 수 없습니다.\n\n정답 후 기록을 올리려면 로그인과 닉네임 설정이 필요합니다. 그대로 비로그인으로 진행할까요?"
         );
         if (!shouldContinue) {
+          window.location.assign(`${window.location.origin}/signin?next=/`);
           return;
         }
         sessionStorage.setItem(promptKey, "1");
