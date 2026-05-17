@@ -3,7 +3,7 @@ import { LegalTemplate } from "@/components/templates/LegalTemplate";
 
 export const metadata: Metadata = {
   title: "이용약관",
-  description: "Pinpoint 이용약관"
+  description: "Narrow 이용약관"
 };
 
 export default function TermsPage() {
@@ -16,7 +16,7 @@ export default function TermsPage() {
         {
           title: "서비스 목적",
           paragraphs: [
-            "Pinpoint는 매일 공개되는 한국어 연상 퍼즐을 플레이하고 결과를 공유할 수 있는 웹 서비스입니다.",
+            "Narrow는 매일 공개되는 한국어 연상 퍼즐을 플레이하고 결과를 공유할 수 있는 웹 서비스입니다.",
             "서비스 내용과 제공 방식은 운영 상황에 따라 변경될 수 있습니다."
           ]
         },
@@ -30,7 +30,7 @@ export default function TermsPage() {
         {
           title: "콘텐츠와 랭킹",
           paragraphs: [
-            "퍼즐, 단서, 화면 구성 등 서비스 콘텐츠의 권리는 Pinpoint 또는 정당한 권리자에게 있습니다.",
+            "퍼즐, 단서, 화면 구성 등 서비스 콘텐츠의 권리는 Narrow 또는 정당한 권리자에게 있습니다.",
             "랭킹과 기록은 기술적 오류, 부정 이용, 운영상 필요가 있을 때 수정 또는 삭제될 수 있습니다."
           ]
         },

@@ -3,7 +3,7 @@ import { LegalTemplate } from "@/components/templates/LegalTemplate";
 
 export const metadata: Metadata = {
   title: "개인정보처리방침",
-  description: "Pinpoint 개인정보처리방침"
+  description: "Narrow 개인정보처리방침"
 };
 
 export default function PrivacyPage() {
@@ -16,7 +16,7 @@ export default function PrivacyPage() {
         {
           title: "수집하는 정보",
           paragraphs: [
-            "Pinpoint는 오늘의 퍼즐 풀이, 랭킹 표시, 로그인 상태 유지를 위해 필요한 최소한의 정보를 처리합니다.",
+            "Narrow는 오늘의 퍼즐 풀이, 랭킹 표시, 로그인 상태 유지를 위해 필요한 최소한의 정보를 처리합니다.",
             "Google 로그인 시 Supabase Auth를 통해 사용자 식별자, 이름, 프로필 이미지 등 Google 계정에서 제공되는 기본 프로필 정보가 처리될 수 있습니다.",
             "비로그인 플레이에서는 같은 브라우저의 오늘 풀이를 구분하기 위한 익명 세션 정보가 사용될 수 있습니다."
           ]

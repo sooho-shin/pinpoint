@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "문의",
-  description: "Pinpoint 문의"
+  description: "Narrow 문의"
 };
 
 export default function ContactPage() {

@@ -8,15 +8,15 @@ const DEFAULT_ADSENSE_CLIENT = "ca-pub-4621241846705196";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://pinpoint-seven.vercel.app"),
   title: {
-    default: "Pinpoint",
-    template: "%s | Pinpoint"
+    default: "Narrow",
+    template: "%s | Narrow"
   },
   description: "매일 오후 5시, 단서로 맞히는 한국어 연상 퍼즐",
   openGraph: {
-    title: "Pinpoint",
+    title: "Narrow",
     description: "매일 오후 5시, 단서로 맞히는 오늘의 정답",
     url: "/",
-    siteName: "Pinpoint",
+    siteName: "Narrow",
     locale: "ko_KR",
     type: "website",
     images: [
@@ -24,13 +24,13 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Pinpoint 한국어 일일 연상 퍼즐"
+        alt: "Narrow 한국어 일일 연상 퍼즐"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pinpoint",
+    title: "Narrow",
     description: "매일 오후 5시, 단서로 맞히는 오늘의 정답",
     images: ["/og.png"]
   }

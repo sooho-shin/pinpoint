@@ -11,7 +11,7 @@ type GameHeaderProps = {
   showShare?: boolean;
 };
 
-export function GameHeader({ eyebrow, title = "Pinpoint", action = "ranking", showGuide = false, showShare = false }: GameHeaderProps) {
+export function GameHeader({ eyebrow, title = "Narrow", action = "ranking", showGuide = false, showShare = false }: GameHeaderProps) {
   const ActionIcon = action === "home" ? Home : Trophy;
   const actionHref = action === "home" ? "/" : "/ranking";
   const actionLabel = action === "home" ? "메인으로 돌아가기" : "오늘의 랭킹";

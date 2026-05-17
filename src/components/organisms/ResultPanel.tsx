@@ -49,7 +49,7 @@ export function ResultPanel() {
   const shareText = useMemo(() => {
     if (!result || !result.answer) return "";
     const mark = result.status === "succeeded" ? `${result.usedClueCount}/5` : "실패";
-    return `Pinpoint ${mark}\n정답: ${result.answer}\n단서: ${result.clues.join(" / ")}`;
+    return `Narrow ${mark}\n정답: ${result.answer}\n단서: ${result.clues.join(" / ")}`;
   }, [result]);
 
   async function shareResult() {
@@ -58,7 +58,7 @@ export function ResultPanel() {
     const text = `${shareText}\n${url}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: "Pinpoint", text, url });
+        await navigator.share({ title: "Narrow", text, url });
       } else {
         await navigator.clipboard.writeText(text);
       }
