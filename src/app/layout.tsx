@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -33,9 +35,42 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const adsenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT;
+
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        {gaMeasurementId ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaMeasurementId}');
+              `}
+            </Script>
+          </>
+        ) : null}
+        {adsenseClient ? (
+          <Script
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+            strategy="afterInteractive"
+            crossOrigin="anonymous"
+          />
+        ) : null}
+        {children}
+        <footer className="site-footer" aria-label="사이트 정보">
+          <Link href="/privacy">개인정보처리방침</Link>
+          <Link href="/terms">이용약관</Link>
+          <Link href="/contact">문의</Link>
+        </footer>
+      </body>
     </html>
   );
 }

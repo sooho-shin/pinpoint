@@ -135,6 +135,16 @@ http://localhost:3000/auth/callback
 
 Vercel 환경 변수 `NEXT_PUBLIC_SITE_URL`도 운영에서는 반드시 `https://pinpoint-seven.vercel.app`로 둔다.
 
+광고와 분석을 켜려면 Vercel 환경 변수에 다음 값을 추가한다.
+
+```text
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-...
+NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT=ca-pub-...
+NEXT_PUBLIC_CONTACT_EMAIL=contact@example.com
+```
+
+`NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT`가 설정되면 AdSense Auto ads 스크립트와 `/ads.txt`가 함께 활성화된다.
+
 ### 2. 프론트엔드 구현
 
 Figma 기준으로 다음 화면을 구현한다.

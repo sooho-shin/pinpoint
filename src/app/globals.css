@@ -42,6 +42,21 @@ textarea {
   font: inherit;
 }
 
+.site-footer {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 24px 32px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.site-footer a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .app-shell {
   min-height: 100vh;
   padding: 32px;
