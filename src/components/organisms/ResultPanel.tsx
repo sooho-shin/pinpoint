@@ -74,6 +74,7 @@ export function ResultPanel() {
       setWinnerMessage("");
       setWinnerPromptOpen(false);
       setResult((current) => current ? { ...current, canWriteWinnerMessage: false } : current);
+      window.location.reload();
     } catch (error) {
       setWinnerFeedback(error instanceof Error ? error.message : "메시지를 등록하지 못했습니다.");
     } finally {
