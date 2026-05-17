@@ -400,6 +400,7 @@ function validateUserScopedPlayModel(contract, issues) {
   const api = contract.apiRequirements || {};
   const expected = {
     dailyPublicationScope: "one_published_puzzle_per_kst_date",
+    activePublicationWindowKst: "17:00_to_next_day_17:00",
     anonymousPlayAllowed: true,
     attemptScope: "publication_id+(user_id|anonymous_session_id)",
     anonymousAttemptClaimedAfterSignin: true,

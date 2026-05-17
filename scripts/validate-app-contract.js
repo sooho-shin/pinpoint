@@ -345,6 +345,7 @@ function validatePlayModel(contract, dbContract, issues) {
   const dbRequirements = dbContract.apiRequirements || {};
   const expected = {
     dailyPublicationScope: "one_published_puzzle_per_kst_date",
+    activePublicationWindowKst: "17:00_to_next_day_17:00",
     attemptScope: "publication_id+(user_id|anonymous_session_id)",
     anonymousAttemptClaimedAfterSignin: true,
     terminalAnonymousAttemptPreventsSigninReplay: true,

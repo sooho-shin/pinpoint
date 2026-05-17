@@ -22,8 +22,10 @@
 
 ## 일일 문제와 플레이 정책
 
-- 하루에 공개되는 문제는 KST 날짜 기준 하나다.
-- 같은 날짜의 공개 문제는 로그인 여부와 관계없이 각자 풀 수 있다.
+- 하루의 기준은 KST 17:00부터 다음날 KST 17:00 직전까지다.
+- `publish_date_kst`는 해당 공개 운영일이 시작된 KST 날짜를 저장한다.
+- KST 00:00이 넘어도 새 공개 시각인 17:00 전까지는 전날 17:00에 공개된 문제가 계속 오늘 문제로 노출된다.
+- 같은 공개 문제는 로그인 여부와 관계없이 각자 풀 수 있다.
 - 한 사용자의 풀이 완료, 실패, 랭킹 등록, 1등 달성은 다른 사용자의 풀이 시작이나 제출을 막지 않는다.
 - 로그인 사용자의 풀이 진행 상태는 `publication_id + user_id` 기준으로 분리한다.
 - 비로그인 사용자의 풀이 진행 상태는 httpOnly 익명 세션 쿠키와 `publication_id + anonymous_session_id` 기준으로 분리한다.
@@ -198,7 +200,7 @@ candidate JSON generated
   -> app /api/today reads the published DB row
 ```
 
-KST 17:00 시점에 오늘 scheduled row가 없으면 스케줄러는 Supabase의 미사용 `generated` 후보 중 품질 기준을 통과한 문제를 선택해 오늘 `published` row를 생성한다. 앱 서버가 별도 루프를 계속 실행하지 않는다. 배포 환경의 cron 또는 외부 스케줄러가 KST 17:00에 공개 API를 한 번 호출한다.
+KST 17:00 시점에 오늘 scheduled row가 없으면 스케줄러는 Supabase의 미사용 `generated` 후보 중 품질 기준을 통과한 문제를 선택해 오늘 `published` row를 생성한다. 앱의 오늘 문제 조회는 현재 KST 시간이 17:00 전이면 전날 `publish_date_kst`, 17:00 이후이면 오늘 `publish_date_kst`를 활성 공개일로 사용한다. 앱 서버가 별도 루프를 계속 실행하지 않는다. 배포 환경의 cron 또는 외부 스케줄러가 KST 17:00에 공개 API를 한 번 호출한다.
 
 ## 성공 조건
 

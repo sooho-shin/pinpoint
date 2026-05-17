@@ -2,7 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { normalizeAnswer } from "@/lib/puzzle/normalize";
-import { getKstDateString, getNextPublicationIso } from "@/lib/puzzle/time";
+import { getActivePublicationDateKst, getNextPublicationIso } from "@/lib/puzzle/time";
 import type {
   NoPuzzleState,
   PublicAttempt,
@@ -125,7 +125,7 @@ async function getActor(): Promise<Actor> {
 
 async function getTodayPublication() {
   const admin = createAdminClient();
-  const publishDateKst = getKstDateString();
+  const publishDateKst = getActivePublicationDateKst();
   const { data: publication, error: publicationError } = await admin
     .from("puzzle_publications")
     .select("id,puzzle_id,publish_date_kst,published_at")

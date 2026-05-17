@@ -84,7 +84,7 @@ generated -> rejected
 
 ### puzzle_publications
 
-특정 문제를 특정 날짜에 공개하는 이벤트다. 하루 한 문제 정책은 `publish_date_kst` 유니크 제약으로 강제한다.
+특정 문제를 특정 운영일에 공개하는 이벤트다. 하루 한 문제 정책은 `publish_date_kst` 유니크 제약으로 강제한다. 여기서 하루는 KST 17:00부터 다음날 KST 17:00 직전까지이며, `publish_date_kst`는 그 운영일이 시작된 KST 날짜다.
 
 `puzzle_publications`는 문제 공개 이벤트일 뿐, 풀이 독점권이 아니다. 하나의 공개 문제는 모든 로그인 사용자와 익명 세션이 각자의 `attempts` row로 풀 수 있어야 한다.
 
@@ -101,7 +101,8 @@ scheduled -> published
 - `publish_date_kst`는 `scheduled_at`을 Asia/Seoul 기준 날짜로 변환해 저장한다.
 - KST 17:00 스케줄러는 오늘 날짜의 `scheduled` row 중 `scheduled_at <= now()`인 row만 `published`로 전환한다.
 - 오늘 row가 없으면 스케줄러는 미사용 `generated` 후보를 선택해 오늘 `published` row를 생성한다.
-- 앱의 오늘 문제 조회는 JSON이 아니라 `puzzle_publications.publish_date_kst = 오늘`과 `status = published` 조건을 기준으로 한다.
+- 앱의 오늘 문제 조회는 JSON이 아니라 활성 공개일의 `puzzle_publications.publish_date_kst`와 `status = published` 조건을 기준으로 한다.
+- 활성 공개일은 현재 KST 시간이 17:00 전이면 전날 날짜, 17:00 이후이면 오늘 날짜다. 따라서 KST 00:00 이후에도 17:00 전까지는 전날 공개 문제가 계속 노출된다.
 - 서비스 role key는 서버 스크립트와 cron route에서만 사용하고 client component 또는 public env로 노출하지 않는다.
 
 ### attempts

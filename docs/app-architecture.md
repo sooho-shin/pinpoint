@@ -73,7 +73,7 @@ Google OAuth는 인증 전용이다. 먼저 Google 로그인을 완료하고, OA
 
 ### 사용자별 일일 풀이
 
-KST 기준 하루에 공개되는 `puzzle_publications`는 하나지만, attempt는 사용자별로 독립된다.
+KST 기준 하루에 공개되는 `puzzle_publications`는 하나지만, attempt는 사용자별로 독립된다. 여기서 하루의 기준은 KST 17:00부터 다음날 KST 17:00 직전까지다. `publish_date_kst`는 공개 운영일이 시작된 KST 날짜이며, `/api/today`, daily ranking, winner message, daily feedback은 현재 KST 시간이 17:00 전이면 전날 `publish_date_kst`, 17:00 이후이면 오늘 `publish_date_kst`를 활성 공개일로 사용한다. KST 00:00 이후에도 17:00 전까지는 전날 17:00에 공개된 문제가 계속 오늘 문제다.
 
 - 같은 `publication_id`를 모든 로그인 사용자와 익명 세션이 각자 풀 수 있어야 한다.
 - 한 사용자의 성공, 실패, terminal attempt, 랭킹 1등 달성은 다른 사용자의 `/api/attempts/start`, `/api/attempts/reveal`, `/api/attempts/submit`을 막지 않는다.
@@ -175,7 +175,7 @@ Google OAuth를 먼저 시작한다. 신규 사용자처럼 프로필 닉네임�
 
 ### `GET /api/today`
 
-오늘 KST 기준 published publication을 반환한다.
+오늘 활성 공개일 기준 published publication을 반환한다. 활성 공개일은 KST 17:00부터 다음날 KST 17:00 직전까지 유지된다.
 
 반환 가능:
 

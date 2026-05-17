@@ -26,13 +26,19 @@ function parseArgs(argv = process.argv.slice(2)) {
   return args;
 }
 
-function getKstDateString(date = new Date()) {
-  return new Intl.DateTimeFormat("en-CA", {
+function getActivePublicationDateKst(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Seoul",
     year: "numeric",
     month: "2-digit",
-    day: "2-digit"
-  }).format(date);
+    day: "2-digit",
+    hour: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(date);
+  const value = (type) => Number(parts.find((part) => part.type === type)?.value);
+  const currentKstDateUtcMs = Date.UTC(value("year"), value("month") - 1, value("day"));
+  const activeDateUtcMs = value("hour") < 17 ? currentKstDateUtcMs - 24 * 60 * 60 * 1000 : currentKstDateUtcMs;
+  return new Date(activeDateUtcMs).toISOString().slice(0, 10);
 }
 
 const supabase = createClient(url, serviceKey, {
@@ -141,7 +147,7 @@ async function deleteAuthUsers() {
 
 async function main() {
   const args = parseArgs();
-  const publishDateKst = args.date ? String(args.date) : getKstDateString();
+  const publishDateKst = args.date ? String(args.date) : getActivePublicationDateKst();
   const resetAuth = Boolean(args.auth);
   const dryRun = Boolean(args["dry-run"]);
 
