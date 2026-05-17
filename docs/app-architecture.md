@@ -8,8 +8,8 @@
 
 - 오늘 공개된 퍼즐을 플레이할 수 있다.
 - 잠긴 단서와 정답은 서버가 허용하기 전까지 노출하지 않는다.
-- 로그인한 사용자만 오늘 공개 문제를 풀 수 있다.
-- Google 로그인 사용자는 닉네임을 설정하고 오늘의 랭킹에 기록할 수 있다.
+- 로그인하지 않은 사용자도 오늘 공개 문제를 바로 풀 수 있다.
+- Google 로그인 사용자는 닉네임을 설정하고 성공 기록을 오늘의 랭킹에 올릴 수 있다.
 - 오늘의 랭킹 1등은 100자 확성기 메시지를 남길 수 있다.
 - 오늘 문제 없음, 실패, 이미 푼 상태를 정상적으로 처리한다.
 
@@ -63,19 +63,23 @@ Supabase browser client로 `puzzles`를 직접 읽는 구현은 금지한다. �
 
 Google OAuth는 인증 전용이다. 가입 시작 화면에서 닉네임을 먼저 입력받고, OAuth 콜백에서 신규 사용자 프로필이 없으면 해당 닉네임으로 `profiles`를 생성한다. 랭킹, 공유, 그룹 화면에는 `profiles.nickname`만 노출한다. 이메일은 API 응답과 UI에 노출하지 않는다.
 
-### 로그인 필수 플레이
+### 익명 플레이와 로그인 랭킹
 
-로그인하지 않은 사용자는 오늘 문제 풀이, 결과 확인, 랭킹 조회에 접근할 수 없다. Today Puzzle, Result, Daily Ranking 화면은 모두 Supabase 세션을 확인한 뒤 세션이 없으면 `/signin`으로 보낸다.
+로그인하지 않은 사용자는 오늘 문제 풀이, 결과 확인, 랭킹 조회에 접근할 수 있다. Today Puzzle, Result, Daily Ranking 화면은 첫 방문자가 10초 안에 플레이를 시작할 수 있도록 로그인 벽을 두지 않는다.
 
-오늘 문제 진행 상태는 `publication_id + user_id` 기준으로 조회한다. httpOnly anonymous session은 MVP 플레이 흐름에서 사용하지 않는다. 랭킹 등록, 그룹 참여, 1등 확성기 메시지는 로그인과 닉네임 설정을 요구한다.
+오늘 문제 진행 상태는 로그인 사용자는 `publication_id + user_id`, 비로그인 사용자는 `publication_id + anonymous_session_id` 기준으로 조회한다. 익명 세션은 서버가 발급한 httpOnly 쿠키로만 관리하고, 클라이언트 JS에서 읽을 수 없게 한다. 랭킹 등록, 그룹 참여, 1등 확성기 메시지는 로그인과 닉네임 설정을 요구한다.
+
+같은 브라우저에서 비로그인으로 시작한 attempt는 로그인 후 계정으로 승계한다. 서버는 로그인 상태에서도 기존 `anonymous_session_id` 쿠키를 확인하고, 오늘 publication에 익명 attempt가 있으며 같은 사용자의 로그인 attempt가 없으면 해당 attempt의 `user_id`를 현재 사용자로 연결한다. 익명 attempt가 이미 `succeeded` 또는 `failed`이면 로그인 후에도 완료 상태를 유지하므로 같은 문제를 새로 풀 수 없다. 익명 성공 attempt는 로그인 후 프로필이 있으면 랭킹 등록 대상으로 승격할 수 있다.
 
 ### 사용자별 일일 풀이
 
 KST 기준 하루에 공개되는 `puzzle_publications`는 하나지만, attempt는 사용자별로 독립된다.
 
-- 같은 `publication_id`를 모든 로그인 사용자가 각자 풀 수 있어야 한다.
+- 같은 `publication_id`를 모든 로그인 사용자와 익명 세션이 각자 풀 수 있어야 한다.
 - 한 사용자의 성공, 실패, terminal attempt, 랭킹 1등 달성은 다른 사용자의 `/api/attempts/start`, `/api/attempts/reveal`, `/api/attempts/submit`을 막지 않는다.
-- attempt 조회와 이어풀기는 `publication_id + user_id` 기준으로만 한다.
+- attempt 조회와 이어풀기는 로그인 사용자는 `publication_id + user_id`, 비로그인 사용자는 `publication_id + anonymous_session_id` 기준으로 한다.
+- 로그인 전 같은 브라우저의 익명 attempt가 있으면 로그인 사용자의 attempt로 먼저 승계한 뒤 조회한다.
+- 같은 publication에 이미 로그인 사용자 attempt가 있으면 그 attempt를 우선하고 익명 attempt는 승계하지 않는다.
 - `leaderboard_entries`는 성공 기록의 projection이며, 게임 플레이 가능 여부를 판단하는 잠금 테이블로 사용하지 않는다.
 - 같은 사용자의 같은 공개 문제 랭킹 기록은 하나만 허용한다.
 
@@ -125,7 +129,7 @@ Today Puzzle 화면이다.
 - 확성기 메시지가 있으면 상단 compact banner
 - visible 랭킹 목록
 - 내 기록 강조
-- 로그인 사용자 기준 랭킹 목록
+- 로그인 사용자라면 내 기록 강조
 
 정렬:
 
@@ -139,7 +143,7 @@ submitted_at asc
 
 Google 로그인 화면이다.
 
-로그인해야 오늘 문제 풀이와 랭킹 조회가 가능하다는 상태를 보여준다.
+로그인하면 성공 기록을 오늘의 랭킹에 올릴 수 있다는 상태를 보여준다.
 
 Google OAuth 시작 전에 닉네임을 필수로 입력받는다. 닉네임은 2~12자의 한국어, 영문, 숫자만 허용한다. 신규 사용자는 콜백에서 이 닉네임으로 프로필이 생성되고, 기존 사용자 프로필은 로그인 시 입력값으로 덮어쓰지 않는다.
 
@@ -184,8 +188,8 @@ Google OAuth 시작 전에 닉네임을 필수로 입력받는다. 닉네임은 
 
 서버 책임:
 
-- 로그인 사용자의 `user_id` 저장
-- 비로그인 요청은 401을 반환
+- 로그인 요청은 `user_id`, 비로그인 요청은 서버 발급 `anonymous_session_id` 저장
+- 비로그인 요청도 새 익명 세션을 발급해 진행한다
 - `started_at`은 서버 시각 사용
 - 이미 terminal attempt가 있으면 기존 상태 반환
 - 다른 사용자의 terminal attempt나 랭킹 기록은 현재 사용자의 시작 가능 여부에 영향을 주지 않음
@@ -218,7 +222,7 @@ Google OAuth 시작 전에 닉네임을 필수로 입력받는다. 닉네임은 
 
 오늘의 visible 랭킹을 반환한다.
 
-비로그인 요청은 401을 반환한다.
+비로그인 요청도 visible 랭킹 목록을 반환한다. 단, `myRank`와 1등 메시지 작성 권한은 로그인 사용자에게만 계산한다.
 
 반환 가능:
 

@@ -44,12 +44,6 @@ npm run puzzles:test
 
 후보 저장은 반드시 `puzzles:harness`를 사용한다. `puzzles:add`는 하네스 내부 또는 디버깅용 저수준 명령이므로 운영 루틴에서 직접 사용하지 않는다.
 
-후보 승인:
-
-```bash
-npm run puzzles:review -- --id <id> --status approved
-```
-
 후보 반려:
 
 ```bash
@@ -62,7 +56,7 @@ npm run puzzles:review -- --id <id> --status rejected --reason "사유"
 npm run puzzles:schedule -- --id <id>
 ```
 
-예약은 `approved` 상태이고 최소 품질 점수 이상인 문제만 가능하다.
+예약은 최소 품질 점수 이상인 `generated` 문제를 바로 사용한다. 별도 승인 단계는 없다.
 
 공개:
 
@@ -91,7 +85,7 @@ npm run db:check
 - Google 로그인 사용자와 공개 닉네임 프로필이 분리되어 있는가
 - 문제 원본과 일일 공개 이벤트가 분리되어 있는가
 - 풀이 기록과 랭킹 노출 데이터가 분리되어 있는가
-- 오늘 공개 문제는 하나지만 모든 로그인 사용자가 각자의 attempt로 풀 수 있는가
+- 오늘 공개 문제는 하나지만 모든 로그인 사용자와 익명 세션이 각자의 attempt로 풀 수 있는가
 - 다른 사용자의 성공/1등/terminal attempt가 현재 사용자의 풀이 시작이나 제출을 막지 않는가
 - 하루 한 문제 공개 제약이 있는가
 - 같은 공개 문제에서 사용자별 랭킹 기록이 하나만 허용되는가
@@ -168,9 +162,40 @@ $make-figma-design
 1. 오후 5시 공개분이 충분한지 확인한다.
 2. 부족하면 후보 문제를 생성하고 dry-run 검증한다.
 3. 통과한 후보를 저장한다.
-4. 운영자가 후보를 읽고 승인 또는 반려한다.
-5. 승인된 문제를 다음 공개일 오후 5시로 예약한다.
-6. 스케줄러 또는 운영자가 `puzzles:publish`를 실행한다.
+4. 품질 기준을 통과한 후보를 다음 공개일 오후 5시로 예약한다.
+5. 문제가 명백히 부적절하면 반려한다.
+6. 예약된 문제를 Supabase에 동기화한다.
+7. 스케줄러 또는 운영자가 KST 오후 5시 이후 DB 공개 명령을 실행한다.
+
+운영 후보 생성/검증은 JSON 파일을 기준으로 한다. 실제 앱은 Supabase DB를 읽으므로, 공개 예약 후에는 반드시 DB 동기화가 필요하다.
+
+```bash
+npm run db:sync-puzzles
+```
+
+이 명령은 `data/puzzle-candidates.ko.json`의 generated/반려 문제와 `data/daily-puzzles.ko.json`의 예약/공개 문제를 Supabase `puzzles`, `puzzle_publications`에 반영한다.
+
+DB 기준 공개:
+
+```bash
+npm run db:publish-daily
+```
+
+이 명령은 KST 오늘 날짜의 `scheduled` publication 중 `scheduled_at <= now()`인 row를 `published`로 바꾼다. 오늘 row가 없으면 Supabase의 미사용 `generated` 후보 중 품질 기준을 통과한 문제를 골라 오늘 `published` row를 만든다. KST 17:00 전에는 실행해도 공개하지 않는다. 수동 테스트는 `-- --force`를 붙인다.
+
+Vercel 배포에서는 `vercel.json`의 cron이 UTC 08:00, 즉 KST 17:00에 `/api/cron/publish-daily`를 호출한다. 서버 프로세스가 계속 실행되는 방식이 아니라, 스케줄러가 하루 한 번 HTTP 요청을 보내는 방식이다.
+
+권장 수동 운영 예:
+
+```bash
+npm run puzzles:schedule -- --id <id> --sync-db
+```
+
+예약 상태 확인 후 공개 시각에:
+
+```bash
+npm run db:publish-daily
+```
 
 ## 리포트 확인
 

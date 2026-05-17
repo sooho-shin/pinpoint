@@ -51,7 +51,25 @@ npm run puzzles:test
 npm run puzzles:harness -- --input tmp/make-puzzles-candidates.json
 ```
 
-승인, 예약, 공개는 별도 요청이 있을 때만 수행한다.
+예약, DB 동기화, 공개는 별도 요청이 있을 때만 수행한다. 승인 단계는 쓰지 않는다. 앱에 실제로 노출하려면 JSON 예약만으로는 부족하고 Supabase 동기화가 필요하다.
+
+예약 후 DB까지 반영해야 하는 요청이면 다음 흐름을 사용한다.
+
+```bash
+npm run puzzles:schedule -- --id <id> --sync-db
+```
+
+이미 예약된 JSON을 DB에 반영해야 하면 다음 명령을 사용한다.
+
+```bash
+npm run db:sync-puzzles
+```
+
+공개 시각 처리는 DB 기준 명령을 사용한다.
+
+```bash
+npm run db:publish-daily
+```
 
 ## 출력 원칙
 

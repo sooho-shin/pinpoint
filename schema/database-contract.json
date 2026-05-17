@@ -135,6 +135,9 @@
       ],
       "indexes": [
         { "name": "attempts_publication_user_idx", "columns": ["publication_id", "user_id"] },
+        { "name": "attempts_publication_anonymous_session_idx", "columns": ["publication_id", "anonymous_session_id"] },
+        { "name": "attempts_one_user_attempt_per_publication", "columns": ["publication_id", "user_id"], "unique": true, "partialWhere": "user_id is not null" },
+        { "name": "attempts_one_anonymous_attempt_per_publication", "columns": ["publication_id", "anonymous_session_id"], "unique": true, "partialWhere": "anonymous_session_id is not null" },
         { "name": "attempts_flagged_idx", "columns": ["flagged", "created_at"] },
         { "name": "attempts_device_publication_idx", "columns": ["publication_id", "device_hash"] }
       ],
@@ -294,10 +297,13 @@
       { "column": "elapsed_ms", "direction": "asc" },
       { "column": "submitted_at", "direction": "asc" }
     ],
-    "anonymousPlayAllowed": false,
+    "anonymousPlayAllowed": true,
     "dailyPublicationScope": "one_published_puzzle_per_kst_date",
-    "attemptScope": "publication_id+user_id",
+    "attemptScope": "publication_id+(user_id|anonymous_session_id)",
+    "anonymousAttemptClaimedAfterSignin": true,
+    "terminalAnonymousAttemptPreventsSigninReplay": true,
     "allAuthenticatedUsersCanPlaySamePublication": true,
+    "allAnonymousSessionsCanPlaySamePublication": true,
     "leaderboardDoesNotLockPlay": true,
     "winnerDoesNotLockPlay": true,
     "rankingRequiresAuthenticatedProfile": true,

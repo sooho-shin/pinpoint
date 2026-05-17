@@ -52,9 +52,11 @@ npm run app:contract
 ## 금지 사항
 
 - 브라우저 Supabase client로 `puzzles` 테이블을 직접 조회하지 않는다.
-- Today Puzzle, Result, Daily Ranking, 플레이 API는 로그인 필수 정책을 우회하지 않는다.
+- Today Puzzle, Result, Daily Ranking, 플레이 API는 익명 플레이 허용 정책을 따른다.
+- 같은 브라우저에서 비로그인으로 시작한 오늘 attempt는 로그인 후 계정 attempt로 승계한다.
+- 익명 attempt가 이미 성공/실패 상태이면 로그인 후에도 완료 상태를 유지하고 같은 문제를 새로 풀게 하지 않는다.
 - 회원가입 시작 화면은 Google OAuth 전에 닉네임을 필수로 입력받는다.
-- 오늘 공개 문제는 하나지만 모든 로그인 사용자가 `publication_id + user_id` 기준의 독립 attempt로 풀 수 있어야 한다.
+- 오늘 공개 문제는 하나지만 모든 로그인 사용자와 익명 세션이 각각 독립 attempt로 풀 수 있어야 한다.
 - 랭킹 1등, winner message, 다른 사용자의 terminal attempt를 이유로 현재 사용자의 풀이 시작/제출을 막지 않는다.
 - terminal result 전 정답, aliases, rationale, 잠긴 단서를 반환하지 않는다.
 - client component에서 `SUPABASE_SERVICE_ROLE_KEY`를 참조하지 않는다.

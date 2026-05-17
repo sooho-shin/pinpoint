@@ -2,7 +2,7 @@
 import { CANDIDATES_PATH, parseArgs, readStore, writeStore } from "./lib/puzzle-store.js";
 
 const args = parseArgs();
-const allowedStatuses = new Set(["approved", "rejected"]);
+const allowedStatuses = new Set(["rejected"]);
 
 async function main() {
   const id = args.id ? String(args.id) : null;
@@ -11,7 +11,7 @@ async function main() {
 
   if (!id) throw new Error("Missing required --id.");
   if (!allowedStatuses.has(status)) {
-    throw new Error("Missing or invalid --status. Use approved or rejected.");
+    throw new Error("Missing or invalid --status. Use rejected.");
   }
 
   const store = await readStore(CANDIDATES_PATH);

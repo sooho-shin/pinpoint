@@ -38,7 +38,7 @@ async function main() {
     difficulty: 4,
     clues: ["경계", "통과", "도장", "비자", "여권"],
     rationale: "초반에는 이동과 경계로 열어두고, 후반에는 비자와 여권으로 출입국 절차에 수렴한다.",
-    status: "approved",
+    status: "generated",
     quality_score: 90,
     issue_flags: [],
     reviewed_at: now

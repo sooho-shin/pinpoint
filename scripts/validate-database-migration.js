@@ -66,6 +66,10 @@ async function main() {
     "create trigger daily_winner_message_requires_rank_one",
     "raise exception 'daily winner message requires the rank 1 leaderboard entry'",
     "grant select (nickname_snapshot, message, visible_until) on public.daily_winner_messages to anon, authenticated",
+    "create unique index if not exists attempts_one_user_attempt_per_publication",
+    "where user_id is not null",
+    "create unique index if not exists attempts_one_anonymous_attempt_per_publication",
+    "where anonymous_session_id is not null",
     "on public.leaderboard_entries ( publication_id, rank_status, used_clue_count, elapsed_ms, submitted_at )",
     "revoke all on public.profiles from anon, authenticated",
     "grant select (id, nickname, avatar_url) on public.profiles to anon, authenticated"

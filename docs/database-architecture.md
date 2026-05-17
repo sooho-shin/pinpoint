@@ -18,7 +18,7 @@ DB 설계는 단순 저장소가 아니라 다음 정책을 강제해야 한다.
 
 MVP는 PostgreSQL을 기준으로 한다. Supabase를 쓰는 경우 Auth는 `auth.users`를 사용하고, 서비스 데이터는 `public` 스키마에 둔다.
 
-이 프로젝트는 관계형 제약이 제품 품질에 직접 연결된다. 사용자별 풀이 분리, `publication_id + user_id` 랭킹 유니크 제약, 날짜별 공개 유니크 제약, 그룹 멤버십 중복 방지, RLS 정책 같은 규칙을 애플리케이션 코드에만 맡기지 않는다.
+이 프로젝트는 관계형 제약이 제품 품질에 직접 연결된다. 사용자별 풀이 분리, `publication_id + user_id` 랭킹 유니크 제약, 익명 세션별 attempt 분리, 날짜별 공개 유니크 제약, 그룹 멤버십 중복 방지, RLS 정책 같은 규칙을 애플리케이션 코드에만 맡기지 않는다.
 
 ## 주요 엔티티
 
@@ -77,7 +77,7 @@ groups
 상태:
 
 ```text
-generated -> approved -> rejected
+generated -> rejected
 ```
 
 공개가 끝났다고 문제 원본을 `published`로 바꾸지 않는다. 공개 상태는 `puzzle_publications.status`가 가진다.
@@ -86,7 +86,7 @@ generated -> approved -> rejected
 
 특정 문제를 특정 날짜에 공개하는 이벤트다. 하루 한 문제 정책은 `publish_date_kst` 유니크 제약으로 강제한다.
 
-`puzzle_publications`는 문제 공개 이벤트일 뿐, 풀이 독점권이 아니다. 하나의 공개 문제는 모든 로그인 사용자가 각자의 `attempts` row로 풀 수 있어야 한다.
+`puzzle_publications`는 문제 공개 이벤트일 뿐, 풀이 독점권이 아니다. 하나의 공개 문제는 모든 로그인 사용자와 익명 세션이 각자의 `attempts` row로 풀 수 있어야 한다.
 
 상태:
 
@@ -95,15 +95,27 @@ scheduled -> published
           -> canceled
 ```
 
+운영 동기화:
+
+- `data/daily-puzzles.ko.json`에 예약된 문제는 `puzzle_publications.status = scheduled`로 먼저 DB에 올라간다.
+- `publish_date_kst`는 `scheduled_at`을 Asia/Seoul 기준 날짜로 변환해 저장한다.
+- KST 17:00 스케줄러는 오늘 날짜의 `scheduled` row 중 `scheduled_at <= now()`인 row만 `published`로 전환한다.
+- 오늘 row가 없으면 스케줄러는 미사용 `generated` 후보를 선택해 오늘 `published` row를 생성한다.
+- 앱의 오늘 문제 조회는 JSON이 아니라 `puzzle_publications.publish_date_kst = 오늘`과 `status = published` 조건을 기준으로 한다.
+- 서비스 role key는 서버 스크립트와 cron route에서만 사용하고 client component 또는 public env로 노출하지 않는다.
+
 ### attempts
 
-풀이 기록 원장이다. 실패, 비공개, 로그인 사용자 세션, flagged 상태를 포함한다. 랭킹 노출 여부와 별개로 운영 분석과 부정 방지에 사용한다. MVP 플레이 흐름은 로그인 필수이므로 새 attempt는 `user_id`를 반드시 가진다.
+풀이 기록 원장이다. 실패, 비공개, 로그인 사용자 세션, 익명 세션, flagged 상태를 포함한다. 랭킹 노출 여부와 별개로 운영 분석과 부정 방지에 사용한다. MVP 플레이 흐름은 익명 시작을 허용하므로 새 attempt는 `user_id` 또는 `anonymous_session_id` 중 하나를 반드시 가진다.
 
 사용자별 풀이 정책:
 
 - 같은 `publication_id`에 대해 여러 사용자가 각각 attempt를 만들 수 있다.
 - 한 사용자의 terminal attempt는 같은 `publication_id`를 푸는 다른 사용자를 막지 않는다.
-- 이어풀기 조회는 `publication_id + user_id` 기준으로 한다.
+- 이어풀기 조회는 로그인 사용자는 `publication_id + user_id`, 비로그인 사용자는 `publication_id + anonymous_session_id` 기준으로 한다.
+- 같은 브라우저에서 비로그인으로 만든 attempt는 로그인 후 동일 publication의 사용자 attempt로 승계할 수 있다.
+- 승계 시 이미 `publication_id + user_id` attempt가 있으면 사용자 attempt를 우선하고 익명 attempt를 새 풀이로 쓰지 않는다.
+- 승계된 성공 attempt는 프로필이 있으면 `leaderboard_entries` projection 생성 대상이 될 수 있다.
 - `leaderboard_entries` 또는 `daily_winner_messages` 존재 여부로 attempt 생성을 막지 않는다.
 
 ### leaderboard_entries

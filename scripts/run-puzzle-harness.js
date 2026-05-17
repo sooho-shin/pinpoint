@@ -101,18 +101,15 @@ async function main() {
   };
   await writeJson(reportPath, report);
 
-  if (args["auto-approve"]) {
-    if (dryRun) throw new Error("--auto-approve cannot be used with --dry-run.");
-    if (!passed) throw new Error("--auto-approve cannot be used when harness validation failed.");
+  if (args.schedule) {
+    if (dryRun) throw new Error("--schedule cannot be used with --dry-run.");
+    if (!passed) throw new Error("--schedule cannot be used when harness validation failed.");
     const id = args.id ? String(args.id) : await newestGeneratedCandidateId();
-    if (!id) throw new Error(`No generated candidate with qualityScore >= ${(await readPolicy()).minimumQualityScore} found for auto approval.`);
-    await run("node", ["scripts/review-puzzle.js", "--id", id, "--status", "approved"]);
-
-    if (args.schedule) {
-      const scheduleArgs = ["scripts/schedule-daily-puzzle.js", "--id", id];
-      if (args.at) scheduleArgs.push("--at", String(args.at));
-      await run("node", scheduleArgs);
-    }
+    if (!id) throw new Error(`No generated candidate with qualityScore >= ${(await readPolicy()).minimumQualityScore} found for scheduling.`);
+    const scheduleArgs = ["scripts/schedule-daily-puzzle.js", "--id", id];
+    if (args.at) scheduleArgs.push("--at", String(args.at));
+    if (args["sync-db"]) scheduleArgs.push("--sync-db");
+    await run("node", scheduleArgs);
   }
 
   if (!passed) {

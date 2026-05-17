@@ -18,6 +18,8 @@
 - 리뷰 CLI: `scripts/review-puzzle.js`
 - 예약 CLI: `scripts/schedule-daily-puzzle.js`
 - 공개 CLI: `scripts/publish-daily-puzzle.js`
+- DB 동기화 CLI: `scripts/db-sync-puzzles.js`
+- DB 공개 CLI: `scripts/db-publish-daily.js`
 - fixture 테스트 CLI: `scripts/test-puzzle-harness.js`
 
 ## 상태 흐름
@@ -25,17 +27,16 @@
 문제는 아래 상태를 따른다.
 
 ```text
-generated -> approved -> scheduled -> published
+generated -> scheduled -> published
           -> rejected
 ```
 
-- `generated`: AI가 생성한 후보. 아직 운영자가 승인하지 않은 상태.
-- `approved`: 운영자가 공개 가능하다고 판단한 상태.
+- `generated`: AI가 생성하고 하네스 품질 기준을 통과한 후보. 예약/공개에 바로 사용할 수 있다.
 - `scheduled`: 공개 시각이 배정된 상태.
 - `published`: 실제 공개된 상태.
 - `rejected`: 품질 문제로 반려된 상태.
 
-현재 MVP에는 관리자 페이지가 없으므로 `approved`와 `rejected` 변경은 `npm run puzzles:review`로 처리한다. 이후 관리자 UI가 생기면 같은 상태값을 사용한다.
+현재 MVP에는 관리자 페이지가 없으므로 `rejected` 변경은 `npm run puzzles:review`로 처리한다. 승인 단계는 사용하지 않는다.
 
 ## 데이터 구조
 
@@ -74,20 +75,14 @@ npm run puzzles:harness -- --input tmp/candidates.json
 npm run puzzles:harness -- --input tmp/candidates.json --dry-run
 ```
 
-전체 하네스는 에이전트가 직접 작성한 후보 JSON을 검증하고 스코어링한 뒤, 통과한 경우에만 저장한다. `--dry-run`을 쓰면 운영 데이터에 저장하지 않고 리포트만 만든다. 승인과 예약은 운영자 판단이 필요한 단계라 기본으로 자동 실행하지 않는다.
+전체 하네스는 에이전트가 직접 작성한 후보 JSON을 검증하고 스코어링한 뒤, 통과한 경우에만 저장한다. `--dry-run`을 쓰면 운영 데이터에 저장하지 않고 리포트만 만든다. 예약은 별도 요청이 있을 때만 수행한다.
 
 입력 JSON은 배열 또는 `{ "puzzles": [...] }` 형식을 허용한다.
 
-승인까지 자동으로 테스트하려면:
+예약까지 자동으로 테스트하려면:
 
 ```bash
-npm run puzzles:harness -- --input tmp/candidates.json --auto-approve
-```
-
-승인 후 예약까지 자동으로 테스트하려면:
-
-```bash
-npm run puzzles:harness -- --input tmp/candidates.json --auto-approve --schedule
+npm run puzzles:harness -- --input tmp/candidates.json --schedule
 ```
 
 후보 추가 저수준 명령:
@@ -116,19 +111,13 @@ fixture 테스트:
 npm run puzzles:test
 ```
 
-후보 승인:
-
-```bash
-npm run puzzles:review -- --id ko-20260509170000-ab123 --status approved
-```
-
 후보 반려:
 
 ```bash
 npm run puzzles:review -- --id ko-20260509170000-ab123 --status rejected --reason "정답이 너무 넓음"
 ```
 
-승인된 문제 예약:
+문제 예약:
 
 ```bash
 npm run puzzles:schedule
@@ -148,6 +137,20 @@ npm run puzzles:schedule -- --id ko-20260509170000-ab123 --at 2026-05-10T08:00:0
 npm run puzzles:publish
 ```
 
+앱 DB에 예약 반영:
+
+```bash
+npm run db:sync-puzzles
+```
+
+앱 DB 기준 오늘 문제 공개:
+
+```bash
+npm run db:publish-daily
+```
+
+`puzzles:publish`는 JSON 운영 원장 상태를 바꾸는 명령이다. 현재 앱은 Supabase DB를 읽으므로, 실제 노출에는 `db:sync-puzzles`와 `db:publish-daily` 또는 cron route가 필요하다.
+
 ## 작업 원칙
 
 - 스킬의 생성 규칙과 스크립트의 검증 규칙이 충돌하면 이 문서를 먼저 갱신한 뒤 양쪽을 맞춘다.
@@ -157,5 +160,5 @@ npm run puzzles:publish
 - 새 데이터 필드를 추가할 때는 이 문서의 데이터 구조 예시와 생성/검증/스코어링 로직을 함께 갱신한다.
 - 검증 로직을 바꿀 때는 `fixtures/`와 `npm run puzzles:test` 결과를 함께 확인한다.
 - 저장형 하네스는 실패 후보를 운영 데이터에 저장하면 안 된다.
-- 예약은 `approved` 상태와 최소 품질 점수를 만족하는 후보만 허용한다.
-- 게임 앱이 생기더라도 `data/daily-puzzles.ko.json`의 `published` 문제를 읽는 방향을 기본으로 한다.
+- 예약은 최소 품질 점수를 만족하는 generated 후보를 허용한다.
+- 게임 앱은 Supabase `puzzle_publications`의 `published` 문제를 읽는다. JSON은 후보 생성, 리뷰, 예약을 위한 운영 원장으로 유지한다.

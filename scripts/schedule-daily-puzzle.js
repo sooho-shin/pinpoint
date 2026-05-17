@@ -1,7 +1,23 @@
 #!/usr/bin/env node
+import { spawn } from "node:child_process";
 import { CANDIDATES_PATH, DAILY_PATH, parseArgs, readPolicy, readStore, writeStore } from "./lib/puzzle-store.js";
 
 const args = parseArgs();
+
+function run(command, commandArgs) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, commandArgs, {
+      cwd: process.cwd(),
+      env: process.env,
+      stdio: "inherit"
+    });
+
+    child.on("close", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`${command} ${commandArgs.join(" ")} exited with ${code}`));
+    });
+  });
+}
 
 function nextKoreaFivePm() {
   const now = new Date();
@@ -24,13 +40,10 @@ async function main() {
 
   const candidate = id
     ? candidateStore.items.find((item) => item.id === id)
-    : candidateStore.items.find((item) => item.status === "approved" && Number(item.qualityScore || 0) >= policy.minimumQualityScore);
+    : candidateStore.items.find((item) => ["generated", "approved", "scheduled"].includes(item.status) && Number(item.qualityScore || 0) >= policy.minimumQualityScore);
 
   if (!candidate) {
-    throw new Error(id ? `Candidate not found: ${id}` : `No approved candidate with qualityScore >= ${policy.minimumQualityScore} found.`);
-  }
-  if (candidate.status !== "approved") {
-    throw new Error(`Candidate must be approved before scheduling: ${candidate.id} is ${candidate.status}.`);
+    throw new Error(id ? `Candidate not found: ${id}` : `No candidate with qualityScore >= ${policy.minimumQualityScore} found.`);
   }
   if (Number(candidate.qualityScore || 0) < policy.minimumQualityScore) {
     throw new Error(`Candidate qualityScore must be >= ${policy.minimumQualityScore} before scheduling.`);
@@ -52,6 +65,10 @@ async function main() {
 
   await writeStore(DAILY_PATH, dailyStore);
   await writeStore(CANDIDATES_PATH, candidateStore);
+
+  if (args["sync-db"]) {
+    await run("node", ["--env-file=.env.local", "scripts/db-sync-puzzles.js"]);
+  }
 
   console.log(`Scheduled ${scheduled.id} ${scheduled.answer} at ${scheduledAt}.`);
 }

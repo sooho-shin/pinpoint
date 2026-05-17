@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 import { normalizeAnswer } from "@/lib/puzzle/normalize";
 import { getKstDateString, getNextPublicationIso } from "@/lib/puzzle/time";
 import type { NoPuzzleState, PublicAttempt, PuzzlePlayState, SubmitResult, WinnerMessage } from "@/lib/puzzle/types";
@@ -35,17 +36,12 @@ type AttemptRow = {
 };
 
 type Actor = {
-  userId: string;
+  userId: string | null;
+  anonymousSessionId: string | null;
 };
 
 const TERMINAL_STATUSES = new Set(["succeeded", "failed", "abandoned"]);
-
-export class AuthenticationRequiredError extends Error {
-  constructor() {
-    super("로그인이 필요합니다.");
-    this.name = "AuthenticationRequiredError";
-  }
-}
+const ANONYMOUS_SESSION_COOKIE = "pinpoint_anon_session";
 
 function asClues(value: unknown) {
   if (!Array.isArray(value)) return [];
@@ -64,15 +60,35 @@ function publicAttempt(attempt: AttemptRow): PublicAttempt {
 }
 
 async function getActor(): Promise<Actor> {
+  const cookieStore = await cookies();
+  const existing = cookieStore.get(ANONYMOUS_SESSION_COOKIE)?.value;
+  const existingAnonymousSessionId = existing && existing.length >= 16 ? existing : null;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
   } = await supabase.auth.getUser();
 
-  if (!user) throw new AuthenticationRequiredError();
+  if (user) {
+    return {
+      userId: user.id,
+      anonymousSessionId: existingAnonymousSessionId
+    };
+  }
+
+  const anonymousSessionId = existingAnonymousSessionId ?? crypto.randomUUID();
+  if (!existingAnonymousSessionId) {
+    cookieStore.set(ANONYMOUS_SESSION_COOKIE, anonymousSessionId, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 45
+    });
+  }
 
   return {
-    userId: user.id
+    userId: null,
+    anonymousSessionId
   };
 }
 
@@ -116,9 +132,30 @@ async function getAttempt(publicationId: string, actor: Actor) {
     .order("created_at", { ascending: false })
     .limit(1);
 
-  query = query.eq("user_id", actor.userId);
+  if (actor.userId) {
+    query = query.eq("user_id", actor.userId);
+  } else {
+    if (!actor.anonymousSessionId) return null;
+    query = query.eq("anonymous_session_id", actor.anonymousSessionId);
+  }
 
   const { data, error } = await query.maybeSingle();
+  if (error) throw error;
+  return data as AttemptRow | null;
+}
+
+async function getAnonymousAttempt(publicationId: string, anonymousSessionId: string) {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("attempts")
+    .select("id,publication_id,user_id,anonymous_session_id,started_at,submitted_at,elapsed_ms,used_clue_count,is_correct,status,is_ranked")
+    .eq("publication_id", publicationId)
+    .eq("anonymous_session_id", anonymousSessionId)
+    .is("user_id", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   if (error) throw error;
   return data as AttemptRow | null;
 }
@@ -152,7 +189,8 @@ function visiblePuzzleState(
   publication: PublicationRow,
   puzzle: PuzzleRow,
   attempt: AttemptRow | null,
-  winnerMessage: WinnerMessage | null
+  winnerMessage: WinnerMessage | null,
+  requiresSignInForRanking: boolean
 ): PuzzlePlayState {
   const usedClueCount = attempt ? publicAttempt(attempt).usedClueCount : 1;
   const shouldShowAll = attempt ? TERMINAL_STATUSES.has(attempt.status) : false;
@@ -167,7 +205,8 @@ function visiblePuzzleState(
     clues: puzzle.clues.slice(0, visibleCount),
     lockedCount: Math.max(0, 5 - visibleCount),
     attempt: attempt ? publicAttempt(attempt) : null,
-    winnerMessage
+    winnerMessage,
+    requiresSignInForRanking
   };
 }
 
@@ -177,11 +216,11 @@ export async function getTodayPayload(): Promise<PuzzlePlayState | NoPuzzleState
   if (!publication || !puzzle) return { status: "no_puzzle", publishDateKst };
 
   const [attempt, winnerMessage] = await Promise.all([
-    getAttempt(publication.id, actor),
+    claimAnonymousAttempt(publication.id, actor).then((claimed) => claimed ?? getAttempt(publication.id, actor)),
     getWinnerMessage(publication.id)
   ]);
 
-  return visiblePuzzleState(publication, puzzle, attempt, winnerMessage);
+  return visiblePuzzleState(publication, puzzle, attempt, winnerMessage, !actor.userId);
 }
 
 export async function startAttempt(): Promise<PuzzlePlayState | NoPuzzleState> {
@@ -189,17 +228,17 @@ export async function startAttempt(): Promise<PuzzlePlayState | NoPuzzleState> {
   const { publishDateKst, publication, puzzle } = await getTodayPublication();
   if (!publication || !puzzle) return { status: "no_puzzle", publishDateKst };
 
-  const existing = await getAttempt(publication.id, actor);
+  const existing = (await claimAnonymousAttempt(publication.id, actor)) ?? (await getAttempt(publication.id, actor));
   if (existing) {
     const winnerMessage = await getWinnerMessage(publication.id);
-    return visiblePuzzleState(publication, puzzle, existing, winnerMessage);
+    return visiblePuzzleState(publication, puzzle, existing, winnerMessage, !actor.userId);
   }
 
   const admin = createAdminClient();
   const insertPayload = {
     publication_id: publication.id,
     user_id: actor.userId,
-    anonymous_session_id: null,
+    anonymous_session_id: actor.userId ? null : actor.anonymousSessionId,
     used_clue_count: 1,
     status: "playing",
     visibility: "private"
@@ -213,7 +252,7 @@ export async function startAttempt(): Promise<PuzzlePlayState | NoPuzzleState> {
   if (error) throw error;
 
   const winnerMessage = await getWinnerMessage(publication.id);
-  return visiblePuzzleState(publication, puzzle, attempt as AttemptRow, winnerMessage);
+  return visiblePuzzleState(publication, puzzle, attempt as AttemptRow, winnerMessage, !actor.userId);
 }
 
 export async function revealNextClue(): Promise<PuzzlePlayState | NoPuzzleState> {
@@ -221,11 +260,11 @@ export async function revealNextClue(): Promise<PuzzlePlayState | NoPuzzleState>
   const { publishDateKst, publication, puzzle } = await getTodayPublication();
   if (!publication || !puzzle) return { status: "no_puzzle", publishDateKst };
 
-  const attempt = await getAttempt(publication.id, actor);
+  const attempt = (await claimAnonymousAttempt(publication.id, actor)) ?? (await getAttempt(publication.id, actor));
   if (!attempt) return startAttempt();
   if (TERMINAL_STATUSES.has(attempt.status)) {
     const winnerMessage = await getWinnerMessage(publication.id);
-    return visiblePuzzleState(publication, puzzle, attempt, winnerMessage);
+    return visiblePuzzleState(publication, puzzle, attempt, winnerMessage, !actor.userId);
   }
 
   const nextCount = Math.min(5, Number(attempt.used_clue_count ?? 1) + 1);
@@ -240,7 +279,7 @@ export async function revealNextClue(): Promise<PuzzlePlayState | NoPuzzleState>
   if (error) throw error;
 
   const winnerMessage = await getWinnerMessage(publication.id);
-  return visiblePuzzleState(publication, puzzle, updated as AttemptRow, winnerMessage);
+  return visiblePuzzleState(publication, puzzle, updated as AttemptRow, winnerMessage, !actor.userId);
 }
 
 async function getProfile(userId: string) {
@@ -275,18 +314,120 @@ async function createLeaderboardEntry(attempt: AttemptRow, nickname: string, ran
   throw error;
 }
 
+async function canWriteWinnerMessage(publicationId: string, userId?: string | null) {
+  if (!userId) return false;
+  const admin = createAdminClient();
+  const { data: topEntry, error: topEntryError } = await admin
+    .from("leaderboard_entries")
+    .select("user_id")
+    .eq("publication_id", publicationId)
+    .eq("rank_status", "visible")
+    .order("used_clue_count", { ascending: true })
+    .order("elapsed_ms", { ascending: true })
+    .order("submitted_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (topEntryError) throw topEntryError;
+  if (!topEntry || topEntry.user_id !== userId) return false;
+
+  const { data: existing, error: existingError } = await admin
+    .from("daily_winner_messages")
+    .select("user_id")
+    .eq("publication_id", publicationId)
+    .maybeSingle();
+
+  if (existingError) throw existingError;
+  return !existing || existing.user_id === userId;
+}
+
+async function claimAnonymousAttempt(publicationId: string, actor: Actor) {
+  if (!actor.userId || !actor.anonymousSessionId) return null;
+
+  const existingUserAttempt = await getAttempt(publicationId, {
+    userId: actor.userId,
+    anonymousSessionId: null
+  });
+  if (existingUserAttempt) return existingUserAttempt;
+
+  const anonymousAttempt = await getAnonymousAttempt(publicationId, actor.anonymousSessionId);
+  if (!anonymousAttempt) return null;
+
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("attempts")
+    .update({ user_id: actor.userId })
+    .eq("id", anonymousAttempt.id)
+    .is("user_id", null)
+    .select("id,publication_id,user_id,anonymous_session_id,started_at,submitted_at,elapsed_ms,used_clue_count,is_correct,status,is_ranked")
+    .single();
+
+  if (error) {
+    if (String(error.code) === "23505") {
+      return getAttempt(publicationId, {
+        userId: actor.userId,
+        anonymousSessionId: null
+      });
+    }
+    throw error;
+  }
+
+  let claimed = data as AttemptRow;
+  if (claimed.status === "succeeded" && !claimed.is_ranked) {
+    const profile = await getProfile(actor.userId);
+    if (profile) {
+      const elapsedMs = Number(claimed.elapsed_ms ?? 0);
+      const rankStatus = elapsedMs < 1000 ? "flagged" : "visible";
+      await createLeaderboardEntry(claimed, profile.nickname, rankStatus);
+      const { data: ranked, error: rankUpdateError } = await admin
+        .from("attempts")
+        .update({
+          is_ranked: true,
+          visibility: "daily",
+          flagged: rankStatus === "flagged",
+          flag_reason: rankStatus === "flagged" ? "elapsed_ms_under_1000" : null
+        })
+        .eq("id", claimed.id)
+        .select("id,publication_id,user_id,anonymous_session_id,started_at,submitted_at,elapsed_ms,used_clue_count,is_correct,status,is_ranked")
+        .single();
+      if (rankUpdateError) throw rankUpdateError;
+      claimed = ranked as AttemptRow;
+    }
+  }
+
+  return claimed;
+}
+
 export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPuzzleState> {
   const actor = await getActor();
   const { publishDateKst, publication, puzzle } = await getTodayPublication();
   if (!publication || !puzzle) return { status: "no_puzzle", publishDateKst };
 
-  const attempt = await getAttempt(publication.id, actor);
+  const attempt = (await claimAnonymousAttempt(publication.id, actor)) ?? (await getAttempt(publication.id, actor));
   if (!attempt) {
     await startAttempt();
     return submitGuess(rawGuess);
   }
 
   const usedClueCount = Math.max(1, Math.min(5, Number(attempt.used_clue_count ?? 1)));
+  if (TERMINAL_STATUSES.has(attempt.status)) {
+    const canWrite = attempt.status === "succeeded" ? await canWriteWinnerMessage(publication.id, actor.userId) : false;
+    return {
+      status: attempt.status === "succeeded" ? "succeeded" : "failed",
+      isCorrect: attempt.is_correct,
+      publicationId: publication.id,
+      category: puzzle.category,
+      difficulty: puzzle.difficulty,
+      clues: puzzle.clues,
+      lockedCount: 0,
+      usedClueCount,
+      elapsedMs: attempt.elapsed_ms,
+      answer: puzzle.answer,
+      isRanked: attempt.is_ranked,
+      canWriteWinnerMessage: canWrite
+    };
+  }
+
   const elapsedMs = Math.max(0, Date.now() - new Date(attempt.started_at).getTime());
   const normalizedGuess = normalizeAnswer(rawGuess);
   const accepted = [puzzle.answer, ...(puzzle.aliases ?? [])].map(normalizeAnswer);
@@ -295,7 +436,7 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
   const nextVisibleCount = isCorrect || terminalFailure ? 5 : Math.min(5, usedClueCount + 1);
   const nextStatus = isCorrect ? "succeeded" : terminalFailure ? "failed" : "playing";
   const submittedAt = new Date().toISOString();
-  const profile = await getProfile(actor.userId);
+  const profile = actor.userId ? await getProfile(actor.userId) : null;
   const canRank = Boolean(isCorrect && profile);
   const rankStatus = elapsedMs < 1000 ? "flagged" : "visible";
 
@@ -327,6 +468,7 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
   }
 
   const terminal = nextStatus !== "playing";
+  const canWrite = terminal && isCorrect ? await canWriteWinnerMessage(publication.id, actor.userId) : false;
   return {
     status: nextStatus,
     isCorrect,
@@ -338,7 +480,8 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
     usedClueCount: updatedAttempt.used_clue_count ?? usedClueCount,
     elapsedMs: updatedAttempt.elapsed_ms,
     ...(terminal ? { answer: puzzle.answer } : {}),
-    ...(canRank ? { isRanked: true, rankStatus } : { isRanked: false })
+    ...(canRank ? { isRanked: true, rankStatus } : { isRanked: false }),
+    canWriteWinnerMessage: canWrite
   };
 }
 
@@ -348,6 +491,8 @@ export async function getDailyLeaderboard() {
   if (!publication) {
     return { status: "no_puzzle", publishDateKst, rows: [], myRank: null, canWriteWinnerMessage: false };
   }
+
+  await claimAnonymousAttempt(publication.id, actor);
 
   const admin = createAdminClient();
   const { data, error } = await admin
@@ -369,7 +514,7 @@ export async function getDailyLeaderboard() {
     usedClueCount: Number(row.used_clue_count),
     elapsedMs: Number(row.elapsed_ms),
     submittedAt: String(row.submitted_at),
-    isMe: row.user_id === actor.userId
+    isMe: Boolean(actor.userId && row.user_id === actor.userId)
   }));
   const myRank = rows.find((row) => row.isMe) ?? null;
 
@@ -378,7 +523,7 @@ export async function getDailyLeaderboard() {
     publishDateKst: publication.publish_date_kst,
     rows,
     myRank,
-    canWriteWinnerMessage: Boolean(myRank && myRank.rank === 1)
+    canWriteWinnerMessage: await canWriteWinnerMessage(publication.id, actor.userId)
   };
 }
 
@@ -393,6 +538,7 @@ export async function writeWinnerMessage(message: string) {
   }
 
   const actor = await getActor();
+  if (!actor.userId) return { ok: false, error: "로그인이 필요합니다." };
   const { publication } = await getTodayPublication();
   if (!publication) return { ok: false, error: "오늘 공개된 문제가 없습니다." };
 

@@ -19,7 +19,8 @@ const REQUIRED_PRINCIPLES = [
   "do_not_expose_answer_before_terminal_result",
   "do_not_expose_locked_clues",
   "do_not_read_puzzles_directly_from_browser_supabase_client",
-  "authenticated_play_required",
+  "anonymous_play_allowed",
+  "anonymous_attempt_claimed_after_signin",
   "signup_nickname_required",
   "ranking_requires_authenticated_profile",
   "email_is_never_public",
@@ -290,7 +291,7 @@ function validateRouteHandlers(contract, issues) {
     }
   }
 
-  const requiredAuthRoutes = new Set([
+  const optionalPlayRoutes = new Set([
     "/api/today",
     "/api/attempts/start",
     "/api/attempts/reveal",
@@ -298,8 +299,8 @@ function validateRouteHandlers(contract, issues) {
     "/api/leaderboard/daily"
   ]);
   for (const route of routes) {
-    if (requiredAuthRoutes.has(route.path) && route.auth !== "required") {
-      addIssue(issues, "route_auth_must_be_required", routeKey(route));
+    if (optionalPlayRoutes.has(route.path) && route.auth !== "optional") {
+      addIssue(issues, "route_auth_must_be_optional", routeKey(route));
     }
   }
 }
@@ -307,13 +308,13 @@ function validateRouteHandlers(contract, issues) {
 function validateAuthPolicy(contract, dbContract, issues) {
   const pages = contract.frontend?.pages || [];
   for (const page of pages) {
-    if (["/", "/result", "/ranking"].includes(page.path) && page.auth !== "required") {
-      addIssue(issues, "page_auth_must_be_required", page.path);
+    if (["/", "/result", "/ranking"].includes(page.path) && page.auth !== "optional") {
+      addIssue(issues, "page_auth_must_be_optional", page.path);
     }
   }
 
-  if (dbContract.apiRequirements?.anonymousPlayAllowed !== false) {
-    addIssue(issues, "database_contract_allows_anonymous_play", "apiRequirements.anonymousPlayAllowed");
+  if (dbContract.apiRequirements?.anonymousPlayAllowed !== true) {
+    addIssue(issues, "database_contract_disallows_anonymous_play", "apiRequirements.anonymousPlayAllowed");
   }
 }
 
@@ -322,8 +323,11 @@ function validatePlayModel(contract, dbContract, issues) {
   const dbRequirements = dbContract.apiRequirements || {};
   const expected = {
     dailyPublicationScope: "one_published_puzzle_per_kst_date",
-    attemptScope: "publication_id+user_id",
+    attemptScope: "publication_id+(user_id|anonymous_session_id)",
+    anonymousAttemptClaimedAfterSignin: true,
+    terminalAnonymousAttemptPreventsSigninReplay: true,
     allAuthenticatedUsersCanPlaySamePublication: true,
+    allAnonymousSessionsCanPlaySamePublication: true,
     leaderboardDoesNotLockPlay: true,
     winnerDoesNotLockPlay: true
   };

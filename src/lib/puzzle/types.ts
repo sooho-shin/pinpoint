@@ -19,6 +19,7 @@ export type PuzzlePlayState = {
   lockedCount: number;
   attempt: PublicAttempt | null;
   winnerMessage: WinnerMessage | null;
+  requiresSignInForRanking: boolean;
 };
 
 export type NoPuzzleState = {
@@ -45,4 +46,5 @@ export type SubmitResult = {
   answer?: string;
   isRanked?: boolean;
   rankStatus?: "visible" | "flagged" | "hidden";
+  canWriteWinnerMessage?: boolean;
 };

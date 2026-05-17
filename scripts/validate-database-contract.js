@@ -328,8 +328,12 @@ function validateUserScopedPlayModel(contract, issues) {
   const api = contract.apiRequirements || {};
   const expected = {
     dailyPublicationScope: "one_published_puzzle_per_kst_date",
-    attemptScope: "publication_id+user_id",
+    anonymousPlayAllowed: true,
+    attemptScope: "publication_id+(user_id|anonymous_session_id)",
+    anonymousAttemptClaimedAfterSignin: true,
+    terminalAnonymousAttemptPreventsSigninReplay: true,
     allAuthenticatedUsersCanPlaySamePublication: true,
+    allAnonymousSessionsCanPlaySamePublication: true,
     leaderboardDoesNotLockPlay: true,
     winnerDoesNotLockPlay: true
   };
@@ -338,6 +342,31 @@ function validateUserScopedPlayModel(contract, issues) {
     if (api[key] !== value) {
       addIssue(issues, "user_scoped_play_model_mismatch", `${key}: expected ${value}`);
     }
+  }
+
+  const attempts = contract.tables?.attempts;
+  if (!attempts) return;
+
+  const hasUserUnique = hasIndex(attempts, (index) => (
+    index.unique === true &&
+    Array.isArray(index.columns) &&
+    index.columns.join(",") === "publication_id,user_id" &&
+    typeof index.partialWhere === "string" &&
+    index.partialWhere.includes("user_id is not null")
+  ));
+  if (!hasUserUnique) {
+    addIssue(issues, "missing_one_user_attempt_per_publication_index", "attempts(publication_id,user_id)");
+  }
+
+  const hasAnonymousUnique = hasIndex(attempts, (index) => (
+    index.unique === true &&
+    Array.isArray(index.columns) &&
+    index.columns.join(",") === "publication_id,anonymous_session_id" &&
+    typeof index.partialWhere === "string" &&
+    index.partialWhere.includes("anonymous_session_id is not null")
+  ));
+  if (!hasAnonymousUnique) {
+    addIssue(issues, "missing_one_anonymous_attempt_per_publication_index", "attempts(publication_id,anonymous_session_id)");
   }
 }
 

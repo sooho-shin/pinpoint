@@ -1,7 +1,17 @@
 import Link from "next/link";
-import { Trophy } from "lucide-react";
+import { Home, Trophy } from "lucide-react";
 
-export function GameHeader({ eyebrow, title = "Pinpoint" }: { eyebrow?: string; title?: string }) {
+type GameHeaderProps = {
+  eyebrow?: string;
+  title?: string;
+  action?: "ranking" | "home";
+};
+
+export function GameHeader({ eyebrow, title = "Pinpoint", action = "ranking" }: GameHeaderProps) {
+  const ActionIcon = action === "home" ? Home : Trophy;
+  const actionHref = action === "home" ? "/" : "/ranking";
+  const actionLabel = action === "home" ? "메인으로 돌아가기" : "오늘의 랭킹";
+
   return (
     <header className="mb-6 flex items-start justify-between">
       <div>
@@ -10,10 +20,10 @@ export function GameHeader({ eyebrow, title = "Pinpoint" }: { eyebrow?: string; 
       </div>
       <Link
         className="focus-ring inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--border)] bg-white"
-        href="/ranking"
-        aria-label="오늘의 랭킹"
+        href={actionHref}
+        aria-label={actionLabel}
       >
-        <Trophy className="h-5 w-5 text-[var(--accent)]" />
+        <ActionIcon className="h-5 w-5 text-[var(--accent)]" />
       </Link>
     </header>
   );

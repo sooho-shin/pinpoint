@@ -11,7 +11,8 @@
 - 적은 단서로 맞힐수록 결과 공유와 랭킹 가치가 높다.
 - MVP 랭킹은 `오늘의 랭킹`과 `그룹 랭킹`을 우선한다.
 - 오늘의 랭킹 1등은 다음 문제가 공개될 때까지 메인 최상단에 100자 메시지를 고정할 수 있다.
-- Google 로그인 후 닉네임을 연결한다.
+- 오늘 문제 풀이, 결과 확인, 랭킹 조회는 로그인 없이 시작할 수 있다.
+- 랭킹 등록, 그룹 참여, 1등 메시지는 Google 로그인 후 닉네임을 연결한다.
 - 이메일은 랭킹/그룹/공유 화면에 노출하지 않는다.
 
 관련 문서:
@@ -133,9 +134,10 @@ Figma 기준으로 다음 화면을 구현한다.
 - Sign In
 - Nickname Setup
 
-로그인 구현 기준:
+로그인/익명 플레이 구현 기준:
 
 - Supabase Auth Google OAuth 사용
+- 첫 플레이와 랭킹 조회는 익명 세션으로 허용
 - 로그인 후 `profiles`의 닉네임 확인
 - 닉네임이 없거나 수정이 필요하면 Nickname Setup으로 이동
 - 랭킹 등록과 그룹 참여는 로그인 + 닉네임이 필요하다
@@ -191,23 +193,37 @@ fixture 테스트:
 npm run puzzles:test
 ```
 
-후보 승인:
-
-```bash
-npm run puzzles:review -- --id <id> --status approved
-```
-
 후보 예약:
 
 ```bash
 npm run puzzles:schedule -- --id <id>
 ```
 
-후보 공개:
+예약과 동시에 앱 DB에 반영:
+
+```bash
+npm run puzzles:schedule -- --id <id> --sync-db
+```
+
+JSON 운영 원장 공개:
 
 ```bash
 npm run puzzles:publish
 ```
+
+앱 DB 동기화:
+
+```bash
+npm run db:sync-puzzles
+```
+
+앱 DB 기준 오늘 공개:
+
+```bash
+npm run db:publish-daily
+```
+
+배포 환경에서는 `vercel.json`의 cron이 UTC 08:00, 즉 KST 오후 5시에 `/api/cron/publish-daily`를 호출한다. 오늘 예약 row가 없으면 미사용 generated 후보를 자동으로 공개한다. 별도 상주 프로세스를 계속 실행하지 않는다.
 
 ### DB 하네스
 

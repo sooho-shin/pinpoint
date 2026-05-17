@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
-import { AuthenticationRequiredError, startAttempt } from "@/lib/puzzle/api";
+import { startAttempt } from "@/lib/puzzle/api";
 
 export async function POST() {
   try {
     return NextResponse.json(await startAttempt());
-  } catch (error) {
-    if (error instanceof AuthenticationRequiredError) {
-      return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-    }
+  } catch {
     return NextResponse.json({ error: "풀이를 시작하지 못했습니다." }, { status: 500 });
   }
 }

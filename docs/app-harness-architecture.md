@@ -34,9 +34,9 @@ npm run app:contract
 - Figma Atomic Design layer와 코드 컴포넌트 파일 1:1 매핑 선언
 - `design/tokens.json` 색상과 `src/app/globals.css` CSS 변수 일치 선언
 - 잠긴 단서와 정답 비노출 정책 선언
-- Today Puzzle, Result, Ranking과 주요 플레이 API의 로그인 필수 정책 선언
+- Today Puzzle, Result, Ranking과 주요 플레이 API의 익명 플레이 허용 정책 선언
 - 가입 시작 시 닉네임 입력 필수 정책 선언
-- 일일 공개 문제는 하나지만 attempt는 `publication_id + user_id` 기준으로 사용자별 분리된다는 정책 선언
+- 일일 공개 문제는 하나지만 attempt는 로그인 사용자와 익명 세션별로 분리된다는 정책 선언
 - 랭킹 정렬 기준 선언
 - 공개 API forbidden field 선언
 - 필수 환경 변수 선언
@@ -100,7 +100,7 @@ npm run puzzles:test
 
 - 정답 또는 aliases가 terminal result 전 응답에 포함됨
 - 잠긴 단서가 `/api/today` 또는 reveal 전 응답에 포함됨
-- 로그인 필수 화면/API가 `auth: required` 계약을 갖지 않음
+- 익명 플레이 화면/API가 `auth: optional` 계약을 갖지 않음
 - 랭킹 1등 또는 다른 사용자의 terminal attempt가 현재 사용자의 풀이 가능 여부를 잠그는 모델
 - 브라우저 Supabase client가 `puzzles` 테이블을 직접 조회함
 - service role key가 client component 또는 public env로 새어 나감

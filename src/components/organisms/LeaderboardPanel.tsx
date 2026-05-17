@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { Button } from "@/components/atoms/Button";
+import { Button, ButtonLink } from "@/components/atoms/Button";
 import { TextInput } from "@/components/atoms/TextInput";
 import { LeaderboardTabs } from "@/components/molecules/LeaderboardTabs";
 import { RankingRow, type RankingRowData } from "@/components/molecules/RankingRow";
@@ -115,17 +115,30 @@ export function LeaderboardPanel() {
 
       {state.canWriteWinnerMessage ? (
         <form className="space-y-3" onSubmit={submitMessage}>
+          <div>
+            <div className="mb-2 text-sm font-semibold text-[var(--text-primary)]">1등 확성기</div>
+            <p className="mb-3 text-sm leading-5 text-[var(--text-secondary)]">메인 화면 최상단에 다음 공개 전까지 표시됩니다.</p>
+          </div>
           <TextInput
             value={message}
             maxLength={100}
             onChange={(event) => setMessage(event.target.value)}
-            placeholder="1등 메시지"
+            placeholder="100자 이내 메시지"
             disabled={pending}
           />
+          <div className="text-right text-xs font-semibold text-[var(--text-secondary)]">{message.length}/100</div>
           <Button type="submit" disabled={pending || !message.trim()}>메시지 등록</Button>
           {feedback ? <p className="text-sm text-[var(--text-secondary)]">{feedback}</p> : null}
         </form>
-      ) : null}
+      ) : (
+        <div className="muted-surface p-4">
+          <div className="text-sm font-semibold text-[var(--text-primary)]">내 기록 올리기</div>
+          <p className="mt-2 text-sm leading-5 text-[var(--text-secondary)]">로그인 후 닉네임을 연결하면 성공 기록이 오늘의 랭킹에 표시됩니다.</p>
+          <div className="mt-4">
+            <ButtonLink href="/signin?next=/ranking" variant="secondary">로그인하기</ButtonLink>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

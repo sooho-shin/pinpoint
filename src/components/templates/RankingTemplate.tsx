@@ -5,7 +5,7 @@ export function RankingTemplate() {
   return (
     <main className="app-shell">
       <div className="screen-frame">
-        <GameHeader eyebrow="Leaderboard" title="랭킹" />
+        <GameHeader eyebrow="Leaderboard" title="랭킹" action="home" />
         <LeaderboardPanel />
       </div>
     </main>

@@ -10,7 +10,7 @@ export function AdminReviewPanel() {
         <ClueRow index={2} clue="운영자 검토 필요" />
       </div>
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <Button type="button" disabled>승인</Button>
+        <Button type="button" disabled>예약</Button>
         <Button type="button" variant="secondary" disabled>반려</Button>
       </div>
     </section>

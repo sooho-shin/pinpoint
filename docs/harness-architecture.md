@@ -40,12 +40,14 @@ agent-authored candidate JSON
   -> score
   -> report
   -> save only if passed
-  -> review
   -> schedule
-  -> publish
+  -> sync to Supabase
+  -> publish in Supabase
 ```
 
-`validate`, `score`, `report`는 하네스가 자동으로 묶어 실행한다. 실제 후보 저장은 모든 게이트를 통과한 뒤에만 수행한다. `review`, `schedule`, `publish`는 운영 판단 또는 스케줄러가 수행한다.
+`validate`, `score`, `report`는 하네스가 자동으로 묶어 실행한다. 실제 후보 저장은 모든 게이트를 통과한 뒤에만 수행한다. `schedule`, `sync`, `publish`는 운영 판단 또는 스케줄러가 수행한다. 승인 단계는 필수 상태가 아니다.
+
+JSON의 `published` 상태는 운영 원장 상태다. 앱 노출 기준은 Supabase `puzzle_publications.status = published`이며, DB 동기화 없이 JSON만 바꾸면 앱에 공개되지 않는다.
 
 ## 품질 게이트
 
@@ -68,8 +70,8 @@ agent-authored candidate JSON
 ## 확장 방향
 
 - Figma 디자인 하네스를 추가해 디자인 시스템과 화면 구조도 검증한다.
-- 관리자 페이지에서 review/schedule/publish를 처리한다.
-- JSON 저장소를 DB로 교체한다.
+- 관리자 페이지에서 schedule/publish와 rejected 처리를 수행한다.
+- JSON 저장소를 DB 관리자 UI로 교체한다.
 - 사용자 풀이 로그로 문제 난이도를 보정한다.
 - report를 CI artifact로 남긴다.
 - 제품/API 계약 하네스는 `schema/database-contract.json`과 `npm run db:check`로 관리한다. 랭킹, 1등 확성기, 인증/공개 필드 같은 제품 규칙은 DB 계약과 migration 검증에 먼저 추가한 뒤 구현한다.

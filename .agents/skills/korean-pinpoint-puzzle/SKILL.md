@@ -54,6 +54,30 @@ description: 한국어 Pinpoint 스타일 연상 퍼즐의 후보를 에이전�
 4. 통과하면 `npm run puzzles:harness -- --input <임시파일>`을 실행해 운영 후보 저장소에 넣는다.
 5. 운영 데이터에 남길 필요가 없는 임시 파일은 삭제한다.
 
+## 예약/공개 절차
+
+앱은 Supabase DB의 `puzzle_publications`를 읽는다. 따라서 JSON에 예약만 해서는 실제 앱에 공개되지 않는다.
+
+1. 품질 기준을 통과한 후보를 예약한다.
+
+```bash
+npm run puzzles:schedule -- --id <id> --sync-db
+```
+
+2. 이미 예약된 JSON 또는 generated 후보를 DB에 다시 맞춰야 하면 동기화한다.
+
+```bash
+npm run db:sync-puzzles
+```
+
+3. KST 17:00 이후 공개는 DB 기준 명령 또는 cron route가 처리한다. 오늘 row가 없으면 미사용 generated 후보를 자동 공개한다.
+
+```bash
+npm run db:publish-daily
+```
+
+Vercel Cron을 쓰는 배포 환경에서는 `vercel.json`이 `/api/cron/publish-daily`를 UTC 08:00에 호출한다. 별도 Node 프로세스를 계속 켜두는 방식이 아니다.
+
 ## 검토 절차
 
 자세한 품질 기준은 `references/puzzle-rules.md`를 읽는다. 특히 다음 경우는 반려하거나 수정한다.

@@ -1,7 +1,23 @@
 #!/usr/bin/env node
+import { spawn } from "node:child_process";
 import { DAILY_PATH, parseArgs, readStore, writeStore } from "./lib/puzzle-store.js";
 
 const args = parseArgs();
+
+function run(command, commandArgs) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, commandArgs, {
+      cwd: process.cwd(),
+      env: process.env,
+      stdio: "inherit"
+    });
+
+    child.on("close", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`${command} ${commandArgs.join(" ")} exited with ${code}`));
+    });
+  });
+}
 
 async function main() {
   const now = args.now ? new Date(String(args.now)) : new Date();
@@ -21,6 +37,9 @@ async function main() {
   });
 
   await writeStore(DAILY_PATH, store);
+  if (args["sync-db"]) {
+    await run("node", ["--env-file=.env.local", "scripts/db-sync-puzzles.js"]);
+  }
   console.log(`Published ${publishedCount} puzzle(s).`);
 }
 
