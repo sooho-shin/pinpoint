@@ -3,7 +3,16 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { normalizeAnswer } from "@/lib/puzzle/normalize";
 import { getKstDateString, getNextPublicationIso } from "@/lib/puzzle/time";
-import type { NoPuzzleState, PublicAttempt, PuzzlePlayState, SubmitResult, WinnerMessage } from "@/lib/puzzle/types";
+import type {
+  NoPuzzleState,
+  PublicAttempt,
+  PuzzleFeedbackItem,
+  PuzzleFeedbackReaction,
+  PuzzleFeedbackState,
+  PuzzlePlayState,
+  SubmitResult,
+  WinnerMessage
+} from "@/lib/puzzle/types";
 
 type PublicationRow = {
   id: string;
@@ -35,12 +44,23 @@ type AttemptRow = {
   is_ranked: boolean;
 };
 
+type PuzzleFeedbackRow = {
+  id: string;
+  user_id: string;
+  nickname_snapshot: string;
+  reaction: PuzzleFeedbackReaction;
+  comment: string;
+  created_at: string;
+};
+
 type Actor = {
   userId: string | null;
   anonymousSessionId: string | null;
 };
 
 const TERMINAL_STATUSES = new Set(["succeeded", "failed", "abandoned"]);
+const COMPLETED_FEEDBACK_STATUSES = new Set(["succeeded", "failed"]);
+const FEEDBACK_REACTIONS = new Set<PuzzleFeedbackReaction>(["easy", "good", "hard", "tricky", "fun"]);
 const ANONYMOUS_SESSION_COOKIE = "pinpoint_anon_session";
 
 function asClues(value: unknown) {
@@ -56,6 +76,17 @@ function publicAttempt(attempt: AttemptRow): PublicAttempt {
     elapsedMs: attempt.elapsed_ms,
     isCorrect: attempt.is_correct,
     isRanked: attempt.is_ranked
+  };
+}
+
+function publicFeedback(row: PuzzleFeedbackRow, userId: string): PuzzleFeedbackItem {
+  return {
+    id: row.id,
+    nickname: row.nickname_snapshot,
+    reaction: row.reaction,
+    comment: row.comment,
+    createdAt: row.created_at,
+    isMe: row.user_id === userId
   };
 }
 
@@ -292,6 +323,17 @@ async function getProfile(userId: string) {
     .maybeSingle();
   if (error) throw error;
   return data as { id: string; nickname: string } | null;
+}
+
+async function getCompletedFeedbackAttempt(publicationId: string, actor: Actor) {
+  if (!actor.userId) return null;
+  const claimed = await claimAnonymousAttempt(publicationId, actor);
+  const attempt = claimed ?? await getAttempt(publicationId, {
+    userId: actor.userId,
+    anonymousSessionId: null
+  });
+  if (!attempt || !COMPLETED_FEEDBACK_STATUSES.has(attempt.status)) return null;
+  return attempt;
 }
 
 async function createLeaderboardEntry(attempt: AttemptRow, nickname: string, rankStatus: "visible" | "flagged") {
@@ -603,6 +645,115 @@ export async function writeWinnerMessage(message: string) {
     visible_from: visibleFrom,
     visible_until: visibleUntil
   });
+
+  if (error) throw error;
+  return { ok: true };
+}
+
+export async function getDailyPuzzleFeedback(): Promise<PuzzleFeedbackState> {
+  const actor = await getActor();
+  const { publishDateKst, publication } = await getTodayPublication();
+  if (!publication) {
+    return {
+      status: "no_puzzle",
+      publishDateKst,
+      canRead: false,
+      canWrite: false,
+      items: [],
+      myFeedback: null,
+      message: "오늘 공개된 문제가 없습니다."
+    };
+  }
+
+  if (!actor.userId) {
+    return {
+      status: "ready",
+      publishDateKst: publication.publish_date_kst,
+      canRead: false,
+      canWrite: false,
+      items: [],
+      myFeedback: null,
+      message: "로그인하고 오늘 문제를 완료하면 플레이어 반응을 볼 수 있어요.",
+      requiresSignIn: true
+    };
+  }
+
+  const completedAttempt = await getCompletedFeedbackAttempt(publication.id, actor);
+  if (!completedAttempt) {
+    return {
+      status: "ready",
+      publishDateKst: publication.publish_date_kst,
+      canRead: false,
+      canWrite: false,
+      items: [],
+      myFeedback: null,
+      message: "오늘 문제를 완료하면 플레이어 반응을 볼 수 있어요.",
+      requiresSignIn: false
+    };
+  }
+
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("daily_puzzle_feedback")
+    .select("id,user_id,nickname_snapshot,reaction,comment,created_at")
+    .eq("publication_id", publication.id)
+    .eq("feedback_status", "visible")
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error) throw error;
+
+  const items = ((data ?? []) as PuzzleFeedbackRow[]).map((row) => publicFeedback(row, actor.userId as string));
+  const myFeedback = items.find((item) => item.isMe) ?? null;
+
+  return {
+    status: "ready",
+    publishDateKst: publication.publish_date_kst,
+    canRead: true,
+    canWrite: true,
+    items,
+    myFeedback
+  };
+}
+
+export async function writePuzzleFeedback(input: { reaction: string; comment: string }) {
+  const reaction = String(input.reaction ?? "") as PuzzleFeedbackReaction;
+  const comment = String(input.comment ?? "").trim();
+
+  if (!FEEDBACK_REACTIONS.has(reaction)) {
+    return { ok: false, error: "평가를 선택해 주세요." };
+  }
+  if (comment.length < 1 || comment.length > 140) {
+    return { ok: false, error: "한마디는 1~140자로 입력해 주세요." };
+  }
+
+  const actor = await getActor();
+  if (!actor.userId) return { ok: false, error: "로그인이 필요합니다." };
+
+  const { publication } = await getTodayPublication();
+  if (!publication) return { ok: false, error: "오늘 공개된 문제가 없습니다." };
+
+  const [profile, completedAttempt] = await Promise.all([
+    getProfile(actor.userId),
+    getCompletedFeedbackAttempt(publication.id, actor)
+  ]);
+  if (!profile) return { ok: false, error: "닉네임 설정이 필요합니다." };
+  if (!completedAttempt) return { ok: false, error: "오늘 문제를 완료하면 평가를 남길 수 있습니다." };
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("daily_puzzle_feedback")
+    .upsert({
+      publication_id: publication.id,
+      user_id: actor.userId,
+      attempt_id: completedAttempt.id,
+      nickname_snapshot: profile.nickname,
+      reaction,
+      comment,
+      feedback_status: "visible"
+    }, {
+      onConflict: "publication_id,user_id"
+    });
 
   if (error) throw error;
   return { ok: true };

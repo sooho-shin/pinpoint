@@ -206,8 +206,10 @@ async function resetDerivedState(publicationId, resetAuth) {
   const attemptIds = await listIds("attempts", "publication_id", [publicationId]);
   const leaderboardEntryIds = await listIds("leaderboard_entries", "publication_id", [publicationId]);
   const dailyWinnerMessageIds = await listIds("daily_winner_messages", "publication_id", [publicationId]);
+  const dailyPuzzleFeedbackIds = await listIds("daily_puzzle_feedback", "publication_id", [publicationId]);
   const groupDeletes = await deleteGroupsForPublication(publicationId);
 
+  const deletedDailyPuzzleFeedback = await deleteByIds("daily_puzzle_feedback", dailyPuzzleFeedbackIds);
   const deletedDailyWinnerMessages = await deleteByIds("daily_winner_messages", dailyWinnerMessageIds);
   const deletedLeaderboardEntries = await deleteByIds("leaderboard_entries", leaderboardEntryIds);
   const deletedAttempts = await deleteByIds("attempts", attemptIds);
@@ -224,6 +226,7 @@ async function resetDerivedState(publicationId, resetAuth) {
     attempts: deletedAttempts,
     leaderboard_entries: deletedLeaderboardEntries,
     daily_winner_messages: deletedDailyWinnerMessages,
+    daily_puzzle_feedback: deletedDailyPuzzleFeedback,
     ...groupDeletes,
     profiles: deletedProfiles,
     auth_users: deletedAuthUsers
@@ -249,6 +252,7 @@ async function main() {
   const attemptIds = publication ? await listIds("attempts", "publication_id", [publication.id]) : [];
   const leaderboardEntryIds = publication ? await listIds("leaderboard_entries", "publication_id", [publication.id]) : [];
   const dailyWinnerMessageIds = publication ? await listIds("daily_winner_messages", "publication_id", [publication.id]) : [];
+  const dailyPuzzleFeedbackIds = publication ? await listIds("daily_puzzle_feedback", "publication_id", [publication.id]) : [];
   const profileIds = resetAuth ? await listAllIds("profiles") : [];
   const authUsers = resetAuth ? await listAuthUsers() : [];
 
@@ -263,6 +267,7 @@ async function main() {
         attempts: attemptIds.length,
         leaderboard_entries: leaderboardEntryIds.length,
         daily_winner_messages: dailyWinnerMessageIds.length,
+        daily_puzzle_feedback: dailyPuzzleFeedbackIds.length,
         ...groupCounts.counts,
         profiles: profileIds.length,
         auth_users: authUsers.length
@@ -306,6 +311,7 @@ async function main() {
       attempts: 0,
       leaderboard_entries: 0,
       daily_winner_messages: 0,
+      daily_puzzle_feedback: 0,
       group_leaderboard_entries: 0,
       group_members: 0,
       groups: 0,

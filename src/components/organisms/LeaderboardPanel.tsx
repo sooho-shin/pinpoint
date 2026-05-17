@@ -1,12 +1,21 @@
 "use client";
 
+import { clsx } from "clsx";
 import { FormEvent, useEffect, useState } from "react";
 import { Button, ButtonLink } from "@/components/atoms/Button";
 import { TextInput } from "@/components/atoms/TextInput";
 import { LeaderboardTabs } from "@/components/molecules/LeaderboardTabs";
 import { RankingRow, type RankingRowData } from "@/components/molecules/RankingRow";
 import { formatKoreanDate } from "@/lib/format";
-import type { WinnerMessage } from "@/lib/puzzle/types";
+import type { PuzzleFeedbackReaction, PuzzleFeedbackState, WinnerMessage } from "@/lib/puzzle/types";
+
+const feedbackReactions: Array<{ value: PuzzleFeedbackReaction; label: string }> = [
+  { value: "good", label: "좋았어요" },
+  { value: "fun", label: "재밌어요" },
+  { value: "tricky", label: "헷갈려요" },
+  { value: "hard", label: "어려워요" },
+  { value: "easy", label: "쉬웠어요" }
+];
 
 type LeaderboardState =
   | { status: "loading" }
@@ -17,6 +26,7 @@ type LeaderboardState =
       rows: RankingRowData[];
       canWriteWinnerMessage: boolean;
       winnerMessage: WinnerMessage | null;
+      puzzleFeedback: PuzzleFeedbackState;
     };
 
 async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
@@ -36,14 +46,23 @@ export function LeaderboardPanel() {
   const [state, setState] = useState<LeaderboardState>({ status: "loading" });
   const [message, setMessage] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [feedbackReaction, setFeedbackReaction] = useState<PuzzleFeedbackReaction>("good");
+  const [feedbackComment, setFeedbackComment] = useState("");
+  const [feedbackSubmitMessage, setFeedbackSubmitMessage] = useState("");
   const [pending, setPending] = useState(false);
+  const [feedbackPending, setFeedbackPending] = useState(false);
 
   async function load() {
-    const [leaderboard, winnerMessage] = await Promise.all([
+    const [leaderboard, winnerMessage, puzzleFeedback] = await Promise.all([
       getJson<Extract<LeaderboardState, { status: "ready" | "no_puzzle" }> & { winnerMessage?: WinnerMessage | null }>("/api/leaderboard/daily"),
-      getJson<WinnerMessage | null>("/api/winner-message/current")
+      getJson<WinnerMessage | null>("/api/winner-message/current"),
+      getJson<PuzzleFeedbackState>("/api/puzzle-feedback/daily")
     ]);
-    setState({ ...leaderboard, winnerMessage });
+    setState({ ...leaderboard, winnerMessage, puzzleFeedback });
+    if (puzzleFeedback.status === "ready" && puzzleFeedback.myFeedback) {
+      setFeedbackReaction(puzzleFeedback.myFeedback.reaction);
+      setFeedbackComment(puzzleFeedback.myFeedback.comment);
+    }
   }
 
   useEffect(() => {
@@ -67,6 +86,28 @@ export function LeaderboardPanel() {
       setFeedback(error instanceof Error ? error.message : "메시지를 등록하지 못했습니다.");
     } finally {
       setPending(false);
+    }
+  }
+
+  async function submitPuzzleFeedback(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!feedbackComment.trim()) return;
+    setFeedbackPending(true);
+    setFeedbackSubmitMessage("");
+    try {
+      await getJson("/api/puzzle-feedback", {
+        method: "POST",
+        body: JSON.stringify({
+          reaction: feedbackReaction,
+          comment: feedbackComment
+        })
+      });
+      setFeedbackSubmitMessage("평가를 저장했습니다.");
+      await load();
+    } catch (error) {
+      setFeedbackSubmitMessage(error instanceof Error ? error.message : "평가를 저장하지 못했습니다.");
+    } finally {
+      setFeedbackPending(false);
     }
   }
 
@@ -139,6 +180,78 @@ export function LeaderboardPanel() {
           </div>
         </div>
       ) : null}
+
+      <div className="mt-6 border-t border-[var(--border)] pt-5">
+        <div className="text-sm font-semibold text-[var(--text-primary)]">오늘 문제 한마디</div>
+        {state.puzzleFeedback.status === "ready" && state.puzzleFeedback.canRead ? (
+          <>
+            <form className="mt-3 space-y-3" onSubmit={submitPuzzleFeedback}>
+              <div className="grid grid-cols-2 gap-2">
+                {feedbackReactions.map((reaction) => (
+                  <button
+                    key={reaction.value}
+                    type="button"
+                    className={clsx(
+                      "focus-ring min-h-10 rounded-md border px-3 text-sm font-semibold transition",
+                      feedbackReaction === reaction.value
+                        ? "border-[var(--accent)] bg-[var(--accent)] text-white"
+                        : "border-[var(--border)] bg-white text-[var(--text-primary)]"
+                    )}
+                    onClick={() => setFeedbackReaction(reaction.value)}
+                    disabled={feedbackPending}
+                  >
+                    {reaction.label}
+                  </button>
+                ))}
+              </div>
+              <TextInput
+                value={feedbackComment}
+                maxLength={140}
+                onChange={(event) => setFeedbackComment(event.target.value)}
+                placeholder="오늘 문제 어땠나요?"
+                disabled={feedbackPending}
+              />
+              <div className="text-right text-xs font-semibold text-[var(--text-secondary)]">{feedbackComment.length}/140</div>
+              <Button type="submit" disabled={feedbackPending || !feedbackComment.trim()}>
+                {state.puzzleFeedback.myFeedback ? "평가 수정" : "평가 등록"}
+              </Button>
+              {feedbackSubmitMessage ? <p className="text-sm text-[var(--text-secondary)]">{feedbackSubmitMessage}</p> : null}
+            </form>
+
+            <div className="mt-5 space-y-2">
+              {state.puzzleFeedback.items.length === 0 ? (
+                <div className="muted-surface p-4 text-sm text-[var(--text-secondary)]">아직 남겨진 한마디가 없습니다.</div>
+              ) : (
+                state.puzzleFeedback.items.map((item) => {
+                  const reaction = feedbackReactions.find((entry) => entry.value === item.reaction)?.label ?? item.reaction;
+                  return (
+                    <div key={item.id} className="rounded-md border border-[var(--border)] bg-white p-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0 text-sm font-semibold text-[var(--text-primary)]">
+                          {item.nickname}{item.isMe ? " · 나" : ""}
+                        </div>
+                        <div className="shrink-0 text-xs font-semibold text-[var(--accent)]">{reaction}</div>
+                      </div>
+                      <p className="mt-2 text-sm leading-5 text-[var(--text-secondary)]">{item.comment}</p>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="muted-surface mt-3 p-4">
+            <p className="text-sm leading-5 text-[var(--text-secondary)]">
+              {state.puzzleFeedback.status === "ready" ? state.puzzleFeedback.message : "오늘 공개된 문제가 없습니다."}
+            </p>
+            {state.puzzleFeedback.status === "ready" && state.puzzleFeedback.requiresSignIn ? (
+              <div className="mt-4">
+                <ButtonLink href="/signin?next=/ranking" variant="secondary">로그인하기</ButtonLink>
+              </div>
+            ) : null}
+          </div>
+        )}
+      </div>
     </section>
   );
 }

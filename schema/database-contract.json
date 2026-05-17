@@ -11,6 +11,7 @@
     "daily_publication_and_user_attempts_are_separate",
     "attempt_log_and_leaderboard_projection_are_separate",
     "daily_winner_message_is_separate_from_leaderboard_projection",
+    "daily_puzzle_feedback_is_completion_gated",
     "email_is_not_public_profile_data",
     "one_ranked_success_per_user_per_publication"
   ],
@@ -20,7 +21,8 @@
     "attempt_status": ["playing", "succeeded", "failed", "abandoned"],
     "visibility": ["private", "daily", "group"],
     "rank_status": ["visible", "flagged", "hidden"],
-    "winner_message_status": ["draft", "visible", "hidden"]
+    "winner_message_status": ["draft", "visible", "hidden"],
+    "feedback_status": ["visible", "hidden"]
   },
   "tables": {
     "profiles": {
@@ -226,6 +228,42 @@
         "adminWritable": true
       }
     },
+    "daily_puzzle_feedback": {
+      "description": "오늘 문제를 완료한 로그인 사용자가 랭킹 화면에서 남기는 평가와 한마디.",
+      "columns": {
+        "id": { "type": "uuid", "primaryKey": true },
+        "publication_id": { "type": "uuid", "required": true, "references": "puzzle_publications.id" },
+        "user_id": { "type": "uuid", "required": true, "references": "profiles.id" },
+        "attempt_id": { "type": "uuid", "required": true, "references": "attempts.id" },
+        "nickname_snapshot": { "type": "text", "required": true, "public": true },
+        "reaction": { "type": "text", "required": true, "public": true },
+        "comment": { "type": "text", "required": true, "public": true, "maxLength": 140 },
+        "feedback_status": { "type": "feedback_status", "required": true, "default": "visible", "public": true },
+        "created_at": { "type": "timestamptz", "required": true, "public": true },
+        "updated_at": { "type": "timestamptz", "required": true }
+      },
+      "constraints": [
+        { "type": "unique", "name": "one_feedback_per_user_publication", "columns": ["publication_id", "user_id"] },
+        { "type": "unique", "name": "one_feedback_per_attempt", "columns": ["attempt_id"] },
+        { "type": "check", "name": "feedback_comment_length", "expression": "char_length(comment) between 1 and 140" },
+        { "type": "check", "name": "feedback_reaction_allowed", "expression": "reaction in ('easy', 'good', 'hard', 'tricky', 'fun')" }
+      ],
+      "indexes": [
+        { "name": "daily_puzzle_feedback_publication_status_idx", "columns": ["publication_id", "feedback_status", "created_at"] }
+      ],
+      "completionAuthorization": {
+        "requiresCompletedAttempt": true,
+        "terminalStatuses": ["succeeded", "failed"],
+        "enforcedBy": "trigger:daily_puzzle_feedback_requires_completed_attempt"
+      },
+      "rls": {
+        "required": true,
+        "completionGatedSelect": true,
+        "ownerWritable": true,
+        "adminSelect": true,
+        "adminWritable": true
+      }
+    },
     "groups": {
       "description": "공유 링크 또는 초대 코드로 만들어지는 그룹 랭킹 컨테이너.",
       "columns": {
@@ -315,6 +353,14 @@
       "visibleUntilNextPublication": true,
       "publicFields": ["nickname_snapshot", "message", "visible_until"],
       "hiddenWhenEmpty": true
+    },
+    "dailyPuzzleFeedback": {
+      "maxCommentLength": 140,
+      "requiresAuthenticatedProfile": true,
+      "requiresCompletedAttemptToRead": true,
+      "requiresCompletedAttemptToWrite": true,
+      "publicFields": ["nickname_snapshot", "reaction", "comment", "created_at"],
+      "hiddenWhenEmpty": false
     }
   }
 }

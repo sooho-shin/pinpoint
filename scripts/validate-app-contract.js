@@ -43,7 +43,9 @@ const REQUIRED_ROUTE_HANDLERS = [
   "POST /api/attempts/submit",
   "GET /api/leaderboard/daily",
   "GET /api/winner-message/current",
-  "POST /api/winner-message"
+  "POST /api/winner-message",
+  "GET /api/puzzle-feedback/daily",
+  "POST /api/puzzle-feedback"
 ];
 
 const REQUIRED_ENV = [
@@ -288,6 +290,26 @@ function validateRouteHandlers(contract, issues) {
 
     if (route.path === "/api/winner-message" && Number(route.maxMessageLength) !== 100) {
       addIssue(issues, "winner_message_length_mismatch", "POST /api/winner-message");
+    }
+
+    if (route.path === "/api/puzzle-feedback/daily") {
+      for (const field of FORBIDDEN_PUBLIC_RESPONSE_FIELDS) {
+        if (!route.mustNotExpose?.includes(field)) {
+          addIssue(issues, "feedback_route_missing_forbidden_field", field);
+        }
+      }
+      if (route.requiresCompletedAttempt !== true) {
+        addIssue(issues, "feedback_route_must_require_completed_attempt", "GET /api/puzzle-feedback/daily");
+      }
+    }
+
+    if (route.path === "/api/puzzle-feedback") {
+      if (Number(route.maxCommentLength) !== 140) {
+        addIssue(issues, "feedback_comment_length_mismatch", "POST /api/puzzle-feedback");
+      }
+      if (route.requiresCompletedAttempt !== true) {
+        addIssue(issues, "feedback_write_must_require_completed_attempt", "POST /api/puzzle-feedback");
+      }
     }
   }
 

@@ -34,7 +34,8 @@
       "daily_ranking",
       "google_sign_in",
       "nickname_setup",
-      "daily_winner_message"
+      "daily_winner_message",
+      "daily_puzzle_feedback"
     ],
     "deferred": [
       "group_ranking_full_flow",
@@ -67,7 +68,7 @@
         "path": "/ranking",
         "file": "src/app/ranking/page.tsx",
         "auth": "optional",
-        "states": ["loading", "ready", "empty", "privacy_prompt"],
+        "states": ["loading", "ready", "empty", "privacy_prompt", "feedback_locked", "feedback_ready"],
         "designScreens": ["Daily Ranking", "Ranking Empty State"]
       },
       {
@@ -197,6 +198,28 @@
         "auth": "required",
         "requires": ["profile", "daily_rank_1"],
         "maxMessageLength": 100
+      },
+      {
+        "name": "Daily Puzzle Feedback",
+        "method": "GET",
+        "path": "/api/puzzle-feedback/daily",
+        "file": "src/app/api/puzzle-feedback/daily/route.ts",
+        "auth": "optional",
+        "requires": ["profile", "completed_attempt"],
+        "requiresCompletedAttempt": true,
+        "publicFields": ["nickname_snapshot", "reaction", "comment", "created_at"],
+        "mustNotExpose": ["email", "answer", "aliases", "rationale", "submitted_answer", "normalized_answer", "device_hash", "ip_hash", "user_agent_hash"]
+      },
+      {
+        "name": "Write Puzzle Feedback",
+        "method": "POST",
+        "path": "/api/puzzle-feedback",
+        "file": "src/app/api/puzzle-feedback/route.ts",
+        "auth": "required",
+        "requires": ["profile", "completed_attempt"],
+        "requiresCompletedAttempt": true,
+        "maxCommentLength": 140,
+        "allowedReactions": ["easy", "good", "hard", "tricky", "fun"]
       }
     ],
     "forbiddenPublicResponseFields": [

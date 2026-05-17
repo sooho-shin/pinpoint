@@ -10,6 +10,7 @@ const REQUIRED_TABLES = [
   "attempts",
   "leaderboard_entries",
   "daily_winner_messages",
+  "daily_puzzle_feedback",
   "groups",
   "group_members",
   "group_leaderboard_entries"
@@ -21,7 +22,8 @@ const REQUIRED_ENUMS = {
   attempt_status: ["playing", "succeeded", "failed", "abandoned"],
   visibility: ["private", "daily", "group"],
   rank_status: ["visible", "flagged", "hidden"],
-  winner_message_status: ["draft", "visible", "hidden"]
+  winner_message_status: ["draft", "visible", "hidden"],
+  feedback_status: ["visible", "hidden"]
 };
 
 const REQUIRED_COLUMNS = {
@@ -69,6 +71,18 @@ const REQUIRED_COLUMNS = {
     "message_status",
     "visible_from",
     "visible_until",
+    "created_at",
+    "updated_at"
+  ],
+  daily_puzzle_feedback: [
+    "id",
+    "publication_id",
+    "user_id",
+    "attempt_id",
+    "nickname_snapshot",
+    "reaction",
+    "comment",
+    "feedback_status",
     "created_at",
     "updated_at"
   ],
@@ -296,6 +310,64 @@ function validateDailyWinnerMessages(contract, issues) {
   }
 }
 
+function validateDailyPuzzleFeedback(contract, issues) {
+  const feedback = contract.tables?.daily_puzzle_feedback;
+  if (!feedback) return;
+
+  if (!feedback.columns?.publication_id?.references?.startsWith("puzzle_publications.")) {
+    addIssue(issues, "feedback_missing_publication_reference", "daily_puzzle_feedback.publication_id");
+  }
+
+  if (!feedback.columns?.user_id?.references?.startsWith("profiles.")) {
+    addIssue(issues, "feedback_missing_profile_reference", "daily_puzzle_feedback.user_id");
+  }
+
+  if (!feedback.columns?.attempt_id?.references?.startsWith("attempts.")) {
+    addIssue(issues, "feedback_missing_attempt_reference", "daily_puzzle_feedback.attempt_id");
+  }
+
+  if (Number(feedback.columns?.comment?.maxLength) !== 140) {
+    addIssue(issues, "feedback_comment_max_length_mismatch", "daily_puzzle_feedback.comment");
+  }
+
+  if (!hasConstraint(feedback, "unique", ["publication_id", "user_id"])) {
+    addIssue(issues, "missing_one_feedback_per_user_publication_constraint", "daily_puzzle_feedback(publication_id,user_id)");
+  }
+
+  const completionAuthorization = feedback.completionAuthorization || {};
+  if (completionAuthorization.requiresCompletedAttempt !== true) {
+    addIssue(issues, "feedback_must_require_completed_attempt", "daily_puzzle_feedback.completionAuthorization.requiresCompletedAttempt");
+  }
+  if (completionAuthorization.enforcedBy !== "trigger:daily_puzzle_feedback_requires_completed_attempt") {
+    addIssue(issues, "feedback_missing_completed_attempt_trigger_contract", "daily_puzzle_feedback.completionAuthorization.enforcedBy");
+  }
+
+  const apiContract = contract.apiRequirements?.dailyPuzzleFeedback;
+  if (!apiContract) {
+    addIssue(issues, "missing_daily_puzzle_feedback_api_contract", "apiRequirements.dailyPuzzleFeedback");
+    return;
+  }
+
+  if (Number(apiContract.maxCommentLength) !== 140) {
+    addIssue(issues, "daily_puzzle_feedback_api_comment_length_mismatch", "apiRequirements.dailyPuzzleFeedback.maxCommentLength");
+  }
+  if (apiContract.requiresCompletedAttemptToRead !== true) {
+    addIssue(issues, "daily_puzzle_feedback_must_require_completion_to_read", "apiRequirements.dailyPuzzleFeedback.requiresCompletedAttemptToRead");
+  }
+  if (apiContract.requiresCompletedAttemptToWrite !== true) {
+    addIssue(issues, "daily_puzzle_feedback_must_require_completion_to_write", "apiRequirements.dailyPuzzleFeedback.requiresCompletedAttemptToWrite");
+  }
+
+  const allowedPublicFields = ["nickname_snapshot", "reaction", "comment", "created_at"];
+  const publicFields = apiContract.publicFields || [];
+  for (const field of allowedPublicFields) {
+    if (!publicFields.includes(field)) addIssue(issues, "daily_puzzle_feedback_missing_public_field", field);
+  }
+  for (const field of publicFields) {
+    if (!allowedPublicFields.includes(field)) addIssue(issues, "daily_puzzle_feedback_forbidden_public_field", field);
+  }
+}
+
 function validateGroups(contract, issues) {
   const groups = contract.tables?.groups;
   const members = contract.tables?.group_members;
@@ -387,6 +459,7 @@ async function main() {
   validateUserScopedPlayModel(contract, issues);
   validateLeaderboard(contract, issues);
   validateDailyWinnerMessages(contract, issues);
+  validateDailyPuzzleFeedback(contract, issues);
   validateGroups(contract, issues);
 
   if (issues.length > 0) {

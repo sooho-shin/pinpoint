@@ -34,6 +34,38 @@ export type WinnerMessage = {
   visibleUntil: string;
 };
 
+export type PuzzleFeedbackReaction = "easy" | "good" | "hard" | "tricky" | "fun";
+
+export type PuzzleFeedbackItem = {
+  id: string;
+  nickname: string;
+  reaction: PuzzleFeedbackReaction;
+  comment: string;
+  createdAt: string;
+  isMe: boolean;
+};
+
+export type PuzzleFeedbackState =
+  | {
+      status: "no_puzzle";
+      publishDateKst: string;
+      canRead: false;
+      canWrite: false;
+      items: [];
+      myFeedback: null;
+      message: string;
+    }
+  | {
+      status: "ready";
+      publishDateKst: string;
+      canRead: boolean;
+      canWrite: boolean;
+      items: PuzzleFeedbackItem[];
+      myFeedback: PuzzleFeedbackItem | null;
+      message?: string;
+      requiresSignIn?: boolean;
+    };
+
 export type SubmitResult = {
   status: "playing" | "succeeded" | "failed";
   isCorrect: boolean;
