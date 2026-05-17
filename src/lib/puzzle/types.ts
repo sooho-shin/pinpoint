@@ -36,6 +36,7 @@ export type WinnerMessage = {
 export type SubmitResult = {
   status: "playing" | "succeeded" | "failed";
   isCorrect: boolean;
+  attemptId?: string;
   publicationId: string;
   category: string;
   difficulty: number;

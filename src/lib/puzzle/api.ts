@@ -415,6 +415,7 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
     return {
       status: attempt.status === "succeeded" ? "succeeded" : "failed",
       isCorrect: attempt.is_correct,
+      attemptId: attempt.id,
       publicationId: publication.id,
       category: puzzle.category,
       difficulty: puzzle.difficulty,
@@ -472,6 +473,7 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
   return {
     status: nextStatus,
     isCorrect,
+    attemptId: updatedAttempt.id,
     publicationId: publication.id,
     category: puzzle.category,
     difficulty: puzzle.difficulty,

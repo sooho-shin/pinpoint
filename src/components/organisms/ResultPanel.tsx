@@ -22,7 +22,7 @@ export function ResultPanel() {
     if (!raw) return;
     const cached = JSON.parse(raw) as SubmitResult;
     setResult(cached);
-    const promptKey = `pinpoint:winner-message-prompted:${cached.publicationId}`;
+    const promptKey = `pinpoint:winner-message-prompted:${cached.attemptId ?? cached.publicationId}`;
     if (cached.canWriteWinnerMessage && !sessionStorage.getItem(promptKey)) {
       setWinnerPromptOpen(true);
       sessionStorage.setItem(promptKey, "1");
