@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isValidNickname } from "@/lib/puzzle/normalize";
 
 const SIGNUP_NICKNAME_COOKIE = "pinpoint_signup_nickname";
+const PRODUCTION_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL ?? "https://pinpoint-seven.vercel.app";
 
 function safeNextPath(value: FormDataEntryValue | null) {
   const next = String(value ?? "/");
@@ -14,6 +15,8 @@ function safeNextPath(value: FormDataEntryValue | null) {
 }
 
 function getRequestOrigin(headerStore: Headers) {
+  if (process.env.NODE_ENV === "production") return PRODUCTION_ORIGIN;
+
   const origin = headerStore.get("origin");
   if (origin && !origin.includes("localhost")) return origin;
 
@@ -21,20 +24,12 @@ function getRequestOrigin(headerStore: Headers) {
   const forwardedProto = headerStore.get("x-forwarded-proto") ?? "https";
   if (forwardedHost) return `${forwardedProto}://${forwardedHost}`;
 
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-
   const host = headerStore.get("host");
   if (host) {
-    if (process.env.NODE_ENV === "production" && host.includes("localhost")) {
-      throw new Error("Production sign-in request resolved to localhost.");
-    }
     const protocol = host.includes("localhost") ? "http" : "https";
     return `${protocol}://${host}`;
   }
 
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("Production sign-in request is missing origin headers.");
-  }
   return "http://localhost:3000";
 }
 
