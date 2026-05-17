@@ -113,7 +113,7 @@ export function LeaderboardPanel() {
         )}
       </div>
 
-      {state.canWriteWinnerMessage ? (
+      {state.canWriteWinnerMessage && !state.winnerMessage ? (
         <form className="space-y-3" onSubmit={submitMessage}>
           <div>
             <div className="mb-2 text-sm font-semibold text-[var(--text-primary)]">1등 확성기</div>
@@ -130,7 +130,7 @@ export function LeaderboardPanel() {
           <Button type="submit" disabled={pending || !message.trim()}>메시지 등록</Button>
           {feedback ? <p className="text-sm text-[var(--text-secondary)]">{feedback}</p> : null}
         </form>
-      ) : (
+      ) : !state.winnerMessage ? (
         <div className="muted-surface p-4">
           <div className="text-sm font-semibold text-[var(--text-primary)]">내 기록 올리기</div>
           <p className="mt-2 text-sm leading-5 text-[var(--text-secondary)]">로그인 후 닉네임을 연결하면 성공 기록이 오늘의 랭킹에 표시됩니다.</p>
@@ -138,7 +138,7 @@ export function LeaderboardPanel() {
             <ButtonLink href="/signin?next=/ranking" variant="secondary">로그인하기</ButtonLink>
           </div>
         </div>
-      )}
+      ) : null}
     </section>
   );
 }
