@@ -6,7 +6,7 @@ export function DailyPuzzleTemplate() {
   return (
     <main className="app-shell">
       <div className="screen-frame">
-        <GameHeader showGuide />
+        <GameHeader showGuide showShare />
         <DailyWinnerBanner />
         <PuzzleBoard />
       </div>

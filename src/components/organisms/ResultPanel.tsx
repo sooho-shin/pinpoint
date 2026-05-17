@@ -52,10 +52,20 @@ export function ResultPanel() {
     return `Pinpoint ${mark}\n정답: ${result.answer}\n단서: ${result.clues.join(" / ")}`;
   }, [result]);
 
-  async function copyShareText() {
+  async function shareResult() {
     if (!shareText) return;
-    await navigator.clipboard.writeText(shareText);
-    setCopied(true);
+    const url = window.location.origin;
+    const text = `${shareText}\n${url}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Pinpoint", text, url });
+      } else {
+        await navigator.clipboard.writeText(text);
+      }
+      setCopied(true);
+    } catch {
+      // 공유창 취소는 사용자가 의도한 흐름이므로 조용히 무시한다.
+    }
   }
 
   async function submitWinnerMessage(event: FormEvent<HTMLFormElement>) {
@@ -125,7 +135,7 @@ export function ResultPanel() {
         </div>
       ) : null}
 
-      <ShareActionGroup onCopy={copyShareText} copied={copied} />
+      <ShareActionGroup onCopy={shareResult} copied={copied} />
 
       {winnerPromptOpen && result.canWriteWinnerMessage ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(32,33,36,0.42)] p-6">

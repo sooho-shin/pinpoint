@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Home, Trophy } from "lucide-react";
+import { ShareButton } from "@/components/molecules/ShareButton";
 import { GameGuideTooltip } from "@/components/organisms/GameGuideTooltip";
 
 type GameHeaderProps = {
@@ -7,9 +8,10 @@ type GameHeaderProps = {
   title?: string;
   action?: "ranking" | "home";
   showGuide?: boolean;
+  showShare?: boolean;
 };
 
-export function GameHeader({ eyebrow, title = "Pinpoint", action = "ranking", showGuide = false }: GameHeaderProps) {
+export function GameHeader({ eyebrow, title = "Pinpoint", action = "ranking", showGuide = false, showShare = false }: GameHeaderProps) {
   const ActionIcon = action === "home" ? Home : Trophy;
   const actionHref = action === "home" ? "/" : "/ranking";
   const actionLabel = action === "home" ? "메인으로 돌아가기" : "오늘의 랭킹";
@@ -22,6 +24,7 @@ export function GameHeader({ eyebrow, title = "Pinpoint", action = "ranking", sh
       </div>
       <div className="flex items-center gap-2">
         {showGuide ? <GameGuideTooltip /> : null}
+        {showShare ? <ShareButton /> : null}
         <Link
           className="focus-ring inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--border)] bg-white"
           href={actionHref}
