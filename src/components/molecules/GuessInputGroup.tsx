@@ -20,7 +20,7 @@ export function GuessInputGroup({
   canReveal: boolean;
 }) {
   return (
-    <form className="min-h-40 w-[278px] space-y-3" onSubmit={onSubmit}>
+    <form className="min-h-40 w-full space-y-3" onSubmit={onSubmit}>
       <TextInput
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -28,7 +28,7 @@ export function GuessInputGroup({
         autoComplete="off"
         disabled={disabled}
       />
-      <div className="grid grid-cols-2 gap-[14px]">
+      <div className="grid w-full grid-cols-2 gap-3">
         <Button type="submit" disabled={disabled || !value.trim()}>제출</Button>
         <Button type="button" variant="secondary" onClick={onReveal} disabled={disabled || !canReveal}>
           다음 단서
