@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/atoms/Button";
+import { Button, ButtonLink } from "@/components/atoms/Button";
 import { ClueRow } from "@/components/molecules/ClueRow";
 import { FeedbackMessage } from "@/components/molecules/FeedbackMessage";
 import { GuessInputGroup } from "@/components/molecules/GuessInputGroup";
@@ -136,6 +136,11 @@ export function PuzzleBoard() {
         <div className="text-xs font-semibold text-[var(--text-secondary)]">{formatKoreanDate(state.publishDateKst)}</div>
         <h2 className="mt-1 text-[22px] font-bold leading-[30px]">{state.category}</h2>
         <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">문제와 1등 확성기는 매일 오후 5시에 새로 시작합니다.</p>
+        {state.requiresSignInForRanking ? (
+          <div className="mt-3">
+            <ButtonLink href="/signin?next=/" variant="secondary" className="h-10 text-xs">로그인하고 랭킹 참여</ButtonLink>
+          </div>
+        ) : null}
       </div>
 
       <div className="mb-6 rounded-md border border-[var(--border)] px-4">
