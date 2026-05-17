@@ -205,6 +205,7 @@ function visiblePuzzleState(
     clues: puzzle.clues.slice(0, visibleCount),
     lockedCount: Math.max(0, 5 - visibleCount),
     attempt: attempt ? publicAttempt(attempt) : null,
+    ...(shouldShowAll ? { answer: puzzle.answer } : {}),
     winnerMessage,
     requiresSignInForRanking
   };

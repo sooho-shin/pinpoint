@@ -147,6 +147,12 @@ export function PuzzleBoard() {
       {completed ? (
         <div className="space-y-3">
           <p className="text-sm text-[var(--text-secondary)]">이미 오늘 문제를 완료했습니다.</p>
+          {state.answer ? (
+            <div className="muted-surface p-4">
+              <div className="text-xs font-semibold text-[var(--text-secondary)]">정답</div>
+              <div className="mt-1 text-xl font-bold">{state.answer}</div>
+            </div>
+          ) : null}
           <Button type="button" onClick={() => router.push("/ranking")}>오늘의 랭킹 보기</Button>
         </div>
       ) : (

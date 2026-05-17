@@ -18,6 +18,7 @@ export type PuzzlePlayState = {
   clues: string[];
   lockedCount: number;
   attempt: PublicAttempt | null;
+  answer?: string;
   winnerMessage: WinnerMessage | null;
   requiresSignInForRanking: boolean;
 };
