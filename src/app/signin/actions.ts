@@ -1,11 +1,9 @@
 "use server";
 
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isValidNickname } from "@/lib/puzzle/normalize";
 
-const SIGNUP_NICKNAME_COOKIE = "pinpoint_signup_nickname";
 const PRODUCTION_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL ?? "https://pinpoint-seven.vercel.app";
 
 function safeNextPath(value: FormDataEntryValue | null) {
@@ -34,20 +32,7 @@ function getRequestOrigin(headerStore: Headers) {
 }
 
 export async function signInWithGoogle(formData: FormData) {
-  const nickname = String(formData.get("nickname") ?? "").trim();
   const next = safeNextPath(formData.get("next"));
-  if (!isValidNickname(nickname)) {
-    redirect(`/signin?error=nickname&next=${encodeURIComponent(next)}`);
-  }
-
-  const cookieStore = await cookies();
-  cookieStore.set(SIGNUP_NICKNAME_COOKIE, encodeURIComponent(nickname), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 15
-  });
 
   const supabase = await createSupabaseServerClient();
   const headerStore = await headers();

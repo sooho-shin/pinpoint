@@ -1,28 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isValidNickname, normalizeAnswer } from "@/lib/puzzle/normalize";
-
-const SIGNUP_NICKNAME_COOKIE = "pinpoint_signup_nickname";
 
 function safeNextPath(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";
   return value;
-}
-
-function safeDecode(value: string) {
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return "";
-  }
-}
-
-function isRecentAuthUser(createdAt?: string) {
-  if (!createdAt) return false;
-  const createdTime = new Date(createdAt).getTime();
-  if (!Number.isFinite(createdTime)) return false;
-  return Date.now() - createdTime < 15 * 60 * 1000;
 }
 
 export async function GET(request: NextRequest) {
@@ -38,31 +19,17 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (user) {
-      const cookieStore = await cookies();
-      const signupNickname = safeDecode(String(cookieStore.get(SIGNUP_NICKNAME_COOKIE)?.value ?? "")).trim();
       const { data: profile } = await supabase
         .from("profiles")
-        .select("nickname,created_at")
+        .select("nickname")
         .eq("id", user.id)
         .maybeSingle();
 
-      if ((!profile?.nickname || isRecentAuthUser(user.created_at)) && isValidNickname(signupNickname)) {
-        const { error } = await supabase.from("profiles").upsert({
-          id: user.id,
-          nickname: signupNickname,
-          nickname_normalized: normalizeAnswer(signupNickname),
-          avatar_url: user.user_metadata?.avatar_url ?? null
-        });
-        if (!error) {
-          cookieStore.delete(SIGNUP_NICKNAME_COOKIE);
-          return NextResponse.redirect(new URL(next, url.origin));
-        }
-      }
-
-      cookieStore.delete(SIGNUP_NICKNAME_COOKIE);
       if (!profile?.nickname) {
         return NextResponse.redirect(new URL(`/nickname?next=${encodeURIComponent(next)}`, url.origin));
       }
+
+      return NextResponse.redirect(new URL(next, url.origin));
     }
   }
 

@@ -1,7 +1,7 @@
 export function AuthStatusMessage() {
   return (
     <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
-      닉네임을 입력한 뒤 Google로 계속하세요. 로그인하면 성공 기록을 오늘의 랭킹에 올릴 수 있습니다.
+      Google로 먼저 로그인하세요. 처음 방문한 계정이면 다음 화면에서 랭킹에 표시할 닉네임을 정합니다.
     </p>
   );
 }

@@ -55,7 +55,7 @@ npm run app:contract
 - Today Puzzle, Result, Daily Ranking, 플레이 API는 익명 플레이 허용 정책을 따른다.
 - 같은 브라우저에서 비로그인으로 시작한 오늘 attempt는 로그인 후 계정 attempt로 승계한다.
 - 익명 attempt가 이미 성공/실패 상태이면 로그인 후에도 완료 상태를 유지하고 같은 문제를 새로 풀게 하지 않는다.
-- 회원가입 시작 화면은 Google OAuth 전에 닉네임을 필수로 입력받는다.
+- 신규 사용자는 Google OAuth 이후 닉네임 설정 화면에서 닉네임을 필수로 입력받는다.
 - 오늘 공개 문제는 하나지만 모든 로그인 사용자와 익명 세션이 각각 독립 attempt로 풀 수 있어야 한다.
 - 랭킹 1등, winner message, 다른 사용자의 terminal attempt를 이유로 현재 사용자의 풀이 시작/제출을 막지 않는다.
 - terminal result 전 정답, aliases, rationale, 잠긴 단서를 반환하지 않는다.

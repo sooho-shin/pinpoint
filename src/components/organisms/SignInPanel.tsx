@@ -1,6 +1,5 @@
 import { GoogleSignInButton } from "@/components/atoms/GoogleSignInButton";
 import { AuthStatusMessage } from "@/components/molecules/AuthStatusMessage";
-import { TextInput } from "@/components/atoms/TextInput";
 
 export function SignInPanel({
   action,
@@ -17,7 +16,6 @@ export function SignInPanel({
       <AuthStatusMessage />
       <form action={action} className="mt-8 space-y-3">
         <input type="hidden" name="next" value={next} />
-        <TextInput name="nickname" minLength={2} maxLength={12} placeholder="닉네임" required />
         <GoogleSignInButton />
         {error ? <p className="text-sm text-[var(--danger)]">{error}</p> : null}
       </form>

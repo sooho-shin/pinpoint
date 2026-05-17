@@ -21,7 +21,7 @@ const REQUIRED_PRINCIPLES = [
   "do_not_read_puzzles_directly_from_browser_supabase_client",
   "anonymous_play_allowed",
   "anonymous_attempt_claimed_after_signin",
-  "signup_nickname_required",
+  "post_oauth_nickname_required",
   "ranking_requires_authenticated_profile",
   "email_is_never_public",
   "service_role_key_is_server_only"

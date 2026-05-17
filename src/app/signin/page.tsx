@@ -27,11 +27,9 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   }
 
   const error =
-    params.error === "nickname"
-      ? "닉네임은 2~12자의 한국어, 영문, 숫자로 입력해 주세요."
-      : params.error === "oauth"
-        ? "Google 로그인을 시작하지 못했습니다."
-        : undefined;
+    params.error === "oauth"
+      ? "Google 로그인을 시작하지 못했습니다."
+      : undefined;
 
   return <AuthTemplate kind="signin" action={signInWithGoogle} next={next} error={error} />;
 }
