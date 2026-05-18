@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og.png",
+        url: "/og-narrow.png",
         width: 1200,
         height: 630,
         alt: "Narrow 한국어 일일 연상 퍼즐"
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Narrow",
     description: "매일 오후 5시, 단서로 맞히는 오늘의 정답",
-    images: ["/og.png"]
+    images: ["/og-narrow.png"]
   }
 };
 
