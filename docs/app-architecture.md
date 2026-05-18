@@ -290,6 +290,7 @@ Google OAuth를 먼저 시작한다. 신규 사용자처럼 프로필 닉네임�
 - 닉네임 확인
 - 100자 제한
 - daily rank 1 검증
+- 기존 메시지가 있어도 현재 1등이면 같은 publication의 메시지 row를 자신의 랭킹 기록으로 덮어쓰기
 - `visible_until`은 다음 공개 전까지로 설정
 
 ### `GET /api/puzzle-feedback/daily`

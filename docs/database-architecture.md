@@ -139,6 +139,7 @@ scheduled -> published
 
 - `publication_id`당 visible 메시지는 하나만 허용한다.
 - 메시지는 `leaderboard_entries`를 참조해 1등 랭킹 기록과 연결한다.
+- 더 좋은 기록으로 1등이 바뀌면 현재 1등의 `leaderboard_entry_id`, `user_id`, `nickname_snapshot`, `message`로 같은 publication row를 갱신할 수 있다.
 - `message`는 1~100자다.
 - `visible_from`부터 `visible_until` 전까지 공개한다. 기본적으로 `visible_until`은 다음 문제 공개 시각이다.
 - 공개 API는 `nickname_snapshot`, `message`, `visible_until`만 노출한다.

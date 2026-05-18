@@ -432,15 +432,7 @@ async function canWriteWinnerMessage(publicationId: string, userId?: string | nu
 
   if (topEntryError) throw topEntryError;
   if (!topEntry || topEntry.user_id !== userId) return false;
-
-  const { data: existing, error: existingError } = await admin
-    .from("daily_winner_messages")
-    .select("user_id")
-    .eq("publication_id", publicationId)
-    .maybeSingle();
-
-  if (existingError) throw existingError;
-  return !existing || existing.user_id === userId;
+  return true;
 }
 
 async function claimAnonymousAttempt(publicationId: string, actor: Actor) {
@@ -871,20 +863,19 @@ export async function writeWinnerMessage(message: string) {
   const visibleUntil = getNextPublicationIso();
   const { data: existing, error: existingError } = await admin
     .from("daily_winner_messages")
-    .select("id,user_id")
+    .select("id")
     .eq("publication_id", publication.id)
     .maybeSingle();
 
   if (existingError) throw existingError;
 
   if (existing) {
-    if (existing.user_id !== actor.userId) {
-      return { ok: false, error: "이미 다른 1등 메시지가 등록되어 있습니다." };
-    }
-
     const { error } = await admin
       .from("daily_winner_messages")
       .update({
+        leaderboard_entry_id: topEntry.id,
+        user_id: actor.userId,
+        nickname_snapshot: topEntry.nickname_snapshot,
         message: trimmed,
         message_status: "visible",
         visible_from: visibleFrom,

@@ -287,11 +287,13 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
         )}
       </div>
 
-      {state.canWriteWinnerMessage && !state.winnerMessage ? (
+      {state.canWriteWinnerMessage ? (
         <form className="space-y-3" onSubmit={submitMessage}>
           <div>
             <div className="mb-2 text-sm font-semibold text-[var(--text-primary)]">1등 확성기</div>
-            <p className="mb-3 text-sm leading-5 text-[var(--text-secondary)]">메인 화면 최상단에 다음 공개 전까지 표시됩니다.</p>
+            <p className="mb-3 text-sm leading-5 text-[var(--text-secondary)]">
+              {state.winnerMessage ? "현재 1등 메시지로 갱신됩니다." : "메인 화면 최상단에 다음 공개 전까지 표시됩니다."}
+            </p>
           </div>
           <TextInput
             value={message}
@@ -301,7 +303,7 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
             disabled={pending}
           />
           <div className="text-right text-xs font-semibold text-[var(--text-secondary)]">{message.length}/100</div>
-          <Button type="submit" disabled={pending || !message.trim()}>메시지 등록</Button>
+          <Button type="submit" disabled={pending || !message.trim()}>{state.winnerMessage ? "메시지 갱신" : "메시지 등록"}</Button>
           {feedback ? <p className="text-sm text-[var(--text-secondary)]">{feedback}</p> : null}
         </form>
       ) : !state.winnerMessage ? (

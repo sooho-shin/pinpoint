@@ -358,6 +358,7 @@
       "maxLength": 100,
       "requiresAuthenticatedProfile": true,
       "requiresDailyRank": 1,
+      "currentRankOneCanReplaceExisting": true,
       "visibleUntilNextPublication": true,
       "publicFields": ["nickname_snapshot", "message", "visible_until"],
       "hiddenWhenEmpty": true

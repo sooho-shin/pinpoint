@@ -296,6 +296,9 @@ function validateDailyWinnerMessages(contract, issues) {
   if (apiContract.requiresDailyRank !== 1) {
     addIssue(issues, "daily_winner_message_requires_rank_one", "apiRequirements.dailyWinnerMessage.requiresDailyRank");
   }
+  if (apiContract.currentRankOneCanReplaceExisting !== true) {
+    addIssue(issues, "daily_winner_message_current_rank_one_must_replace_existing", "apiRequirements.dailyWinnerMessage.currentRankOneCanReplaceExisting");
+  }
   if (apiContract.visibleUntilNextPublication !== true) {
     addIssue(issues, "daily_winner_message_missing_next_publication_expiry", "apiRequirements.dailyWinnerMessage.visibleUntilNextPublication");
   }
