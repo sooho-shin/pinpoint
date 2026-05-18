@@ -184,7 +184,7 @@ npm run db:publish-daily
 
 이 명령은 KST 오늘 날짜의 `scheduled` publication 중 `scheduled_at <= now()`인 row를 `published`로 바꾼다. 오늘 row가 없으면 Supabase의 미사용 `generated` 후보 중 품질 기준을 통과한 문제를 골라 오늘 `published` row를 만든다. KST 17:00 전에는 실행해도 공개하지 않는다. 수동 테스트는 `-- --force`를 붙인다.
 
-Vercel 배포에서는 `vercel.json`의 cron이 UTC 08:00, 즉 KST 17:00에 `/api/cron/publish-daily`를 호출한다. 서버 프로세스가 계속 실행되는 방식이 아니라, 스케줄러가 하루 한 번 HTTP 요청을 보내는 방식이다.
+Vercel 배포에서는 `vercel.json`의 cron이 UTC 08:00, 즉 KST 17:00에 `/api/cron/publish-daily`를 호출한다. 서버 프로세스가 계속 실행되는 방식이 아니라, 스케줄러가 하루 한 번 HTTP 요청을 보내는 방식이다. Vercel Hobby cron은 지정 hour 안에서 지연될 수 있으므로, `/api/today` 조회도 17:00 이후 활성 공개일 row가 없으면 같은 공개 로직을 실행하는 보조 안전장치 역할을 한다.
 
 권장 수동 운영 예:
 

@@ -41,6 +41,18 @@ function getKstHour(date = new Date()) {
   );
 }
 
+async function getPublishedPublication(publishDateKst: string) {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("puzzle_publications")
+    .select("id,puzzle_id,publish_date_kst,status,scheduled_at,published_at")
+    .eq("publish_date_kst", publishDateKst)
+    .eq("status", "published")
+    .maybeSingle();
+  if (error) throw error;
+  return data as PublishDailyResult["publications"][number] | null;
+}
+
 export async function publishDailyPuzzle(options: PublishDailyOptions = {}): Promise<PublishDailyResult> {
   const now = options.now ?? new Date();
   const publishDateKst = options.dateKst ?? getKstDateString(now);
@@ -58,13 +70,7 @@ export async function publishDailyPuzzle(options: PublishDailyOptions = {}): Pro
   }
 
   const admin = createAdminClient();
-  const { data: existingPublished, error: existingError } = await admin
-    .from("puzzle_publications")
-    .select("id,puzzle_id,publish_date_kst,status,scheduled_at,published_at")
-    .eq("publish_date_kst", publishDateKst)
-    .eq("status", "published")
-    .maybeSingle();
-  if (existingError) throw existingError;
+  const existingPublished = await getPublishedPublication(publishDateKst);
   if (existingPublished) {
     return {
       publishDateKst,
@@ -138,7 +144,21 @@ export async function publishDailyPuzzle(options: PublishDailyOptions = {}): Pro
     })
     .select("id,puzzle_id,publish_date_kst,status,scheduled_at,published_at")
     .single();
-  if (createError) throw createError;
+  if (createError) {
+    if (String(createError.code) === "23505") {
+      const concurrentPublished = await getPublishedPublication(publishDateKst);
+      if (concurrentPublished) {
+        return {
+          publishDateKst,
+          eligible,
+          publishedCount: 0,
+          createdCount: 0,
+          publications: [concurrentPublished]
+        };
+      }
+    }
+    throw createError;
+  }
 
   return {
     publishDateKst,

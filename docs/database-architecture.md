@@ -103,6 +103,7 @@ scheduled -> published
 - 오늘 row가 없으면 스케줄러는 미사용 `generated` 후보를 선택해 오늘 `published` row를 생성한다.
 - 앱의 오늘 문제 조회는 JSON이 아니라 활성 공개일의 `puzzle_publications.publish_date_kst`와 `status = published` 조건을 기준으로 한다.
 - 활성 공개일은 현재 KST 시간이 17:00 전이면 전날 날짜, 17:00 이후이면 오늘 날짜다. 따라서 KST 00:00 이후에도 17:00 전까지는 전날 공개 문제가 계속 노출된다.
+- KST 17:00 이후 활성 공개일의 published row가 아직 없으면 앱 서버의 오늘 문제 조회가 동일한 공개 로직을 한 번 실행해 cron 지연을 보완한다.
 - 서비스 role key는 서버 스크립트와 cron route에서만 사용하고 client component 또는 public env로 노출하지 않는다.
 
 ### attempts

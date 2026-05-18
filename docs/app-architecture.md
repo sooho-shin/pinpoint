@@ -189,7 +189,7 @@ Google OAuth를 먼저 시작한다. 신규 사용자처럼 프로필 닉네임�
 
 ### `GET /api/today`
 
-오늘 활성 공개일 기준 published publication을 반환한다. 활성 공개일은 KST 17:00부터 다음날 KST 17:00 직전까지 유지된다.
+오늘 활성 공개일 기준 published publication을 반환한다. 활성 공개일은 KST 17:00부터 다음날 KST 17:00 직전까지 유지된다. KST 17:00 이후 활성 공개일 publication이 아직 없으면 서버가 공개 로직을 즉시 실행해 cron 지연으로 인한 빈 상태를 줄인다.
 
 반환 가능:
 
