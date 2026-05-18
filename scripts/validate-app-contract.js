@@ -16,6 +16,7 @@ const REQUIRED_PRINCIPLES = [
   "server_authoritative_clue_progression",
   "server_authoritative_answer_checking",
   "daily_publication_has_user_scoped_attempts",
+  "daily_success_streak_has_user_scoped_results",
   "do_not_expose_answer_before_terminal_result",
   "do_not_expose_locked_clues",
   "do_not_read_puzzles_directly_from_browser_supabase_client",
@@ -42,6 +43,7 @@ const REQUIRED_ROUTE_HANDLERS = [
   "POST /api/attempts/reveal",
   "POST /api/attempts/submit",
   "GET /api/leaderboard/daily",
+  "GET /api/leaderboard/streak",
   "GET /api/winner-message/current",
   "POST /api/winner-message",
   "GET /api/puzzle-feedback/daily",
@@ -70,6 +72,13 @@ const EXPECTED_RANKING_ORDER = [
   "used_clue_count:asc",
   "elapsed_ms:asc",
   "submitted_at:asc"
+];
+
+const EXPECTED_STREAK_RANKING_ORDER = [
+  "current_streak:desc",
+  "last_success_publish_date_kst:desc",
+  "longest_streak:desc",
+  "total_success_count:desc"
 ];
 
 function parseArgs(argv = process.argv.slice(2)) {
@@ -288,6 +297,19 @@ function validateRouteHandlers(contract, issues) {
       }
     }
 
+    if (route.path === "/api/leaderboard/streak") {
+      for (const field of FORBIDDEN_PUBLIC_RESPONSE_FIELDS) {
+        if (!route.mustNotExpose?.includes(field)) {
+          addIssue(issues, "streak_leaderboard_route_missing_forbidden_field", field);
+        }
+      }
+
+      const order = (route.order || []).map(orderKey);
+      if (order.join(",") !== EXPECTED_STREAK_RANKING_ORDER.join(",")) {
+        addIssue(issues, "streak_leaderboard_route_order_mismatch", EXPECTED_STREAK_RANKING_ORDER.join(" -> "));
+      }
+    }
+
     if (route.path === "/api/winner-message" && Number(route.maxMessageLength) !== 100) {
       addIssue(issues, "winner_message_length_mismatch", "POST /api/winner-message");
     }
@@ -318,7 +340,8 @@ function validateRouteHandlers(contract, issues) {
     "/api/attempts/start",
     "/api/attempts/reveal",
     "/api/attempts/submit",
-    "/api/leaderboard/daily"
+    "/api/leaderboard/daily",
+    "/api/leaderboard/streak"
   ]);
   for (const route of routes) {
     if (optionalPlayRoutes.has(route.path) && route.auth !== "optional") {
@@ -367,6 +390,12 @@ function validatePlayModel(contract, dbContract, issues) {
   if (model.oneRankedEntryPerUserPublication !== true) {
     addIssue(issues, "app_play_model_missing_rank_uniqueness", "oneRankedEntryPerUserPublication");
   }
+  if (model.oneDailyResultPerUserPublication !== true) {
+    addIssue(issues, "app_play_model_missing_daily_result_uniqueness", "oneDailyResultPerUserPublication");
+  }
+  if (model.streakProjectionScope !== "user_id") {
+    addIssue(issues, "app_play_model_missing_streak_projection_scope", "streakProjectionScope");
+  }
 }
 
 function validatePrivacy(contract, dbContract, issues) {
@@ -413,6 +442,16 @@ function validateRanking(contract, dbContract, issues) {
   const dbOrder = (dbContract.apiRequirements?.dailyRankingOrder || []).map(orderKey);
   if (dbOrder.join(",") !== appOrder.join(",")) {
     addIssue(issues, "app_db_ranking_order_mismatch", `app ${appOrder.join(",")} db ${dbOrder.join(",")}`);
+  }
+
+  const appStreakOrder = (contract.backend?.streakRankingOrder || []).map(orderKey);
+  if (appStreakOrder.join(",") !== EXPECTED_STREAK_RANKING_ORDER.join(",")) {
+    addIssue(issues, "app_streak_ranking_order_mismatch", EXPECTED_STREAK_RANKING_ORDER.join(" -> "));
+  }
+
+  const dbStreakOrder = (dbContract.apiRequirements?.streakRanking?.order || []).map(orderKey);
+  if (dbStreakOrder.join(",") !== appStreakOrder.join(",")) {
+    addIssue(issues, "app_db_streak_ranking_order_mismatch", `app ${appStreakOrder.join(",")} db ${dbStreakOrder.join(",")}`);
   }
 }
 

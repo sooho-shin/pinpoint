@@ -14,6 +14,7 @@ description: 사용자가 `$reset-today-puzzle`, 오늘 문제 초기화, 오늘
 - 기본 리셋은 모든 사용자가 오늘 문제를 처음부터 다시 풀 수 있게 만드는 작업이다.
 - 오늘 문제는 하나지만 attempt는 `publication_id + user_id` 기준으로 사용자별 분리된다.
 - 랭킹, 1등 메시지, 문제 평가/한마디, 그룹 랭킹 데이터는 오늘 publication의 파생 상태이므로 함께 초기화한다.
+- 연승 데이터는 오늘 publication의 `user_daily_results`만 삭제하고, 영향을 받은 사용자의 `user_streaks` projection을 재계산한다.
 - Auth 유저 삭제는 사용자가 `--auth`, `회원가입부터`, `로그인도 초기화`처럼 명시한 경우에만 수행한다.
 
 ## 실행 전 확인
@@ -52,6 +53,7 @@ npm run db:reset:today
 
 - 오늘 publication의 `daily_winner_messages`
 - 오늘 publication의 `daily_puzzle_feedback`
+- 오늘 publication의 `user_daily_results`
 - 오늘 publication의 `group_leaderboard_entries`
 - 오늘 publication의 `group_members`
 - 오늘 publication의 `groups`
@@ -64,6 +66,8 @@ npm run db:reset:today
 - `puzzle_publications`
 - `profiles`
 - `auth.users`
+- 오늘 이전 공개일의 `user_daily_results`
+- 재계산된 `user_streaks`
 
 ## 회원가입부터 다시 테스트
 

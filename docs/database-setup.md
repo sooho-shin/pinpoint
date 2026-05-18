@@ -10,6 +10,7 @@ supabase/migrations/20260511120000_add_daily_winner_messages.sql
 supabase/migrations/20260515183000_add_anonymous_attempt_lookup_index.sql
 supabase/migrations/20260517100000_add_attempt_uniqueness_for_claiming.sql
 supabase/migrations/20260517143000_add_daily_puzzle_feedback.sql
+supabase/migrations/20260518120000_add_user_streaks.sql
 ```
 
 이 migration은 Supabase Postgres를 기준으로 한다. `profiles.id`가 `auth.users.id`를 참조하고, `auth.uid()`를 사용하는 RLS 정책이 포함되어 있으므로 일반 PostgreSQL에 그대로 적용하려면 별도 auth schema가 필요하다.
@@ -54,6 +55,8 @@ attempts
 leaderboard_entries
 daily_winner_messages
 daily_puzzle_feedback
+user_daily_results
+user_streaks
 groups
 group_members
 group_leaderboard_entries
@@ -84,6 +87,8 @@ where table_schema = 'public'
     'leaderboard_entries',
     'daily_winner_messages',
     'daily_puzzle_feedback',
+    'user_daily_results',
+    'user_streaks',
     'groups',
     'group_members',
     'group_leaderboard_entries'
@@ -104,6 +109,8 @@ where relname in (
   'leaderboard_entries',
   'daily_winner_messages',
   'daily_puzzle_feedback',
+  'user_daily_results',
+  'user_streaks',
   'groups',
   'group_members',
   'group_leaderboard_entries'
@@ -118,5 +125,6 @@ order by relname;
 - 랭킹 API는 `leaderboard_entries` 기준으로 만든다.
 - 메인 상단 1등 확성기 API는 `daily_winner_messages` 기준으로 만들고, `message`는 100자를 넘기지 않는다.
 - 랭킹 화면의 완료자 전용 평가 API는 `daily_puzzle_feedback` 기준으로 만들고, `comment`는 140자를 넘기지 않는다.
+- 연승 랭킹은 `user_daily_results`와 `user_streaks` 기준으로 만들고, 오늘 문제 리셋 시 오늘 결과 삭제 후 projection을 재계산한다.
 - `attempts.submitted_answer`, `attempts.normalized_answer`, `device_hash`, `ip_hash`, `user_agent_hash`는 공개 API에 노출하지 않는다.
 - 관리자 API는 Supabase service role 또는 별도 admin claim을 사용한다.

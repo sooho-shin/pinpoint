@@ -10,6 +10,7 @@ Narrow는 매일 한 문제씩 공개되는 한국어 연상 퍼즐 게임이다
 - 사용자는 5개 단서 안에 정답을 맞힌다.
 - 적은 단서로 맞힐수록 결과 공유와 랭킹 가치가 높다.
 - MVP 랭킹은 `오늘의 랭킹`과 `그룹 랭킹`을 우선한다.
+- 로그인 사용자의 연속 정답일은 `연승 랭킹`으로 별도 표시한다.
 - 오늘의 랭킹 1등은 다음 문제가 공개될 때까지 메인 최상단에 100자 메시지를 고정할 수 있다.
 - 오늘 문제 풀이, 결과 확인, 랭킹 조회는 로그인 없이 시작할 수 있다.
 - 랭킹 등록, 그룹 참여, 1등 메시지는 Google 로그인 후 닉네임을 연결한다.
@@ -76,17 +77,22 @@ project url: https://ktbwxwzxsljjhtallios.supabase.co
 - `attempts`
 - `leaderboard_entries`
 - `daily_winner_messages`
+- `daily_puzzle_feedback`
+- `user_daily_results`
+- `user_streaks`
 - `groups`
 - `group_members`
 - `group_leaderboard_entries`
 
-RLS는 위 9개 테이블 모두 활성화되어 있다.
+RLS는 위 테이블 모두 활성화되어 있다.
 
 Migration 파일:
 
 ```text
 supabase/migrations/20260510190000_initial_pinpoint_schema.sql
 supabase/migrations/20260511120000_add_daily_winner_messages.sql
+supabase/migrations/20260517143000_add_daily_puzzle_feedback.sql
+supabase/migrations/20260518120000_add_user_streaks.sql
 ```
 
 DB 설계 원칙:
@@ -94,6 +100,7 @@ DB 설계 원칙:
 - Google Auth 사용자와 공개 프로필을 분리한다.
 - 문제 원본과 일일 공개 이벤트를 분리한다.
 - 풀이 기록과 랭킹 노출 데이터를 분리한다.
+- 일일 완료 결과와 연승 projection을 분리한다.
 - 같은 공개 문제에서 사용자별 랭킹 기록은 하나만 허용한다.
 - 공개 문제별 1등 확성기 메시지는 하나만 노출한다.
 - 이메일, 제출 답안, device/ip/user-agent hash는 공개 API에 노출하지 않는다.

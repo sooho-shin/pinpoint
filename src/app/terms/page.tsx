@@ -3,7 +3,10 @@ import { LegalTemplate } from "@/components/templates/LegalTemplate";
 
 export const metadata: Metadata = {
   title: "이용약관",
-  description: "Narrow 이용약관"
+  description: "Narrow 이용약관",
+  alternates: {
+    canonical: "/terms"
+  }
 };
 
 export default function TermsPage() {

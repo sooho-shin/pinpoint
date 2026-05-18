@@ -10,6 +10,7 @@ import type {
   PuzzleFeedbackReaction,
   PuzzleFeedbackState,
   PuzzlePlayState,
+  StreakLeaderboardState,
   SubmitResult,
   WinnerMessage
 } from "@/lib/puzzle/types";
@@ -42,6 +43,20 @@ type AttemptRow = {
   is_correct: boolean;
   status: "playing" | "succeeded" | "failed" | "abandoned";
   is_ranked: boolean;
+};
+
+type UserDailyResultRow = {
+  publish_date_kst: string;
+  succeeded: boolean;
+};
+
+type StreakLeaderboardRow = {
+  user_id: string;
+  current_streak: number;
+  longest_streak: number;
+  total_success_count: number;
+  last_success_publish_date_kst: string | null;
+  profiles?: { nickname?: string | null } | Array<{ nickname?: string | null }> | null;
 };
 
 type PuzzleFeedbackRow = {
@@ -101,6 +116,96 @@ function publicFeedback(row: PuzzleFeedbackRow, userId: string): PuzzleFeedbackI
     createdAt: row.created_at,
     isMe: row.user_id === userId
   };
+}
+
+function addKstDate(dateText: string, days: number) {
+  const [year, month, day] = dateText.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day + days));
+  return date.toISOString().slice(0, 10);
+}
+
+function computeUserStreak(results: UserDailyResultRow[]) {
+  const ordered = [...results].sort((a, b) => a.publish_date_kst.localeCompare(b.publish_date_kst));
+  let currentSuccessRun = 0;
+  let longestStreak = 0;
+  let totalSuccessCount = 0;
+  let previousSuccessDate: string | null = null;
+  let lastSuccessPublishDateKst: string | null = null;
+  let lastResultPublishDateKst: string | null = null;
+
+  for (const result of ordered) {
+    lastResultPublishDateKst = result.publish_date_kst;
+
+    if (!result.succeeded) {
+      currentSuccessRun = 0;
+      previousSuccessDate = null;
+      continue;
+    }
+
+    totalSuccessCount += 1;
+    currentSuccessRun = previousSuccessDate && addKstDate(previousSuccessDate, 1) === result.publish_date_kst
+      ? currentSuccessRun + 1
+      : 1;
+    longestStreak = Math.max(longestStreak, currentSuccessRun);
+    previousSuccessDate = result.publish_date_kst;
+    lastSuccessPublishDateKst = result.publish_date_kst;
+  }
+
+  const latestResult = ordered.at(-1);
+  return {
+    currentStreak: latestResult?.succeeded ? currentSuccessRun : 0,
+    longestStreak,
+    totalSuccessCount,
+    lastSuccessPublishDateKst,
+    lastResultPublishDateKst
+  };
+}
+
+async function recomputeUserStreak(userId: string) {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("user_daily_results")
+    .select("publish_date_kst,succeeded")
+    .eq("user_id", userId)
+    .order("publish_date_kst", { ascending: true });
+  if (error) throw error;
+
+  const streak = computeUserStreak((data ?? []) as UserDailyResultRow[]);
+  const { error: upsertError } = await admin
+    .from("user_streaks")
+    .upsert({
+      user_id: userId,
+      current_streak: streak.currentStreak,
+      longest_streak: streak.longestStreak,
+      total_success_count: streak.totalSuccessCount,
+      last_success_publish_date_kst: streak.lastSuccessPublishDateKst,
+      last_result_publish_date_kst: streak.lastResultPublishDateKst
+    }, {
+      onConflict: "user_id"
+    });
+  if (upsertError) throw upsertError;
+}
+
+async function recordDailyResult(publication: PublicationRow, attempt: AttemptRow) {
+  if (!attempt.user_id || !COMPLETED_FEEDBACK_STATUSES.has(attempt.status)) return;
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("user_daily_results")
+    .upsert({
+      publication_id: publication.id,
+      publish_date_kst: publication.publish_date_kst,
+      user_id: attempt.user_id,
+      attempt_id: attempt.id,
+      result_status: attempt.status === "succeeded" ? "succeeded" : "failed",
+      succeeded: attempt.status === "succeeded",
+      submitted_at: attempt.submitted_at ?? new Date().toISOString()
+    }, {
+      onConflict: "publication_id,user_id"
+    });
+  if (error) throw error;
+
+  await recomputeUserStreak(attempt.user_id);
 }
 
 async function getActor(): Promise<Actor> {
@@ -467,6 +572,11 @@ async function claimAnonymousAttempt(publicationId: string, actor: Actor) {
   }
 
   let claimed = data as AttemptRow;
+  if (COMPLETED_FEEDBACK_STATUSES.has(claimed.status)) {
+    const { publication } = await getTodayPublication();
+    if (publication?.id === publicationId) await recordDailyResult(publication, claimed);
+  }
+
   if (claimed.status === "succeeded" && !claimed.is_ranked) {
     const profile = await getProfile(actor.userId);
     if (profile) {
@@ -569,6 +679,8 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
   }
 
   const terminal = nextStatus !== "playing";
+  if (terminal) await recordDailyResult(publication, updatedAttempt);
+
   const canWrite = terminal && isCorrect ? await canWriteWinnerMessage(publication.id, actor.userId) : false;
   return {
     status: nextStatus,
@@ -626,6 +738,56 @@ export async function getDailyLeaderboard() {
     rows,
     myRank,
     canWriteWinnerMessage: await canWriteWinnerMessage(publication.id, actor.userId)
+  };
+}
+
+export async function getStreakLeaderboard(): Promise<StreakLeaderboardState> {
+  const actor = await getActor();
+  const activePublishDateKst = getActivePublicationDateKst();
+  const previousPublishDateKst = addKstDate(activePublishDateKst, -1);
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("user_streaks")
+    .select("user_id,current_streak,longest_streak,total_success_count,last_success_publish_date_kst,profiles(nickname)")
+    .gt("current_streak", 0)
+    .order("current_streak", { ascending: false })
+    .order("last_success_publish_date_kst", { ascending: false })
+    .order("longest_streak", { ascending: false })
+    .order("total_success_count", { ascending: false })
+    .limit(200);
+
+  if (error) throw error;
+
+  const rows = ((data ?? []) as StreakLeaderboardRow[])
+    .map((row) => {
+      const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+      const isLiveStreak = row.last_success_publish_date_kst === activePublishDateKst
+        || row.last_success_publish_date_kst === previousPublishDateKst;
+      return {
+        id: row.user_id,
+        rank: 0,
+        nickname: profile?.nickname ?? "익명",
+        currentStreak: isLiveStreak ? Number(row.current_streak) : 0,
+        longestStreak: Number(row.longest_streak),
+        totalSuccessCount: Number(row.total_success_count),
+        lastSuccessPublishDateKst: row.last_success_publish_date_kst,
+        isMe: Boolean(actor.userId && row.user_id === actor.userId)
+      };
+    })
+    .filter((row) => row.currentStreak > 0)
+    .sort((a, b) => (
+      b.currentStreak - a.currentStreak
+      || String(b.lastSuccessPublishDateKst ?? "").localeCompare(String(a.lastSuccessPublishDateKst ?? ""))
+      || b.longestStreak - a.longestStreak
+      || b.totalSuccessCount - a.totalSuccessCount
+    ))
+    .slice(0, 50)
+    .map((row, index) => ({ ...row, rank: index + 1 }));
+
+  return {
+    status: "ready",
+    rows,
+    myRank: rows.find((row) => row.isMe) ?? null
   };
 }
 

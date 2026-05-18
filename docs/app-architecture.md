@@ -82,6 +82,9 @@ KST 기준 하루에 공개되는 `puzzle_publications`는 하나지만, attempt
 - 같은 publication에 이미 로그인 사용자 attempt가 있으면 그 attempt를 우선하고 익명 attempt는 승계하지 않는다.
 - `leaderboard_entries`는 성공 기록의 projection이며, 게임 플레이 가능 여부를 판단하는 잠금 테이블로 사용하지 않는다.
 - 같은 사용자의 같은 공개 문제 랭킹 기록은 하나만 허용한다.
+- 로그인 사용자의 terminal 결과는 `user_daily_results`에 `publication_id + user_id` 기준으로 하나만 저장한다.
+- 연승 랭킹은 `user_daily_results`를 재계산한 `user_streaks` projection에서 읽는다. 오늘 문제 리셋은 오늘 결과를 삭제한 뒤 해당 사용자들의 projection을 다시 계산한다.
+- 연승 랭킹 조회는 활성 공개일 기준 오늘 또는 직전 공개일에 성공한 사용자만 live current streak으로 인정한다.
 
 ## 화면 범위
 
@@ -270,6 +273,38 @@ Google OAuth를 먼저 시작한다. 신규 사용자처럼 프로필 닉네임�
 반환 금지:
 
 - email
+- submitted_answer
+- normalized_answer
+- device_hash
+- ip_hash
+
+### `GET /api/leaderboard/streak`
+
+로그인 사용자의 현재 연승 랭킹을 반환한다. 비로그인 요청도 공개 연승 랭킹 목록은 볼 수 있지만, `isMe`와 `myRank`는 로그인 사용자에게만 계산된다.
+
+정렬 기준:
+
+```text
+1순위: current_streak desc
+2순위: last_success_publish_date_kst desc
+3순위: longest_streak desc
+4순위: total_success_count desc
+```
+
+반환 가능:
+
+- rank
+- nickname
+- current_streak
+- longest_streak
+- total_success_count
+- last_success_publish_date_kst
+
+반환 금지:
+
+- email
+- answer
+- aliases
 - submitted_answer
 - normalized_answer
 - device_hash

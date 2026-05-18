@@ -3,7 +3,10 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "문의",
-  description: "Narrow 문의"
+  description: "Narrow 서비스 문의, 오류 제보, 개인정보 관련 연락 경로입니다.",
+  alternates: {
+    canonical: "/contact"
+  }
 };
 
 export default function ContactPage() {

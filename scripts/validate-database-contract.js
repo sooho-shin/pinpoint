@@ -11,6 +11,8 @@ const REQUIRED_TABLES = [
   "leaderboard_entries",
   "daily_winner_messages",
   "daily_puzzle_feedback",
+  "user_daily_results",
+  "user_streaks",
   "groups",
   "group_members",
   "group_leaderboard_entries"
@@ -23,7 +25,8 @@ const REQUIRED_ENUMS = {
   visibility: ["private", "daily", "group"],
   rank_status: ["visible", "flagged", "hidden"],
   winner_message_status: ["draft", "visible", "hidden"],
-  feedback_status: ["visible", "hidden"]
+  feedback_status: ["visible", "hidden"],
+  daily_result_status: ["succeeded", "failed"]
 };
 
 const REQUIRED_COLUMNS = {
@@ -84,6 +87,27 @@ const REQUIRED_COLUMNS = {
     "comment",
     "feedback_status",
     "created_at",
+    "updated_at"
+  ],
+  user_daily_results: [
+    "id",
+    "publication_id",
+    "publish_date_kst",
+    "user_id",
+    "attempt_id",
+    "result_status",
+    "succeeded",
+    "submitted_at",
+    "created_at",
+    "updated_at"
+  ],
+  user_streaks: [
+    "user_id",
+    "current_streak",
+    "longest_streak",
+    "total_success_count",
+    "last_success_publish_date_kst",
+    "last_result_publish_date_kst",
     "updated_at"
   ],
   groups: ["id", "owner_user_id", "publication_id", "invite_code", "created_at"],
@@ -390,6 +414,56 @@ function validateGroups(contract, issues) {
   }
 }
 
+function validateStreaks(contract, issues) {
+  const dailyResults = contract.tables?.user_daily_results;
+  const streaks = contract.tables?.user_streaks;
+  if (!dailyResults || !streaks) return;
+
+  if (!dailyResults.columns?.publication_id?.references?.startsWith("puzzle_publications.")) {
+    addIssue(issues, "daily_result_missing_publication_reference", "user_daily_results.publication_id");
+  }
+  if (!dailyResults.columns?.user_id?.references?.startsWith("profiles.")) {
+    addIssue(issues, "daily_result_missing_profile_reference", "user_daily_results.user_id");
+  }
+  if (!dailyResults.columns?.attempt_id?.references?.startsWith("attempts.")) {
+    addIssue(issues, "daily_result_missing_attempt_reference", "user_daily_results.attempt_id");
+  }
+  if (!hasConstraint(dailyResults, "unique", ["publication_id", "user_id"])) {
+    addIssue(issues, "missing_one_daily_result_per_user_publication_constraint", "user_daily_results(publication_id,user_id)");
+  }
+  if (!hasConstraint(dailyResults, "unique", ["user_id", "publish_date_kst"])) {
+    addIssue(issues, "missing_one_daily_result_per_user_date_constraint", "user_daily_results(user_id,publish_date_kst)");
+  }
+  if (!streaks.columns?.user_id?.references?.startsWith("profiles.")) {
+    addIssue(issues, "user_streak_missing_profile_reference", "user_streaks.user_id");
+  }
+  if (!hasConstraint(streaks, "primary", ["user_id"])) {
+    addIssue(issues, "missing_user_streak_primary_key", "user_streaks(user_id)");
+  }
+
+  const expectedSort = ["current_streak", "last_success_publish_date_kst", "longest_streak", "total_success_count"];
+  const actualSort = streaks.rankingSort || [];
+  if (expectedSort.join(",") !== actualSort.join(",")) {
+    addIssue(issues, "invalid_streak_ranking_sort", `expected ${expectedSort.join(" -> ")}`);
+  }
+
+  const apiContract = contract.apiRequirements?.streakRanking;
+  if (!apiContract) {
+    addIssue(issues, "missing_streak_ranking_api_contract", "apiRequirements.streakRanking");
+    return;
+  }
+  const apiSort = (apiContract.order || []).map((item) => `${item.column}:${item.direction}`);
+  const expectedApiSort = [
+    "current_streak:desc",
+    "last_success_publish_date_kst:desc",
+    "longest_streak:desc",
+    "total_success_count:desc"
+  ];
+  if (expectedApiSort.join(",") !== apiSort.join(",")) {
+    addIssue(issues, "invalid_api_streak_ranking_sort", `expected ${expectedApiSort.join(" -> ")}`);
+  }
+}
+
 function validatePublications(contract, issues) {
   const publications = contract.tables?.puzzle_publications;
   if (!publications) return;
@@ -418,6 +492,19 @@ function validateUserScopedPlayModel(contract, issues) {
     if (api[key] !== value) {
       addIssue(issues, "user_scoped_play_model_mismatch", `${key}: expected ${value}`);
     }
+  }
+
+  if (api.dailyResultScope !== "publication_id+user_id") {
+    addIssue(issues, "daily_result_scope_mismatch", "dailyResultScope");
+  }
+  if (api.streakProjectionScope !== "user_id") {
+    addIssue(issues, "streak_projection_scope_mismatch", "streakProjectionScope");
+  }
+  if (api.resetTodayPuzzleDeletesTodayDailyResults !== true) {
+    addIssue(issues, "reset_today_must_delete_daily_results", "resetTodayPuzzleDeletesTodayDailyResults");
+  }
+  if (api.resetTodayPuzzleRecomputesUserStreaks !== true) {
+    addIssue(issues, "reset_today_must_recompute_streaks", "resetTodayPuzzleRecomputesUserStreaks");
   }
 
   const attempts = contract.tables?.attempts;
@@ -464,6 +551,7 @@ async function main() {
   validateLeaderboard(contract, issues);
   validateDailyWinnerMessages(contract, issues);
   validateDailyPuzzleFeedback(contract, issues);
+  validateStreaks(contract, issues);
   validateGroups(contract, issues);
 
   if (issues.length > 0) {

@@ -77,6 +77,13 @@ async function main() {
     "where user_id is not null",
     "create unique index if not exists attempts_one_anonymous_attempt_per_publication",
     "where anonymous_session_id is not null",
+    "create type public.daily_result_status",
+    "create table public.user_daily_results",
+    "constraint one_daily_result_per_user_publication unique (publication_id, user_id)",
+    "constraint one_daily_result_per_user_date unique (user_id, publish_date_kst)",
+    "create table public.user_streaks",
+    "create index user_streaks_current_rank_idx",
+    "grant select ( user_id, current_streak, longest_streak, total_success_count, last_success_publish_date_kst, last_result_publish_date_kst, updated_at ) on public.user_streaks to anon, authenticated",
     "on public.leaderboard_entries ( publication_id, rank_status, used_clue_count, elapsed_ms, submitted_at )",
     "revoke all on public.profiles from anon, authenticated",
     "grant select (id, nickname, avatar_url) on public.profiles to anon, authenticated"

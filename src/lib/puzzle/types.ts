@@ -66,6 +66,23 @@ export type PuzzleFeedbackState =
       requiresSignIn?: boolean;
     };
 
+export type StreakLeaderboardRow = {
+  id: string;
+  rank: number;
+  nickname: string;
+  currentStreak: number;
+  longestStreak: number;
+  totalSuccessCount: number;
+  lastSuccessPublishDateKst: string | null;
+  isMe: boolean;
+};
+
+export type StreakLeaderboardState = {
+  status: "ready";
+  rows: StreakLeaderboardRow[];
+  myRank: StreakLeaderboardRow | null;
+};
+
 export type SubmitResult = {
   status: "playing" | "succeeded" | "failed";
   isCorrect: boolean;

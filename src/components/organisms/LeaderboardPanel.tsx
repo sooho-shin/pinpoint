@@ -8,7 +8,7 @@ import { GroupInviteCard } from "@/components/molecules/GroupInviteCard";
 import { LeaderboardTabs } from "@/components/molecules/LeaderboardTabs";
 import { RankingRow, type RankingRowData } from "@/components/molecules/RankingRow";
 import { formatKoreanDate } from "@/lib/format";
-import type { PuzzleFeedbackReaction, PuzzleFeedbackState, WinnerMessage } from "@/lib/puzzle/types";
+import type { PuzzleFeedbackReaction, PuzzleFeedbackState, StreakLeaderboardState, WinnerMessage } from "@/lib/puzzle/types";
 
 const feedbackReactions: Array<{ value: PuzzleFeedbackReaction; label: string }> = [
   { value: "good", label: "좋았어요" },
@@ -28,6 +28,7 @@ type LeaderboardState =
       canWriteWinnerMessage: boolean;
       winnerMessage: WinnerMessage | null;
       puzzleFeedback: PuzzleFeedbackState;
+      streakLeaderboard: StreakLeaderboardState;
     };
 
 type GroupLeaderboardState =
@@ -89,12 +90,13 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
       return;
     }
 
-    const [leaderboard, winnerMessage, puzzleFeedback] = await Promise.all([
+    const [leaderboard, winnerMessage, puzzleFeedback, streakLeaderboard] = await Promise.all([
       getJson<Extract<LeaderboardState, { status: "ready" | "no_puzzle" }> & { winnerMessage?: WinnerMessage | null }>("/api/leaderboard/daily"),
       getJson<WinnerMessage | null>("/api/winner-message/current"),
-      getJson<PuzzleFeedbackState>("/api/puzzle-feedback/daily")
+      getJson<PuzzleFeedbackState>("/api/puzzle-feedback/daily"),
+      getJson<StreakLeaderboardState>("/api/leaderboard/streak")
     ]);
-    setState({ ...leaderboard, winnerMessage, puzzleFeedback });
+    setState({ ...leaderboard, winnerMessage, puzzleFeedback, streakLeaderboard });
     if (puzzleFeedback.status === "ready" && puzzleFeedback.myFeedback) {
       setFeedbackReaction(puzzleFeedback.myFeedback.reaction);
       setFeedbackComment(puzzleFeedback.myFeedback.comment);
@@ -285,6 +287,37 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
         ) : (
           state.rows.map((row) => <RankingRow key={row.id} row={row} />)
         )}
+      </div>
+
+      <div className="mb-6 border-t border-[var(--border)] pt-5">
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <div>
+            <div className="text-sm font-semibold text-[var(--text-primary)]">연승 랭킹</div>
+            <p className="mt-1 text-xs font-semibold text-[var(--text-secondary)]">매일 정답을 맞힌 연속 기록</p>
+          </div>
+          {state.streakLeaderboard.myRank ? (
+            <div className="shrink-0 text-xs font-semibold text-[var(--accent)]">내 연승 {state.streakLeaderboard.myRank.currentStreak}일</div>
+          ) : null}
+        </div>
+        <div className="space-y-2">
+          {state.streakLeaderboard.rows.length === 0 ? (
+            <div className="muted-surface p-4 text-sm text-[var(--text-secondary)]">아직 연승 기록이 없습니다.</div>
+          ) : (
+            state.streakLeaderboard.rows.slice(0, 5).map((row) => (
+              <div key={row.id} className="flex min-h-14 items-center justify-between gap-3 rounded-md border border-[var(--border)] bg-white px-4 py-3">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                    {row.rank}. {row.nickname}{row.isMe ? " · 나" : ""}
+                  </div>
+                  <div className="mt-1 text-xs font-semibold text-[var(--text-secondary)]">
+                    최고 {row.longestStreak}일 · 누적 {row.totalSuccessCount}회
+                  </div>
+                </div>
+                <div className="shrink-0 text-sm font-bold text-[var(--accent)]">{row.currentStreak}일</div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       {state.canWriteWinnerMessage ? (

@@ -1,7 +1,17 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AuthTemplate } from "@/components/templates/AuthTemplate";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { saveNickname } from "@/app/nickname/actions";
+
+export const metadata: Metadata = {
+  title: "닉네임 설정",
+  description: "Narrow 닉네임 설정",
+  robots: {
+    index: false,
+    follow: false
+  }
+};
 
 function safeNextPath(value?: string) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";

@@ -168,6 +168,34 @@ scheduled -> published
 - `publication_id, user_id` 조합은 unique다. 같은 사용자는 같은 공개 문제에 하나의 평가만 남긴다.
 - 작성은 로그인 + 닉네임 + 오늘 문제 완료 attempt가 있는 사용자에게만 허용한다.
 - 조회도 오늘 문제를 완료한 사용자에게만 허용한다. 비완료자에게는 목록을 반환하지 않는다.
+
+### user_daily_results
+
+로그인 사용자의 공개일별 완료 결과 원장이다. 오늘의 랭킹이 성공 기록만 노출하는 projection이라면, 이 테이블은 성공과 실패를 모두 포함해 연승 계산의 기준이 된다.
+
+주요 정책:
+
+- `publication_id, user_id` 조합은 unique다. 같은 사용자는 같은 공개 문제에 하나의 완료 결과만 갖는다.
+- `user_id, publish_date_kst` 조합도 unique다. 같은 KST 공개일에 중복 결과를 만들지 않는다.
+- `result_status = succeeded`이면 `succeeded = true`, `failed`이면 `succeeded = false`여야 한다.
+- 익명 사용자의 결과는 로그인 계정으로 승계되기 전까지 연승에 반영하지 않는다.
+- 오늘 문제 리셋은 해당 publication의 row를 삭제하고, 영향을 받은 사용자들의 `user_streaks`를 재계산한다.
+- 랭킹 조회 시 활성 공개일 기준 오늘 또는 직전 공개일에 성공한 projection만 현재 연승으로 인정한다.
+
+### user_streaks
+
+연승 랭킹 조회용 projection이다. `user_daily_results`를 기준으로 사용자별 현재 연승, 최고 연승, 누적 성공 횟수, 마지막 성공 공개일을 저장한다.
+
+정렬 기준:
+
+```text
+1순위: current_streak desc
+2순위: last_success_publish_date_kst desc
+3순위: longest_streak desc
+4순위: total_success_count desc
+```
+
+공개 API는 `profiles.nickname`, `current_streak`, `longest_streak`, `total_success_count`, `last_success_publish_date_kst`만 노출한다. 이메일, 제출 답안, 정답, aliases, 해시 식별자는 포함하지 않는다.
 - 공개 API는 `nickname_snapshot`, `rating/reaction`, `comment`, `created_at`만 반환한다.
 - `comment`는 1~140자로 제한한다.
 - 운영자는 `feedback_status = hidden`으로 부적절하거나 스포일러가 포함된 평가를 숨길 수 있다.

@@ -1,27 +1,45 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
+import { getSiteUrl, siteConfig } from "@/lib/site";
 import "./globals.css";
 
 const DEFAULT_ADSENSE_CLIENT = "ca-pub-4621241846705196";
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://pinpoint-seven.vercel.app"),
+  metadataBase: new URL(siteUrl),
+  applicationName: siteConfig.name,
   title: {
-    default: "Narrow",
-    template: "%s | Narrow"
+    default: `${siteConfig.name} - 매일 한 문제 한국어 연상 퍼즐`,
+    template: `%s | ${siteConfig.name}`
   },
-  description: "매일 오후 5시, 단서로 맞히는 한국어 연상 퍼즐",
+  description: siteConfig.description,
+  keywords: siteConfig.keywords,
+  alternates: {
+    canonical: "/"
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1
+    }
+  },
   openGraph: {
-    title: "Narrow",
+    title: `${siteConfig.name} - 매일 한 문제 한국어 연상 퍼즐`,
     description: "매일 오후 5시, 단서로 맞히는 오늘의 정답",
     url: "/",
-    siteName: "Narrow",
+    siteName: siteConfig.name,
     locale: "ko_KR",
     type: "website",
     images: [
       {
-        url: "/og-narrow.png",
+        url: siteConfig.ogImage,
         width: 1200,
         height: 630,
         alt: "Narrow 한국어 일일 연상 퍼즐"
@@ -30,15 +48,27 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Narrow",
+    title: `${siteConfig.name} - 한국어 연상 퍼즐`,
     description: "매일 오후 5시, 단서로 맞히는 오늘의 정답",
-    images: ["/og-narrow.png"]
+    images: [siteConfig.ogImage]
   }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
   const adsenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT ?? DEFAULT_ADSENSE_CLIENT;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.name,
+    url: siteUrl,
+    inLanguage: "ko-KR",
+    description: siteConfig.description,
+    potentialAction: {
+      "@type": "PlayAction",
+      target: siteUrl
+    }
+  };
 
   return (
     <html lang="ko">
@@ -47,6 +77,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           async
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
           crossOrigin="anonymous"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
       <body>

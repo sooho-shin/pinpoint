@@ -17,6 +17,7 @@
     "server_authoritative_clue_progression",
     "server_authoritative_answer_checking",
     "daily_publication_has_user_scoped_attempts",
+    "daily_success_streak_has_user_scoped_results",
     "do_not_expose_answer_before_terminal_result",
     "do_not_expose_locked_clues",
     "do_not_read_puzzles_directly_from_browser_supabase_client",
@@ -36,7 +37,8 @@
       "nickname_setup",
       "daily_winner_message",
       "daily_puzzle_feedback",
-      "group_ranking_full_flow"
+      "group_ranking_full_flow",
+      "streak_ranking"
     ],
     "deferred": [
       "admin_review_web_ui",
@@ -68,7 +70,7 @@
         "path": "/ranking",
         "file": "src/app/ranking/page.tsx",
         "auth": "optional",
-        "states": ["loading", "ready", "empty", "privacy_prompt", "feedback_locked", "feedback_ready", "group_ready", "group_join_required"],
+        "states": ["loading", "ready", "empty", "privacy_prompt", "feedback_locked", "feedback_ready", "group_ready", "group_join_required", "streak_ready"],
         "designScreens": ["Daily Ranking", "Group Ranking", "Ranking Empty State"]
       },
       {
@@ -128,7 +130,9 @@
       "terminalAnonymousAttemptPreventsSigninReplay": true,
       "leaderboardDoesNotLockPlay": true,
       "winnerDoesNotLockPlay": true,
-      "oneRankedEntryPerUserPublication": true
+      "oneRankedEntryPerUserPublication": true,
+      "oneDailyResultPerUserPublication": true,
+      "streakProjectionScope": "user_id"
     },
     "routeHandlers": [
       {
@@ -182,6 +186,20 @@
           { "column": "submitted_at", "direction": "asc" }
         ],
         "mustNotExpose": ["email", "submitted_answer", "normalized_answer", "device_hash", "ip_hash", "user_agent_hash"]
+      },
+      {
+        "name": "Streak Leaderboard",
+        "method": "GET",
+        "path": "/api/leaderboard/streak",
+        "file": "src/app/api/leaderboard/streak/route.ts",
+        "auth": "optional",
+        "order": [
+          { "column": "current_streak", "direction": "desc" },
+          { "column": "last_success_publish_date_kst", "direction": "desc" },
+          { "column": "longest_streak", "direction": "desc" },
+          { "column": "total_success_count", "direction": "desc" }
+        ],
+        "mustNotExpose": ["email", "answer", "aliases", "rationale", "submitted_answer", "normalized_answer", "device_hash", "ip_hash", "user_agent_hash"]
       },
       {
         "name": "Group Leaderboard",
@@ -268,6 +286,12 @@
       { "column": "used_clue_count", "direction": "asc" },
       { "column": "elapsed_ms", "direction": "asc" },
       { "column": "submitted_at", "direction": "asc" }
+    ],
+    "streakRankingOrder": [
+      { "column": "current_streak", "direction": "desc" },
+      { "column": "last_success_publish_date_kst", "direction": "desc" },
+      { "column": "longest_streak", "direction": "desc" },
+      { "column": "total_success_count", "direction": "desc" }
     ]
   },
   "environment": {

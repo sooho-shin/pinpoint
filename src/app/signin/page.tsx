@@ -1,7 +1,17 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AuthTemplate } from "@/components/templates/AuthTemplate";
 import { signInWithGoogle } from "@/app/signin/actions";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = {
+  title: "로그인",
+  description: "Narrow 로그인",
+  robots: {
+    index: false,
+    follow: false
+  }
+};
 
 function safeNextPath(value?: string) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";

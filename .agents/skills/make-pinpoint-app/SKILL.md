@@ -46,8 +46,9 @@ npm run app:contract
 9. Result와 공유 텍스트를 구현한다.
 10. Google 로그인, 가입 시작 닉네임 입력, 닉네임 설정을 구현한다.
 11. Daily Ranking과 winner message를 구현한다.
-12. `npm run app:check`를 실행한다.
-13. 구현 파일이 모두 생긴 뒤 `npm run app:implementation:check`를 실행한다.
+12. 사용자별 일일 완료 결과와 연승 랭킹을 구현할 때는 `user_daily_results` 원장과 `user_streaks` projection을 분리한다.
+13. `npm run app:check`를 실행한다.
+14. 구현 파일이 모두 생긴 뒤 `npm run app:implementation:check`를 실행한다.
 
 ## 금지 사항
 
@@ -57,6 +58,7 @@ npm run app:contract
 - 익명 attempt가 이미 성공/실패 상태이면 로그인 후에도 완료 상태를 유지하고 같은 문제를 새로 풀게 하지 않는다.
 - 신규 사용자는 Google OAuth 이후 닉네임 설정 화면에서 닉네임을 필수로 입력받는다.
 - 오늘 공개 문제는 하나지만 모든 로그인 사용자와 익명 세션이 각각 독립 attempt로 풀 수 있어야 한다.
+- 연승은 로그인 사용자별 `publication_id + user_id` 완료 결과로 계산하며, 오늘 문제 리셋 시 오늘 결과 삭제 후 사용자별 projection을 재계산한다.
 - 랭킹 1등, winner message, 다른 사용자의 terminal attempt를 이유로 현재 사용자의 풀이 시작/제출을 막지 않는다.
 - terminal result 전 정답, aliases, rationale, 잠긴 단서를 반환하지 않는다.
 - client component에서 `SUPABASE_SERVICE_ROLE_KEY`를 참조하지 않는다.

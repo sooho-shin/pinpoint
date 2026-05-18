@@ -78,6 +78,96 @@ async function listIds(table, column, values) {
   return (data ?? []).map((row) => row.id);
 }
 
+function addKstDate(dateText, days) {
+  const [year, month, day] = dateText.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day + days));
+  return date.toISOString().slice(0, 10);
+}
+
+function computeUserStreak(results) {
+  const ordered = [...results].sort((a, b) => String(a.publish_date_kst).localeCompare(String(b.publish_date_kst)));
+  let currentSuccessRun = 0;
+  let longestStreak = 0;
+  let totalSuccessCount = 0;
+  let previousSuccessDate = null;
+  let lastSuccessPublishDateKst = null;
+  let lastResultPublishDateKst = null;
+
+  for (const result of ordered) {
+    const publishDateKst = String(result.publish_date_kst);
+    lastResultPublishDateKst = publishDateKst;
+
+    if (!result.succeeded) {
+      currentSuccessRun = 0;
+      previousSuccessDate = null;
+      continue;
+    }
+
+    totalSuccessCount += 1;
+    currentSuccessRun = previousSuccessDate && addKstDate(previousSuccessDate, 1) === publishDateKst
+      ? currentSuccessRun + 1
+      : 1;
+    longestStreak = Math.max(longestStreak, currentSuccessRun);
+    previousSuccessDate = publishDateKst;
+    lastSuccessPublishDateKst = publishDateKst;
+  }
+
+  const latestResult = ordered.at(-1);
+  return {
+    current_streak: latestResult?.succeeded ? currentSuccessRun : 0,
+    longest_streak: longestStreak,
+    total_success_count: totalSuccessCount,
+    last_success_publish_date_kst: lastSuccessPublishDateKst,
+    last_result_publish_date_kst: lastResultPublishDateKst
+  };
+}
+
+async function listAffectedUserIds(publicationId) {
+  const { data: attempts, error: attemptError } = await supabase
+    .from("attempts")
+    .select("user_id")
+    .eq("publication_id", publicationId)
+    .not("user_id", "is", null);
+  if (attemptError) throw new Error(`attempts affected users lookup failed: ${attemptError.message}`);
+
+  const { data: dailyResults, error: dailyResultError } = await supabase
+    .from("user_daily_results")
+    .select("user_id")
+    .eq("publication_id", publicationId);
+  if (dailyResultError) throw new Error(`user_daily_results affected users lookup failed: ${dailyResultError.message}`);
+
+  return [...new Set([
+    ...(attempts ?? []).map((row) => row.user_id).filter(Boolean),
+    ...(dailyResults ?? []).map((row) => row.user_id).filter(Boolean)
+  ])];
+}
+
+async function recomputeUserStreak(userId) {
+  const { data, error } = await supabase
+    .from("user_daily_results")
+    .select("publish_date_kst,succeeded")
+    .eq("user_id", userId)
+    .order("publish_date_kst", { ascending: true });
+  if (error) throw new Error(`user_daily_results streak lookup failed: ${error.message}`);
+
+  const { error: upsertError } = await supabase
+    .from("user_streaks")
+    .upsert({
+      user_id: userId,
+      ...computeUserStreak(data ?? [])
+    }, {
+      onConflict: "user_id"
+    });
+  if (upsertError) throw new Error(`user_streaks recompute failed: ${upsertError.message}`);
+}
+
+async function recomputeUserStreaks(userIds) {
+  for (const userId of userIds) {
+    await recomputeUserStreak(userId);
+  }
+  return userIds.length;
+}
+
 async function deleteByIds(table, ids) {
   if (ids.length === 0) return 0;
   const { error } = await supabase.from(table).delete().in("id", ids);
@@ -213,12 +303,16 @@ async function resetDerivedState(publicationId, resetAuth) {
   const leaderboardEntryIds = await listIds("leaderboard_entries", "publication_id", [publicationId]);
   const dailyWinnerMessageIds = await listIds("daily_winner_messages", "publication_id", [publicationId]);
   const dailyPuzzleFeedbackIds = await listIds("daily_puzzle_feedback", "publication_id", [publicationId]);
+  const userDailyResultIds = await listIds("user_daily_results", "publication_id", [publicationId]);
+  const affectedUserIds = await listAffectedUserIds(publicationId);
   const groupDeletes = await deleteGroupsForPublication(publicationId);
 
   const deletedDailyPuzzleFeedback = await deleteByIds("daily_puzzle_feedback", dailyPuzzleFeedbackIds);
   const deletedDailyWinnerMessages = await deleteByIds("daily_winner_messages", dailyWinnerMessageIds);
   const deletedLeaderboardEntries = await deleteByIds("leaderboard_entries", leaderboardEntryIds);
+  const deletedUserDailyResults = await deleteByIds("user_daily_results", userDailyResultIds);
   const deletedAttempts = await deleteByIds("attempts", attemptIds);
+  const recomputedUserStreaks = resetAuth ? 0 : await recomputeUserStreaks(affectedUserIds);
 
   let deletedProfiles = 0;
   let deletedAuthUsers = 0;
@@ -233,7 +327,9 @@ async function resetDerivedState(publicationId, resetAuth) {
     leaderboard_entries: deletedLeaderboardEntries,
     daily_winner_messages: deletedDailyWinnerMessages,
     daily_puzzle_feedback: deletedDailyPuzzleFeedback,
+    user_daily_results: deletedUserDailyResults,
     ...groupDeletes,
+    user_streaks_recomputed: recomputedUserStreaks,
     profiles: deletedProfiles,
     auth_users: deletedAuthUsers
   };
@@ -259,6 +355,8 @@ async function main() {
   const leaderboardEntryIds = publication ? await listIds("leaderboard_entries", "publication_id", [publication.id]) : [];
   const dailyWinnerMessageIds = publication ? await listIds("daily_winner_messages", "publication_id", [publication.id]) : [];
   const dailyPuzzleFeedbackIds = publication ? await listIds("daily_puzzle_feedback", "publication_id", [publication.id]) : [];
+  const userDailyResultIds = publication ? await listIds("user_daily_results", "publication_id", [publication.id]) : [];
+  const affectedUserIds = publication ? await listAffectedUserIds(publication.id) : [];
   const profileIds = resetAuth ? await listAllIds("profiles") : [];
   const authUsers = resetAuth ? await listAuthUsers() : [];
 
@@ -274,7 +372,9 @@ async function main() {
         leaderboard_entries: leaderboardEntryIds.length,
         daily_winner_messages: dailyWinnerMessageIds.length,
         daily_puzzle_feedback: dailyPuzzleFeedbackIds.length,
+        user_daily_results: userDailyResultIds.length,
         ...groupCounts.counts,
+        user_streaks_recomputed: resetAuth ? 0 : affectedUserIds.length,
         profiles: profileIds.length,
         auth_users: authUsers.length
       }
@@ -318,9 +418,11 @@ async function main() {
       leaderboard_entries: 0,
       daily_winner_messages: 0,
       daily_puzzle_feedback: 0,
+      user_daily_results: 0,
       group_leaderboard_entries: 0,
       group_members: 0,
       groups: 0,
+      user_streaks_recomputed: 0,
       profiles: 0,
       auth_users: 0
     };

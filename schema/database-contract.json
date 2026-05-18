@@ -12,6 +12,7 @@
     "attempt_log_and_leaderboard_projection_are_separate",
     "daily_winner_message_is_separate_from_leaderboard_projection",
     "daily_puzzle_feedback_is_completion_gated",
+    "daily_success_streak_is_user_scoped_projection",
     "email_is_not_public_profile_data",
     "one_ranked_success_per_user_per_publication"
   ],
@@ -22,7 +23,8 @@
     "visibility": ["private", "daily", "group"],
     "rank_status": ["visible", "flagged", "hidden"],
     "winner_message_status": ["draft", "visible", "hidden"],
-    "feedback_status": ["visible", "hidden"]
+    "feedback_status": ["visible", "hidden"],
+    "daily_result_status": ["succeeded", "failed"]
   },
   "tables": {
     "profiles": {
@@ -264,6 +266,64 @@
         "adminWritable": true
       }
     },
+    "user_daily_results": {
+      "description": "로그인 사용자의 공개일별 최종 완료 결과 원장. 연승 계산의 기준이며 오늘 랭킹과 분리한다.",
+      "columns": {
+        "id": { "type": "uuid", "primaryKey": true },
+        "publication_id": { "type": "uuid", "required": true, "references": "puzzle_publications.id" },
+        "publish_date_kst": { "type": "date", "required": true },
+        "user_id": { "type": "uuid", "required": true, "references": "profiles.id" },
+        "attempt_id": { "type": "uuid", "required": true, "references": "attempts.id" },
+        "result_status": { "type": "daily_result_status", "required": true },
+        "succeeded": { "type": "boolean", "required": true, "public": false },
+        "submitted_at": { "type": "timestamptz", "required": true },
+        "created_at": { "type": "timestamptz", "required": true },
+        "updated_at": { "type": "timestamptz", "required": true }
+      },
+      "constraints": [
+        { "type": "unique", "name": "one_daily_result_per_user_publication", "columns": ["publication_id", "user_id"] },
+        { "type": "unique", "name": "one_daily_result_per_user_date", "columns": ["user_id", "publish_date_kst"] },
+        { "type": "check", "name": "daily_result_status_succeeded_consistency", "expression": "result_status and succeeded agree" }
+      ],
+      "indexes": [
+        { "name": "user_daily_results_publication_idx", "columns": ["publication_id"] },
+        { "name": "user_daily_results_user_date_idx", "columns": ["user_id", "publish_date_kst"] },
+        { "name": "user_daily_results_user_success_date_idx", "columns": ["user_id", "succeeded", "publish_date_kst"] }
+      ],
+      "rls": {
+        "required": true,
+        "ownerSelect": true,
+        "adminWritable": true
+      }
+    },
+    "user_streaks": {
+      "description": "사용자별 현재 연승, 최고 연승, 누적 성공 횟수 projection. 연승 랭킹 API는 이 테이블만 공개 필드로 읽는다.",
+      "columns": {
+        "user_id": { "type": "uuid", "primaryKey": true, "references": "profiles.id", "public": true },
+        "current_streak": { "type": "integer", "required": true, "default": 0, "public": true },
+        "longest_streak": { "type": "integer", "required": true, "default": 0, "public": true },
+        "total_success_count": { "type": "integer", "required": true, "default": 0, "public": true },
+        "last_success_publish_date_kst": { "type": "date", "required": false, "public": true },
+        "last_result_publish_date_kst": { "type": "date", "required": false, "public": false },
+        "updated_at": { "type": "timestamptz", "required": true }
+      },
+      "constraints": [
+        { "type": "primary", "name": "user_streaks_pk", "columns": ["user_id"] },
+        { "type": "check", "name": "user_streaks_non_negative", "expression": "current_streak >= 0 and longest_streak >= 0 and total_success_count >= 0" }
+      ],
+      "indexes": [
+        {
+          "name": "user_streaks_current_rank_idx",
+          "columns": ["current_streak", "last_success_publish_date_kst", "longest_streak", "total_success_count"]
+        }
+      ],
+      "rankingSort": ["current_streak", "last_success_publish_date_kst", "longest_streak", "total_success_count"],
+      "rls": {
+        "required": true,
+        "publicSelectColumns": ["user_id", "current_streak", "longest_streak", "total_success_count", "last_success_publish_date_kst"],
+        "adminWritable": true
+      }
+    },
     "groups": {
       "description": "공유 링크 또는 초대 코드로 만들어지는 그룹 랭킹 컨테이너.",
       "columns": {
@@ -345,6 +405,10 @@
     "allAnonymousSessionsCanPlaySamePublication": true,
     "leaderboardDoesNotLockPlay": true,
     "winnerDoesNotLockPlay": true,
+    "dailyResultScope": "publication_id+user_id",
+    "streakProjectionScope": "user_id",
+    "resetTodayPuzzleDeletesTodayDailyResults": true,
+    "resetTodayPuzzleRecomputesUserStreaks": true,
     "rankingRequiresAuthenticatedProfile": true,
     "groupParticipationRequiresAuthenticatedProfile": true,
     "groupRanking": {
@@ -369,6 +433,18 @@
       "requiresCompletedAttemptToRead": true,
       "requiresCompletedAttemptToWrite": true,
       "publicFields": ["nickname_snapshot", "reaction", "comment", "created_at"],
+      "hiddenWhenEmpty": false
+    },
+    "streakRanking": {
+      "requiresAuthenticatedProfile": true,
+      "sourceTables": ["user_daily_results", "user_streaks"],
+      "order": [
+        { "column": "current_streak", "direction": "desc" },
+        { "column": "last_success_publish_date_kst", "direction": "desc" },
+        { "column": "longest_streak", "direction": "desc" },
+        { "column": "total_success_count", "direction": "desc" }
+      ],
+      "publicFields": ["nickname", "current_streak", "longest_streak", "total_success_count", "last_success_publish_date_kst"],
       "hiddenWhenEmpty": false
     }
   }

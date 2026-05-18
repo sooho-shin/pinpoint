@@ -3,7 +3,10 @@ import { LegalTemplate } from "@/components/templates/LegalTemplate";
 
 export const metadata: Metadata = {
   title: "개인정보처리방침",
-  description: "Narrow 개인정보처리방침"
+  description: "Narrow 개인정보처리방침",
+  alternates: {
+    canonical: "/privacy"
+  }
 };
 
 export default function PrivacyPage() {
