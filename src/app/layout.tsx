@@ -93,11 +93,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Script>
           </>
         ) : null}
+        <header className="site-header" aria-label="주요 메뉴">
+          <nav className="site-nav">
+            <Link className="site-brand" href="/">
+              {siteConfig.name}
+            </Link>
+            <div className="site-nav-links">
+              <Link href="/how-to-play">플레이 방법</Link>
+              <Link href="/archive">지난 문제</Link>
+            </div>
+          </nav>
+        </header>
         {children}
         <footer className="site-footer" aria-label="사이트 정보">
           <Link href="/about">소개</Link>
-          <Link href="/how-to-play">플레이 방법</Link>
-          <Link href="/archive">지난 문제</Link>
           <Link href="/privacy">개인정보처리방침</Link>
           <Link href="/terms">이용약관</Link>
           <Link href="/contact">문의</Link>

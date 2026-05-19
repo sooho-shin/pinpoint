@@ -42,6 +42,53 @@ textarea {
   font: inherit;
 }
 
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid rgba(216, 210, 196, 0.78);
+  background: rgba(247, 245, 239, 0.94);
+  backdrop-filter: blur(12px);
+}
+
+.site-nav {
+  width: min(100%, 430px);
+  height: 52px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.site-brand {
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 20px;
+}
+
+.site-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.site-nav a {
+  text-underline-offset: 4px;
+}
+
+.site-nav a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
 .site-footer {
   display: flex;
   flex-wrap: wrap;
@@ -59,8 +106,8 @@ textarea {
 }
 
 .app-shell {
-  min-height: 100vh;
-  padding: 32px;
+  min-height: calc(100vh - 52px);
+  padding: 24px 32px 32px;
 }
 
 .screen-frame {
