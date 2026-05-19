@@ -4,7 +4,6 @@ import Script from "next/script";
 import { getSiteUrl, siteConfig } from "@/lib/site";
 import "./globals.css";
 
-const DEFAULT_ADSENSE_CLIENT = "ca-pub-4621241846705196";
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
@@ -56,7 +55,6 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-  const adsenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT ?? DEFAULT_ADSENSE_CLIENT;
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -73,11 +71,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <head>
-        <script
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
-          crossOrigin="anonymous"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -102,6 +95,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         ) : null}
         {children}
         <footer className="site-footer" aria-label="사이트 정보">
+          <Link href="/about">소개</Link>
+          <Link href="/how-to-play">플레이 방법</Link>
+          <Link href="/archive">지난 문제</Link>
           <Link href="/privacy">개인정보처리방침</Link>
           <Link href="/terms">이용약관</Link>
           <Link href="/contact">문의</Link>

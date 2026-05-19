@@ -150,7 +150,7 @@ NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT=ca-pub-4621241846705196
 NEXT_PUBLIC_CONTACT_EMAIL=contact@example.com
 ```
 
-`NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT`가 설정되면 AdSense Auto ads 스크립트와 `/ads.txt`가 함께 활성화된다.
+`NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT`는 `/ads.txt` 응답에 사용한다. AdSense 승인 전에는 전역 Auto ads 스크립트를 넣지 않는다. 광고는 승인 후에도 플레이, 로그인, 랭킹 같은 상호작용 중심 화면이 아니라 `/about`, `/how-to-play`, `/archive`처럼 게시자 콘텐츠가 충분한 화면부터 제한적으로 붙인다.
 
 ### 2. 프론트엔드 구현
 

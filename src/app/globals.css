@@ -44,6 +44,7 @@ textarea {
 
 .site-footer {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 16px;
   padding: 0 24px 32px;
