@@ -1,5 +1,5 @@
-import { GoogleSignInButton } from "@/components/atoms/GoogleSignInButton";
 import { AuthStatusMessage } from "@/components/molecules/AuthStatusMessage";
+import { SignInBrowserGate } from "@/components/molecules/SignInBrowserGate";
 
 export function SignInPanel({
   action,
@@ -14,11 +14,7 @@ export function SignInPanel({
     <section className="surface min-h-[360px] p-6">
       <h2 className="text-[22px] font-bold leading-[30px]">로그인</h2>
       <AuthStatusMessage />
-      <form action={action} className="mt-8 space-y-3">
-        <input type="hidden" name="next" value={next} />
-        <GoogleSignInButton />
-        {error ? <p className="text-sm text-[var(--danger)]">{error}</p> : null}
-      </form>
+      <SignInBrowserGate action={action} next={next} error={error} />
     </section>
   );
 }

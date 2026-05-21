@@ -175,6 +175,8 @@ Google 로그인 화면이다.
 
 Google OAuth를 먼저 시작한다. 신규 사용자처럼 프로필 닉네임이 없으면 로그인 콜백 뒤 `/nickname`으로 이동해 2~12자의 한국어, 영문, 숫자 닉네임을 설정한다. 기존 사용자 프로필은 로그인 시 덮어쓰지 않는다.
 
+Threads, Instagram, 카카오톡처럼 Google OAuth가 `disallowed_useragent`로 차단될 수 있는 인앱 브라우저에서는 Google 로그인 제출 버튼을 바로 노출하지 않는다. 대신 현재 URL을 외부 브라우저에서 열거나 복사하도록 안내한다. 이 처리는 Google OAuth 정책 회피가 아니라, 사용자를 Safari/Chrome 같은 허용 브라우저로 이동시키는 오류 예방 UI다.
+
 ### `/nickname`
 
 닉네임 설정 화면이다.
