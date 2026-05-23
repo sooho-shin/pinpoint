@@ -30,14 +30,13 @@ function firstPublicOrigin(...values: Array<string | null | undefined>) {
 }
 
 export function getPublicSiteOrigin(headerStore?: Headers) {
-  const configuredOrigin = firstPublicOrigin(
+  const canonicalOrigin = firstPublicOrigin(
     process.env.NEXT_PUBLIC_SITE_URL,
-    process.env.VERCEL_PROJECT_PRODUCTION_URL,
-    process.env.VERCEL_URL
+    process.env.VERCEL_PROJECT_PRODUCTION_URL
   );
 
   if (process.env.NODE_ENV === "production") {
-    if (configuredOrigin) return configuredOrigin;
+    if (canonicalOrigin) return canonicalOrigin;
 
     const forwardedOrigin = firstPublicOrigin(
       headerStore?.get("origin"),
@@ -47,6 +46,13 @@ export function getPublicSiteOrigin(headerStore?: Headers) {
 
     return forwardedOrigin ?? DEFAULT_PRODUCTION_ORIGIN;
   }
+
+  const configuredOrigin = firstPublicOrigin(
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    process.env.VERCEL_URL
+  );
+  if (configuredOrigin) return configuredOrigin;
 
   const requestOrigin = normalizeOrigin(headerStore?.get("origin"));
   if (requestOrigin) return requestOrigin;

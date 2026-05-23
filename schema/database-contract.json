@@ -58,7 +58,7 @@
         "aliases": { "type": "text[]", "required": true, "public": false },
         "category": { "type": "text", "required": true, "public": true },
         "difficulty": { "type": "integer", "required": true, "public": false },
-        "clues": { "type": "jsonb", "required": true, "public": true },
+        "clues": { "type": "jsonb", "required": true, "public": false },
         "rationale": { "type": "text", "required": false, "public": false },
         "status": { "type": "puzzle_status", "required": true },
         "quality_score": { "type": "integer", "required": false },
@@ -80,6 +80,7 @@
       "rls": {
         "required": true,
         "publicSelectWhen": "published_via_puzzle_publications",
+        "publicSelectColumns": ["id", "locale", "category", "status", "created_at", "updated_at"],
         "adminWritable": true
       }
     },
@@ -148,7 +149,8 @@
       "rls": {
         "required": true,
         "ownerSelect": true,
-        "ownerInsert": true,
+        "ownerInsert": false,
+        "routeHandlerWritableOnly": true,
         "adminSelect": true
       }
     },
@@ -328,7 +330,7 @@
       "description": "공유 링크 또는 초대 코드로 만들어지는 그룹 랭킹 컨테이너.",
       "columns": {
         "id": { "type": "uuid", "primaryKey": true },
-        "owner_user_id": { "type": "uuid", "required": true, "references": "profiles.id" },
+        "owner_user_id": { "type": "uuid", "required": false, "references": "profiles.id" },
         "publication_id": { "type": "uuid", "required": true, "references": "puzzle_publications.id" },
         "name": { "type": "text", "required": false, "public": true },
         "invite_code": { "type": "text", "required": true, "public": false },
@@ -413,6 +415,7 @@
     "groupParticipationRequiresAuthenticatedProfile": true,
     "groupRanking": {
       "requiresAuthenticatedProfile": true,
+      "shareCreatesInviteWithoutProfile": true,
       "inviteCodeLink": true,
       "scopedToActivePublication": true,
       "publicFields": ["nickname_snapshot", "used_clue_count", "elapsed_ms", "submitted_at"],

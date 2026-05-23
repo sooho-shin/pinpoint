@@ -79,7 +79,7 @@ export function SignInBrowserGate({
           <h3 className="text-base font-bold text-[var(--text-primary)]">브라우저에서 로그인해주세요</h3>
           <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
             Threads, Instagram, 카카오톡 같은 앱 안의 브라우저에서는 Google 로그인이 보안 정책으로 차단될 수 있습니다.
-            Safari나 Chrome에서 Narrow를 열면 정상적으로 로그인할 수 있습니다.
+            아래 버튼이 같은 앱 안에서 다시 열리면 주소를 복사해 Safari나 Chrome 주소창에 붙여넣어 주세요.
           </p>
         </div>
         <div className="grid gap-3">
@@ -90,7 +90,7 @@ export function SignInBrowserGate({
             rel="noreferrer"
           >
             <ExternalLink aria-hidden="true" className="h-5 w-5" />
-            브라우저로 열기
+            외부 브라우저로 열기
           </a>
           <button
             className="focus-ring inline-flex h-12 items-center justify-center gap-2 rounded-md border border-[var(--border)] bg-white px-4 text-sm font-bold text-[var(--accent)]"

@@ -4,7 +4,6 @@ import { clsx } from "clsx";
 import { FormEvent, useEffect, useState } from "react";
 import { Button, ButtonLink } from "@/components/atoms/Button";
 import { TextInput } from "@/components/atoms/TextInput";
-import { GroupInviteCard } from "@/components/molecules/GroupInviteCard";
 import { LeaderboardTabs } from "@/components/molecules/LeaderboardTabs";
 import { RankingRow, type RankingRowData } from "@/components/molecules/RankingRow";
 import { formatKoreanDate } from "@/lib/format";
@@ -44,12 +43,6 @@ type GroupLeaderboardState =
       requiresNickname?: boolean;
     };
 
-type CreatedGroup = {
-  name: string;
-  inviteCode: string;
-  inviteUrl: string;
-};
-
 async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     ...init,
@@ -77,11 +70,9 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
   const [feedbackReaction, setFeedbackReaction] = useState<PuzzleFeedbackReaction>("good");
   const [feedbackComment, setFeedbackComment] = useState("");
   const [feedbackSubmitMessage, setFeedbackSubmitMessage] = useState("");
-  const [createdGroup, setCreatedGroup] = useState<CreatedGroup | null>(null);
   const [groupMessage, setGroupMessage] = useState("");
   const [pending, setPending] = useState(false);
   const [feedbackPending, setFeedbackPending] = useState(false);
-  const [groupPending, setGroupPending] = useState(false);
 
   async function load() {
     if (isGroupMode) {
@@ -113,27 +104,8 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
     });
   }, [activeTab, groupCode]);
 
-  async function createGroup() {
-    setGroupPending(true);
-    setGroupMessage("");
-    try {
-      const result = await getJson<{ ok: true; group: { name: string; inviteCode: string } }>("/api/groups", {
-        method: "POST",
-        body: JSON.stringify({})
-      });
-      const inviteUrl = getGroupUrl(result.group.inviteCode);
-      setCreatedGroup({ ...result.group, inviteUrl });
-      await navigator.clipboard?.writeText(inviteUrl);
-      setGroupMessage("그룹 링크를 만들고 복사했습니다.");
-    } catch (error) {
-      setGroupMessage(error instanceof Error ? error.message : "그룹을 만들지 못했습니다.");
-    } finally {
-      setGroupPending(false);
-    }
-  }
-
   async function copyGroupLink(inviteUrl?: string) {
-    const url = inviteUrl ?? (createdGroup ? createdGroup.inviteUrl : "");
+    const url = inviteUrl ?? "";
     if (!url) return;
     await navigator.clipboard?.writeText(url);
     setGroupMessage("그룹 링크를 복사했습니다.");
@@ -204,13 +176,15 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
 
         {groupState.status === "ready" ? (
           <>
-            <GroupInviteCard
-              inviteUrl={inviteUrl}
-              pending={false}
-              message={groupMessage || "이 링크를 공유하면 친구들이 같은 그룹 랭킹에 참여합니다."}
-              onCreate={() => {}}
-              onCopy={() => copyGroupLink(inviteUrl)}
-            />
+            <div className="muted-surface p-4">
+              <div className="text-sm font-semibold text-[var(--text-primary)]">공유 그룹</div>
+              <p className="mt-2 text-sm leading-5 text-[var(--text-secondary)]">같은 공유 URL로 들어온 사람들끼리 오늘 기록을 비교합니다.</p>
+              <div className="mt-3 truncate rounded-md border border-[var(--border)] bg-white px-3 py-2 text-xs text-[var(--text-secondary)]">{inviteUrl}</div>
+              <div className="mt-4">
+                <Button type="button" variant="secondary" onClick={() => copyGroupLink(inviteUrl)}>URL 복사</Button>
+              </div>
+              {groupMessage ? <p className="mt-3 text-sm text-[var(--text-secondary)]">{groupMessage}</p> : null}
+            </div>
             <div className="mt-6 space-y-1">
               {groupState.rows.length === 0 ? (
                 <div className="muted-surface p-4 text-sm text-[var(--text-secondary)]">아직 이 그룹에 랭킹 기록이 없습니다.</div>
@@ -220,13 +194,13 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
             </div>
           </>
         ) : groupState.status === "missing_code" ? (
-          <GroupInviteCard
-            inviteUrl={createdGroup?.inviteUrl}
-            pending={groupPending}
-            message={groupMessage || "초대 링크를 만들면 친구들과 오늘 기록을 비교할 수 있습니다."}
-            onCreate={createGroup}
-            onCopy={() => copyGroupLink()}
-          />
+          <div className="muted-surface p-4">
+            <div className="text-sm font-semibold text-[var(--text-primary)]">공유 URL이 필요합니다</div>
+            <p className="mt-2 text-sm leading-5 text-[var(--text-secondary)]">메인 화면의 공유 버튼을 누르면 자동으로 그룹 URL이 복사됩니다. 그 URL로 들어온 사람들끼리 그룹 랭킹을 볼 수 있습니다.</p>
+            <div className="mt-4">
+              <ButtonLink href="/" variant="secondary">메인에서 공유하기</ButtonLink>
+            </div>
+          </div>
         ) : (
           <div className="muted-surface p-4">
             <p className="text-sm leading-5 text-[var(--text-secondary)]">{groupState.message ?? "그룹 랭킹에 참여할 수 없습니다."}</p>
@@ -268,7 +242,7 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
       {state.winnerMessage ? (
         <div className="mb-5 rounded-md border border-[var(--border)] bg-[var(--surface-muted)] p-3 text-sm">
           <span className="font-semibold">{state.winnerMessage.nickname}</span>
-          <span className="ml-2 text-[var(--text-secondary)]">{state.winnerMessage.message}</span>
+          <span className="ml-2 break-words text-[var(--text-secondary)] [overflow-wrap:anywhere]">{state.winnerMessage.message}</span>
         </div>
       ) : null}
 

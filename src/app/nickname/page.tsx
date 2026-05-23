@@ -38,9 +38,13 @@ export default async function NicknamePage({ searchParams }: { searchParams: Pro
   const error =
     params.error === "invalid"
       ? "닉네임은 2~12자의 한국어, 영문, 숫자로 입력해 주세요."
-      : params.error === "save"
-        ? "닉네임을 저장하지 못했습니다."
-        : undefined;
+      : params.error === "duplicate"
+        ? "이미 사용 중인 닉네임입니다."
+        : params.error === "permission"
+          ? "로그인 세션을 확인하지 못했습니다. 다시 로그인해 주세요."
+          : params.error === "save"
+            ? "닉네임을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요."
+            : undefined;
 
   return <AuthTemplate kind="nickname" action={saveNickname} defaultNickname={profile?.nickname ?? fallbackName} error={error} next={next} />;
 }

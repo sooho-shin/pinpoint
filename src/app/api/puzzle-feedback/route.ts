@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { logRouteError } from "@/lib/api-error";
 import { writePuzzleFeedback } from "@/lib/puzzle/api";
 
 export async function POST(request: NextRequest) {
@@ -13,7 +14,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(result);
-  } catch {
+  } catch (error) {
+    logRouteError("api/puzzle-feedback", error);
     return NextResponse.json({ error: "평가를 저장하지 못했습니다." }, { status: 500 });
   }
 }

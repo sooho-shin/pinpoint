@@ -29,14 +29,18 @@ export default function ContactPage() {
               >
                 {contactEmail}
               </a>
-            ) : null}
+            ) : (
+              <div className="rounded-md border border-[var(--border)] bg-white p-4 text-sm leading-6 text-[var(--text-secondary)]">
+                개인정보, 계정 삭제, 광고 문의는 비공개 연락처가 설정된 뒤 이메일로만 받습니다. 운영자는 `NEXT_PUBLIC_CONTACT_EMAIL` 환경 변수를 먼저 설정해야 합니다.
+              </div>
+            )}
             <a
               className="focus-ring flex min-h-14 items-center rounded-md border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--accent)]"
               href="https://github.com/sooho-shin/pinpoint/issues"
               rel="noreferrer"
               target="_blank"
             >
-              GitHub Issues
+              공개 오류 제보: GitHub Issues
             </a>
           </div>
           <Link

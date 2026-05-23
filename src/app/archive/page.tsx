@@ -77,7 +77,8 @@ export default async function ArchivePage() {
           <div className="mt-6 space-y-4">
             {rows.length === 0 ? (
               <div className="muted-surface p-4 text-sm leading-6 text-[var(--text-secondary)]">
-                아직 아카이브에 표시할 지난 문제가 없습니다.
+                아직 아카이브에 표시할 지난 문제가 없습니다. 첫 공개 문제의 운영일이 지나면 이곳에 정답, 단서, 카테고리, 난이도가 쌓입니다.
+                현재 진행 중인 문제는 스포일러 방지를 위해 공개 기간이 끝난 뒤에만 표시합니다.
               </div>
             ) : (
               rows.map((row) => {

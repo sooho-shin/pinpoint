@@ -24,7 +24,7 @@ async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
   return payload as T;
 }
 
-export function PuzzleBoard() {
+export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
   const router = useRouter();
   const [state, setState] = useState<BoardState>({ status: "loading" });
   const [guess, setGuess] = useState("");
@@ -33,7 +33,8 @@ export function PuzzleBoard() {
 
   useEffect(() => {
     let mounted = true;
-    requestJson<PuzzlePlayState | NoPuzzleState>("/api/attempts/start", { method: "POST", body: "{}" })
+    if (groupCode) sessionStorage.setItem("narrow:active-group", groupCode);
+    requestJson<PuzzlePlayState | NoPuzzleState>("/api/today")
       .then((payload) => {
         if (mounted) setState(payload);
       })
@@ -43,7 +44,15 @@ export function PuzzleBoard() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [groupCode]);
+
+  useEffect(() => {
+    if (!groupCode) return;
+    requestJson("/api/groups/join", {
+      method: "POST",
+      body: JSON.stringify({ inviteCode: groupCode })
+    }).catch(() => undefined);
+  }, [groupCode]);
 
   async function reveal() {
     setPending(true);
@@ -68,7 +77,8 @@ export function PuzzleBoard() {
           "비로그인 상태에서는 오늘의 랭킹 등록과 1등 확성기 메시지를 사용할 수 없습니다.\n\n정답 후 기록을 올리려면 로그인과 닉네임 설정이 필요합니다. 그대로 비로그인으로 진행할까요?"
         );
         if (!shouldContinue) {
-          window.location.assign(`${window.location.origin}/signin?next=/`);
+          const next = `${window.location.pathname}${window.location.search}`;
+          window.location.assign(`${window.location.origin}/signin?next=${encodeURIComponent(next)}`);
           return;
         }
         sessionStorage.setItem(promptKey, "1");
@@ -158,7 +168,7 @@ export function PuzzleBoard() {
               <div className="mt-1 text-xl font-bold">{state.answer}</div>
             </div>
           ) : null}
-          <Button type="button" onClick={() => router.push("/ranking")}>오늘의 랭킹 보기</Button>
+          <Button type="button" onClick={() => router.push(groupCode ? `/ranking?group=${encodeURIComponent(groupCode)}` : "/ranking")}>오늘의 랭킹 보기</Button>
         </div>
       ) : (
         <div className="space-y-3">

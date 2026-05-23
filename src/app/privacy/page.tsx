@@ -36,6 +36,7 @@ export default function PrivacyPage() {
           paragraphs: [
             "서비스는 방문 통계와 이용 흐름을 파악하기 위해 Google Analytics를 사용할 수 있습니다.",
             "광고 수익화를 위해 Google AdSense가 사용될 수 있으며, Google은 광고 제공과 측정을 위해 쿠키 또는 유사 기술을 사용할 수 있습니다.",
+            "EEA, 영국, 스위스 등 동의가 필요한 지역의 사용자를 대상으로 개인 맞춤 광고를 제공하기 전에는 Google 인증 동의 관리 플랫폼 또는 Google AdSense 개인정보 보호 메시지를 적용합니다.",
             "사용자는 브라우저 설정 또는 Google 광고 설정을 통해 개인 맞춤 광고와 쿠키 사용을 관리할 수 있습니다."
           ]
         },
@@ -43,7 +44,7 @@ export default function PrivacyPage() {
           title: "보관과 삭제",
           paragraphs: [
             "서비스 운영에 필요한 정보는 목적 달성에 필요한 기간 동안 보관됩니다.",
-            "계정 및 개인정보 삭제 요청은 문의 페이지의 연락 경로를 통해 요청할 수 있습니다."
+            "계정 및 개인정보 삭제 요청은 문의 페이지의 이메일 연락 경로를 통해 요청할 수 있습니다. 공개 GitHub Issues에는 개인정보를 포함하지 않아야 합니다."
           ]
         }
       ]}

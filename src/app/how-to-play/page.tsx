@@ -57,6 +57,22 @@ export default function HowToPlayPage() {
           </section>
 
           <section className="mt-6">
+            <h2 className="text-base font-bold">하루 기준</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              Narrow의 하루는 자정이 아니라 KST 오후 5시에 바뀝니다. 예를 들어 월요일 오후 5시에 열린 문제는 화요일 오후 4시 59분까지
+              오늘 문제로 유지됩니다. 이 기준은 오늘의 랭킹, 그룹 랭킹, 1등 확성기, 문제 평가에 모두 같이 적용됩니다.
+            </p>
+          </section>
+
+          <section className="mt-6">
+            <h2 className="text-base font-bold">평가와 한마디</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              문제를 끝까지 완료한 로그인 사용자는 랭킹 화면에서 오늘 문제에 대한 짧은 평가를 남길 수 있습니다.
+              아직 풀지 않은 사람에게는 평가 목록을 보여주지 않으며, 정답이나 단서를 직접 포함한 한마디는 저장하지 않습니다.
+            </p>
+          </section>
+
+          <section className="mt-6">
             <h2 className="text-base font-bold">예시 문제</h2>
             <div className="mt-3 space-y-4">
               {examples.map((example) => (

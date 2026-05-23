@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
-import { normalizeAnswer } from "@/lib/puzzle/normalize";
+import { isAcceptedAnswer, normalizeAnswer } from "@/lib/puzzle/normalize";
 import { publishDailyPuzzle } from "@/lib/puzzle/publication-admin";
 import { getActivePublicationDateKst, getNextPublicationIso } from "@/lib/puzzle/time";
 import type {
@@ -71,7 +71,7 @@ type PuzzleFeedbackRow = {
 
 type GroupRow = {
   id: string;
-  owner_user_id: string;
+  owner_user_id: string | null;
   publication_id: string;
   name: string | null;
   invite_code: string;
@@ -86,6 +86,8 @@ const TERMINAL_STATUSES = new Set(["succeeded", "failed", "abandoned"]);
 const COMPLETED_FEEDBACK_STATUSES = new Set(["succeeded", "failed"]);
 const FEEDBACK_REACTIONS = new Set<PuzzleFeedbackReaction>(["easy", "good", "hard", "tricky", "fun"]);
 const ANONYMOUS_SESSION_COOKIE = "pinpoint_anon_session";
+const LEADERBOARD_DISPLAY_LIMIT = 50;
+const LEADERBOARD_RANK_SCAN_LIMIT = 5000;
 
 function createInviteCode() {
   const bytes = crypto.getRandomValues(new Uint8Array(8));
@@ -117,6 +119,19 @@ function publicFeedback(row: PuzzleFeedbackRow, userId: string): PuzzleFeedbackI
     createdAt: row.created_at,
     isMe: row.user_id === userId
   };
+}
+
+function containsSpoilerText(comment: string, puzzle: PuzzleRow) {
+  const normalizedComment = normalizeAnswer(comment);
+  const forbiddenTerms = [
+    puzzle.answer,
+    ...(puzzle.aliases ?? []),
+    ...puzzle.clues
+  ]
+    .map(normalizeAnswer)
+    .filter((term) => term.length >= 2);
+
+  return forbiddenTerms.some((term) => normalizedComment.includes(term));
 }
 
 function addKstDate(dateText: string, days: number) {
@@ -424,7 +439,10 @@ export async function revealNextClue(): Promise<PuzzlePlayState | NoPuzzleState>
   if (!publication || !puzzle) return { status: "no_puzzle", publishDateKst };
 
   const attempt = (await claimAnonymousAttempt(publication.id, actor)) ?? (await getAttempt(publication.id, actor));
-  if (!attempt) return startAttempt();
+  if (!attempt) {
+    await startAttempt();
+    return revealNextClue();
+  }
   if (TERMINAL_STATUSES.has(attempt.status)) {
     const winnerMessage = await getWinnerMessage(publication.id);
     return visiblePuzzleState(publication, puzzle, attempt, winnerMessage, !actor.userId);
@@ -651,8 +669,8 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
 
   const elapsedMs = Math.max(0, Date.now() - new Date(attempt.started_at).getTime());
   const normalizedGuess = normalizeAnswer(rawGuess);
-  const accepted = [puzzle.answer, ...(puzzle.aliases ?? [])].map(normalizeAnswer);
-  const isCorrect = accepted.includes(normalizedGuess);
+  const accepted = [puzzle.answer, ...(puzzle.aliases ?? [])];
+  const isCorrect = isAcceptedAnswer(rawGuess, accepted);
   const terminalFailure = !isCorrect && usedClueCount >= 5;
   const nextVisibleCount = isCorrect || terminalFailure ? 5 : Math.min(5, usedClueCount + 1);
   const nextStatus = isCorrect ? "succeeded" : terminalFailure ? "failed" : "playing";
@@ -730,11 +748,11 @@ export async function getDailyLeaderboard() {
     .order("used_clue_count", { ascending: true })
     .order("elapsed_ms", { ascending: true })
     .order("submitted_at", { ascending: true })
-    .limit(50);
+    .limit(LEADERBOARD_RANK_SCAN_LIMIT);
 
   if (error) throw error;
 
-  const rows = (data ?? []).map((row, index) => ({
+  const allRows = (data ?? []).map((row, index) => ({
     id: String(row.id),
     rank: index + 1,
     nickname: String(row.nickname_snapshot),
@@ -743,7 +761,8 @@ export async function getDailyLeaderboard() {
     submittedAt: String(row.submitted_at),
     isMe: Boolean(actor.userId && row.user_id === actor.userId)
   }));
-  const myRank = rows.find((row) => row.isMe) ?? null;
+  const rows = allRows.slice(0, LEADERBOARD_DISPLAY_LIMIT);
+  const myRank = allRows.find((row) => row.isMe) ?? null;
 
   return {
     status: "ready",
@@ -835,16 +854,13 @@ async function addGroupMemberAndProjection(group: GroupRow, userId: string) {
 
 export async function createRankingGroup(input: { name?: string }) {
   const actor = await getActor();
-  if (!actor.userId) return { ok: false, error: "로그인이 필요합니다.", requiresSignIn: true };
-
   const { publication } = await getTodayPublication();
   if (!publication) return { ok: false, error: "오늘 공개된 문제가 없습니다." };
 
-  const profile = await getProfile(actor.userId);
-  if (!profile) return { ok: false, error: "닉네임 설정이 필요합니다.", requiresNickname: true };
+  const profile = actor.userId ? await getProfile(actor.userId) : null;
 
   const trimmedName = String(input.name ?? "").trim();
-  const groupName = trimmedName.length > 0 ? trimmedName.slice(0, 24) : `${profile.nickname}의 그룹`;
+  const groupName = trimmedName.length > 0 ? trimmedName.slice(0, 24) : profile ? `${profile.nickname}의 그룹` : "공유 그룹";
   const admin = createAdminClient();
 
   for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -864,7 +880,7 @@ export async function createRankingGroup(input: { name?: string }) {
     if (error) throw error;
 
     const group = data as GroupRow;
-    await addGroupMemberAndProjection(group, actor.userId);
+    if (actor.userId && profile) await addGroupMemberAndProjection(group, actor.userId);
     return {
       ok: true,
       group: {
@@ -1156,8 +1172,8 @@ export async function writePuzzleFeedback(input: { reaction: string; comment: st
   const actor = await getActor();
   if (!actor.userId) return { ok: false, error: "로그인이 필요합니다." };
 
-  const { publication } = await getTodayPublication();
-  if (!publication) return { ok: false, error: "오늘 공개된 문제가 없습니다." };
+  const { publication, puzzle } = await getTodayPublication();
+  if (!publication || !puzzle) return { ok: false, error: "오늘 공개된 문제가 없습니다." };
 
   const [profile, completedAttempt] = await Promise.all([
     getProfile(actor.userId),
@@ -1165,6 +1181,9 @@ export async function writePuzzleFeedback(input: { reaction: string; comment: st
   ]);
   if (!profile) return { ok: false, error: "닉네임 설정이 필요합니다." };
   if (!completedAttempt) return { ok: false, error: "오늘 문제를 완료하면 평가를 남길 수 있습니다." };
+  if (containsSpoilerText(comment, puzzle)) {
+    return { ok: false, error: "정답이나 단서를 직접 포함한 한마디는 남길 수 없습니다." };
+  }
 
   const admin = createAdminClient();
   const { error } = await admin

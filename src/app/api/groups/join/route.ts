@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { logRouteError } from "@/lib/api-error";
 import { joinRankingGroup } from "@/lib/puzzle/api";
 
 export async function POST(request: NextRequest) {
@@ -10,7 +11,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(result);
-  } catch {
+  } catch (error) {
+    logRouteError("api/groups/join", error);
     return NextResponse.json({ ok: false, error: "그룹에 참여하지 못했습니다." }, { status: 500 });
   }
 }

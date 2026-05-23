@@ -20,7 +20,13 @@ export function ResultPanel() {
     let mounted = true;
     const raw = sessionStorage.getItem("pinpoint:last-result");
     if (!raw) return;
-    const cached = JSON.parse(raw) as SubmitResult;
+    let cached: SubmitResult;
+    try {
+      cached = JSON.parse(raw) as SubmitResult;
+    } catch {
+      sessionStorage.removeItem("pinpoint:last-result");
+      return;
+    }
     setResult(cached);
     const promptKey = `pinpoint:winner-message-prompted:${cached.attemptId ?? cached.publicationId}`;
     if (cached.canWriteWinnerMessage && !sessionStorage.getItem(promptKey)) {

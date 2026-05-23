@@ -82,8 +82,28 @@ async function main() {
   }
 
   if (publications.length > 0) {
-    const { error } = await supabase.from("puzzle_publications").upsert(publications, { onConflict: "publish_date_kst" });
+    const dates = [...new Set(publications.map((publication) => publication.publish_date_kst))];
+    const { data: existingPublications, error: existingError } = await supabase
+      .from("puzzle_publications")
+      .select("publish_date_kst,status,puzzle_id")
+      .in("publish_date_kst", dates);
+    if (existingError) throw existingError;
+
+    const existingByDate = new Map((existingPublications ?? []).map((publication) => [String(publication.publish_date_kst), publication]));
+    const safePublications = publications.filter((publication) => {
+      const existing = existingByDate.get(publication.publish_date_kst);
+      return !existing || existing.status !== "published" || existing.puzzle_id === publication.puzzle_id;
+    });
+    const skippedPublished = publications.length - safePublications.length;
+
+    if (safePublications.length === 0) {
+      console.log(`Skipped ${skippedPublished} already-published publication(s).`);
+      return;
+    }
+
+    const { error } = await supabase.from("puzzle_publications").upsert(safePublications, { onConflict: "publish_date_kst" });
     if (error) throw error;
+    if (skippedPublished > 0) console.log(`Skipped ${skippedPublished} already-published publication(s).`);
   }
 
   console.log(`Synced ${uniquePuzzles.length} puzzle(s) and ${publications.length} publication(s) to Supabase.`);

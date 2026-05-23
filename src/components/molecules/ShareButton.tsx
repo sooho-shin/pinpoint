@@ -3,25 +3,36 @@
 import { Check, Share2 } from "lucide-react";
 import { useState } from "react";
 
+async function createShareUrl() {
+  const currentGroup = new URLSearchParams(window.location.search).get("group");
+  if (currentGroup) {
+    return `${window.location.origin}/?group=${encodeURIComponent(currentGroup)}`;
+  }
+
+  const response = await fetch("/api/groups", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{}"
+  });
+  const payload = await response.json();
+  if (!response.ok || !payload.ok) throw new Error(payload.error ?? "공유 링크를 만들지 못했습니다.");
+  const inviteCode = String(payload.group.inviteCode);
+  return `${window.location.origin}/?group=${encodeURIComponent(inviteCode)}`;
+}
+
 export function ShareButton() {
   const [shared, setShared] = useState(false);
 
   async function share() {
-    const url = window.location.origin;
-    const title = "Narrow";
-    const text = "매일 오후 5시, 단서로 맞히는 한국어 연상 퍼즐";
-
     try {
-      if (navigator.share) {
-        await navigator.share({ title, text, url });
-        return;
-      }
-
-      await navigator.clipboard.writeText(`${text}\n${url}`);
+      const url = await createShareUrl();
+      await navigator.clipboard.writeText(url);
       setShared(true);
       window.setTimeout(() => setShared(false), 1600);
     } catch {
-      // 공유창 취소는 사용자가 의도한 흐름이므로 조용히 무시한다.
+      await navigator.clipboard.writeText(window.location.origin);
+      setShared(true);
+      window.setTimeout(() => setShared(false), 1600);
     }
   }
 
@@ -36,6 +47,7 @@ export function ShareButton() {
       title={shared ? "복사됨" : "공유하기"}
     >
       <Icon className="h-5 w-5 text-[var(--accent)]" aria-hidden="true" />
+      <span className="sr-only">{shared ? "그룹 URL이 복사되었습니다" : "그룹 URL 복사"}</span>
     </button>
   );
 }

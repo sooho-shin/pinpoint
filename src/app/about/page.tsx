@@ -45,6 +45,24 @@ export default function AboutPage() {
             </p>
           </section>
 
+          <section className="mt-6">
+            <h2 className="text-base font-bold">문제는 어떻게 고르나요?</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              문제 후보는 자동으로 바로 게시하지 않습니다. 정답이 너무 넓지 않은지, 단서에 정답이 직접 들어가지 않는지,
+              1번과 2번 단서만으로 답이 너무 쉽게 보이지 않는지 검토한 뒤 공개 후보로 저장합니다.
+              공개된 문제는 지난 문제 페이지에 남기고, 현재 활성 문제는 아카이브에서 제외해 스포일러를 막습니다.
+            </p>
+          </section>
+
+          <section className="mt-6">
+            <h2 className="text-base font-bold">운영과 개인정보</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              비로그인 사용자는 브라우저별 익명 세션으로 풀이를 이어가고, Google 로그인 사용자는 닉네임으로만 랭킹에 표시됩니다.
+              이메일, 제출한 오답, 내부 식별자는 공개 랭킹과 공유 화면에 표시하지 않습니다.
+              광고가 도입되더라도 정답 입력, 제출, 다음 단서 버튼 주변에는 배치하지 않는 것을 원칙으로 합니다.
+            </p>
+          </section>
+
           <div className="mt-8 grid gap-3">
             <Link className="focus-ring inline-flex h-10 items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--accent)]" href="/how-to-play">
               플레이 방법 보기

@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   }
 };
 
-export default async function TodayPage() {
-  return <DailyPuzzleTemplate />;
+function safeGroupCode(value?: string) {
+  const code = String(value ?? "").trim();
+  return /^[0-9a-z]{6,24}$/i.test(code) ? code : undefined;
+}
+
+export default async function TodayPage({ searchParams }: { searchParams: Promise<{ group?: string }> }) {
+  const params = await searchParams;
+  return <DailyPuzzleTemplate groupCode={safeGroupCode(params.group)} />;
 }

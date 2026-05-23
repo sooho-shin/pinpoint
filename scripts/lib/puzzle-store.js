@@ -132,10 +132,16 @@ export function validatePuzzle(puzzle, existing = [], policy = { weakAnswers: []
   const weakAnswers = policy.weakAnswers.map(normalizeText);
   if (weakAnswers.includes(normalizedAnswer)) issues.push("too_broad_or_easy_answer");
 
-  const existingAnswers = new Set(existing.filter((item) => item.id !== puzzle.id).map((item) => normalizeText(item.answer)));
-  if (normalizedAnswer && existingAnswers.has(normalizedAnswer)) issues.push("duplicate_answer");
-
   const allAcceptedAnswers = [normalizedAnswer, ...normalizedAliases].filter(Boolean);
+  const existingAcceptedAnswers = new Set(
+    existing
+      .filter((item) => item.id !== puzzle.id)
+      .flatMap((item) => [item.answer, ...(Array.isArray(item.aliases) ? item.aliases : [])])
+      .map(normalizeText)
+      .filter(Boolean)
+  );
+  if (allAcceptedAnswers.some((answer) => existingAcceptedAnswers.has(answer))) issues.push("duplicate_answer_or_alias");
+
   if (new Set(allAcceptedAnswers).size !== allAcceptedAnswers.length) issues.push("duplicate_alias");
 
   return issues;

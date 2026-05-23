@@ -86,7 +86,10 @@ async function main() {
     "grant select ( user_id, current_streak, longest_streak, total_success_count, last_success_publish_date_kst, last_result_publish_date_kst, updated_at ) on public.user_streaks to anon, authenticated",
     "on public.leaderboard_entries ( publication_id, rank_status, used_clue_count, elapsed_ms, submitted_at )",
     "revoke all on public.profiles from anon, authenticated",
-    "grant select (id, nickname, avatar_url) on public.profiles to anon, authenticated"
+    "grant select (id, nickname, avatar_url) on public.profiles to anon, authenticated",
+    "revoke select on public.puzzles from anon, authenticated",
+    "grant select (id, locale, category, status, created_at, updated_at) on public.puzzles to anon, authenticated",
+    "revoke insert, update on public.attempts from anon, authenticated"
   ];
   includesAll(sql, requiredSnippets, "missing_required_sql", issues);
 

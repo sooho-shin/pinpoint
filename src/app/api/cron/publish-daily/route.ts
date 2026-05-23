@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logRouteError } from "@/lib/api-error";
 import { publishDailyPuzzle } from "@/lib/puzzle/publication-admin";
 
 function isAuthorized(request: NextRequest) {
@@ -19,7 +20,8 @@ export async function GET(request: NextRequest) {
     const dateKst = request.nextUrl.searchParams.get("date") ?? undefined;
     const result = await publishDailyPuzzle({ dateKst, force });
     return NextResponse.json(result);
-  } catch {
+  } catch (error) {
+    logRouteError("api/cron/publish-daily", error);
     return NextResponse.json({ error: "오늘 공개 예약을 처리하지 못했습니다." }, { status: 500 });
   }
 }

@@ -105,6 +105,7 @@ scheduled -> published
 - 활성 공개일은 현재 KST 시간이 17:00 전이면 전날 날짜, 17:00 이후이면 오늘 날짜다. 따라서 KST 00:00 이후에도 17:00 전까지는 전날 공개 문제가 계속 노출된다.
 - KST 17:00 이후 활성 공개일의 published row가 아직 없으면 앱 서버의 오늘 문제 조회가 동일한 공개 로직을 한 번 실행해 cron 지연을 보완한다.
 - 서비스 role key는 서버 스크립트와 cron route에서만 사용하고 client component 또는 public env로 노출하지 않는다.
+- 브라우저 Supabase 권한으로 `puzzles.clues`, `puzzles.answer`, `puzzles.aliases`, `puzzles.difficulty`를 직접 읽을 수 있게 하지 않는다. 오늘 문제와 아카이브는 서버 API 또는 서버 컴포넌트가 service role로 읽고 필요한 시점에만 값을 반환한다.
 
 ### attempts
 
@@ -119,6 +120,7 @@ scheduled -> published
 - 승계 시 이미 `publication_id + user_id` attempt가 있으면 사용자 attempt를 우선하고 익명 attempt를 새 풀이로 쓰지 않는다.
 - 승계된 성공 attempt는 프로필이 있으면 `leaderboard_entries` projection 생성 대상이 될 수 있다.
 - `leaderboard_entries` 또는 `daily_winner_messages` 존재 여부로 attempt 생성을 막지 않는다.
+- 브라우저 Supabase 권한으로 `attempts`를 직접 insert/update하지 않는다. 익명/로그인 attempt 생성과 갱신은 Next.js Route Handler가 service role로 처리한다.
 
 ### leaderboard_entries
 
@@ -205,11 +207,11 @@ scheduled -> published
 
 ### groups
 
-공유 링크 또는 초대 코드로 만들어진 그룹 랭킹 컨테이너다. MVP에서는 특정 `puzzle_publication`에 종속된 일회성 그룹을 기본값으로 둔다. 그룹 생성자는 로그인 + 닉네임 설정을 완료해야 하며, `invite_code`는 `/ranking?group={invite_code}` 링크에 사용한다.
+공유 링크 또는 초대 코드로 만들어진 그룹 랭킹 컨테이너다. MVP에서는 특정 `puzzle_publication`에 종속된 일회성 그룹을 기본값으로 둔다. 메인 공유 버튼이 로그인 없이도 그룹을 만들 수 있으므로 `owner_user_id`는 비어 있을 수 있다. `invite_code`는 `/?group={invite_code}`와 `/ranking?group={invite_code}` 링크에 사용한다.
 
 ### group_members
 
-그룹 참여자 목록이다. 같은 사용자가 같은 그룹에 중복 참여할 수 없다. 초대 링크로 들어온 로그인 + 닉네임 사용자는 이 테이블에 upsert된다.
+그룹 참여자 목록이다. 같은 사용자가 같은 그룹에 중복 참여할 수 없다. 공유 URL로 들어온 로그인 + 닉네임 사용자는 이 테이블에 upsert된다.
 
 ### group_leaderboard_entries
 
