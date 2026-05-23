@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ExternalLink, Link2 } from "lucide-react";
+import { Button, ButtonAnchor } from "@/components/atoms/Button";
 import { GoogleSignInButton } from "@/components/atoms/GoogleSignInButton";
 
 const BLOCKED_IN_APP_BROWSER_PATTERNS = [
@@ -61,13 +62,9 @@ export function SignInBrowserGate({
   if (browserState === "checking") {
     return (
       <div className="mt-8">
-        <button
-          className="inline-flex h-12 w-full items-center justify-center rounded-md bg-[var(--surface-muted)] px-4 text-sm font-bold text-[var(--text-secondary)]"
-          type="button"
-          disabled
-        >
+        <Button type="button" variant="secondary" className="h-12" disabled>
           로그인 환경 확인 중
-        </button>
+        </Button>
       </div>
     );
   }
@@ -83,23 +80,14 @@ export function SignInBrowserGate({
           </p>
         </div>
         <div className="grid gap-3">
-          <a
-            className="focus-ring inline-flex h-12 items-center justify-center gap-2 rounded-md bg-[var(--accent)] px-4 text-sm font-bold text-white"
-            href={openUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
+          <ButtonAnchor href={openUrl} target="_blank" rel="noreferrer" className="h-12">
             <ExternalLink aria-hidden="true" className="h-5 w-5" />
             외부 브라우저로 열기
-          </a>
-          <button
-            className="focus-ring inline-flex h-12 items-center justify-center gap-2 rounded-md border border-[var(--border)] bg-white px-4 text-sm font-bold text-[var(--accent)]"
-            type="button"
-            onClick={copyUrl}
-          >
+          </ButtonAnchor>
+          <Button type="button" variant="secondary" className="h-12" onClick={copyUrl}>
             <Link2 aria-hidden="true" className="h-5 w-5" />
             주소 복사
-          </button>
+          </Button>
         </div>
         {copyState === "copied" ? (
           <p className="text-sm text-[var(--success)]">주소를 복사했습니다. Safari나 Chrome 주소창에 붙여넣어 주세요.</p>

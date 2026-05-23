@@ -12,13 +12,19 @@ const buttonClass = {
   ghost: "bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
 };
 
+const buttonBaseClass =
+  "focus-ring inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition";
+
+function buttonClasses(variant: NonNullable<ButtonProps["variant"]>, className?: string) {
+  return clsx(buttonBaseClass, buttonClass[variant], className);
+}
+
 export function Button({ className, variant = "primary", ...props }: ButtonProps) {
   return (
     <button
       className={clsx(
-        "focus-ring inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50",
-        buttonClass[variant],
-        className
+        buttonClasses(variant, className),
+        "disabled:cursor-not-allowed disabled:opacity-50"
       )}
       {...props}
     />
@@ -33,13 +39,13 @@ type ButtonLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
 export function ButtonLink({ className, variant = "primary", href, ...props }: ButtonLinkProps) {
   return (
     <Link
-      className={clsx(
-        "focus-ring inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
-        buttonClass[variant],
-        className
-      )}
+      className={buttonClasses(variant, className)}
       href={href}
       {...props}
     />
   );
+}
+
+export function ButtonAnchor({ className, variant = "primary", href, ...props }: ButtonLinkProps) {
+  return <a className={buttonClasses(variant, className)} href={href} {...props} />;
 }

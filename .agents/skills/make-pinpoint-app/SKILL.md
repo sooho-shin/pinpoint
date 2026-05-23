@@ -67,6 +67,14 @@ npm run app:contract
 - Figma Atomic layer를 건너뛰어 page에서 atoms/molecules/organisms를 임의 조립하지 않는다.
 - `design/tokens.json`에 없는 색상을 새 dominant palette로 추가하지 않는다.
 
+## 공통 컴포넌트 사용 규칙
+
+- 버튼처럼 보이거나 동작하는 UI는 먼저 `src/components/atoms/Button.tsx`의 `Button`, `ButtonLink`, `ButtonAnchor`를 사용한다.
+- Google 로그인 버튼처럼 별도 atom이 이미 있는 경우에는 해당 공통 컴포넌트를 사용하고, molecule/page에서 버튼 Tailwind 클래스를 직접 조합하지 않는다.
+- 새 버튼 변형이 필요하면 사용하는 화면에서 임시 클래스를 만들지 말고 atom 버튼 컴포넌트의 variant 또는 공통 API를 먼저 확장한다.
+- 버튼 안의 lucide 아이콘은 기본적으로 `currentColor`를 상속하게 두고, 의도적으로 다르게 보여야 하는 경우가 아니면 아이콘에 별도 `text-*` 색상을 넣지 않는다.
+- 외부 링크 CTA처럼 Next `Link`가 아닌 실제 `<a>`가 필요한 경우에도 직접 스타일링하지 말고 `ButtonAnchor`를 사용한다.
+
 ## 보고 원칙
 
 최종 보고에는 다음을 포함한다.
