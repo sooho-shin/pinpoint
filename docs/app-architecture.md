@@ -229,7 +229,7 @@ DB 조회는 서버 컴포넌트에서 admin client로 수행한다. 브라우�
 
 ### 광고 스크립트 정책
 
-AdSense 승인 전에는 layout에 전역 Auto ads 스크립트를 넣지 않는다. 승인 후 광고를 붙일 때도 `/about`, `/how-to-play`, `/archive`처럼 게시자 콘텐츠가 있는 화면부터 제한적으로 적용하고, `/`, `/result`, `/ranking`, `/signin`, `/nickname` 같은 상호작용 중심 화면에는 별도 검토 없이 광고를 붙이지 않는다.
+AdSense 사이트 소유권/검수 확인을 위해 Google이 요구하는 publisher 스크립트는 전역 `<head>`에 둘 수 있다. 단, 승인 전에는 광고 슬롯이나 Auto ads 배치 정책을 켜지 않는다. 승인 후 광고를 붙일 때도 `/about`, `/how-to-play`, `/archive`처럼 게시자 콘텐츠가 있는 화면부터 제한적으로 적용하고, `/`, `/result`, `/ranking`, `/signin`, `/nickname` 같은 상호작용 중심 화면에는 별도 검토 없이 광고를 붙이지 않는다.
 
 ### 전역 내비게이션 정책
 

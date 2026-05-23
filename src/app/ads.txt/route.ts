@@ -1,16 +1,7 @@
 import { NextResponse } from "next/server";
 
 export function GET() {
-  const adsenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT;
-
-  if (!adsenseClient) {
-    return new NextResponse("AdSense publisher ID is not configured.\n", {
-      status: 404,
-      headers: {
-        "content-type": "text/plain; charset=utf-8"
-      }
-    });
-  }
+  const adsenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT ?? "ca-pub-4621241846705196";
 
   const publisherId = adsenseClient.replace(/^ca-/, "");
 
