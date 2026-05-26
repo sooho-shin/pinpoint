@@ -737,14 +737,17 @@ export async function getDailyLeaderboard() {
     return { status: "no_puzzle", publishDateKst, rows: [], myRank: null, canWriteWinnerMessage: false };
   }
 
-  await claimAnonymousAttempt(publication.id, actor);
+  const claimedAttempt = await claimAnonymousAttempt(publication.id, actor);
+  const [viewerAttempt, viewerProfile] = await Promise.all([
+    claimedAttempt ? Promise.resolve(claimedAttempt) : getAttempt(publication.id, actor),
+    actor.userId ? getProfile(actor.userId) : Promise.resolve(null)
+  ]);
 
   const admin = createAdminClient();
   const { data, error } = await admin
     .from("leaderboard_entries")
-    .select("id,user_id,nickname_snapshot,used_clue_count,elapsed_ms,submitted_at")
+    .select("id,user_id,nickname_snapshot,used_clue_count,elapsed_ms,submitted_at,rank_status")
     .eq("publication_id", publication.id)
-    .eq("rank_status", "visible")
     .order("used_clue_count", { ascending: true })
     .order("elapsed_ms", { ascending: true })
     .order("submitted_at", { ascending: true })
@@ -752,7 +755,8 @@ export async function getDailyLeaderboard() {
 
   if (error) throw error;
 
-  const allRows = (data ?? []).map((row, index) => ({
+  const visibleEntries = (data ?? []).filter((row) => row.rank_status === "visible");
+  const allRows = visibleEntries.map((row, index) => ({
     id: String(row.id),
     rank: index + 1,
     nickname: String(row.nickname_snapshot),
@@ -763,13 +767,25 @@ export async function getDailyLeaderboard() {
   }));
   const rows = allRows.slice(0, LEADERBOARD_DISPLAY_LIMIT);
   const myRank = allRows.find((row) => row.isMe) ?? null;
+  const viewerEntry = actor.userId ? (data ?? []).find((row) => row.user_id === actor.userId) : null;
+  const participation = (() => {
+    if (!actor.userId) return { status: "requires_sign_in" as const };
+    if (!viewerProfile) return { status: "requires_nickname" as const };
+    if (!viewerAttempt || viewerAttempt.status === "playing") return { status: "not_completed" as const };
+    if (viewerAttempt.status === "failed") return { status: "failed" as const };
+    if (viewerAttempt.status !== "succeeded") return { status: "not_completed" as const };
+    if (viewerEntry?.rank_status === "visible") return { status: "ranked" as const };
+    if (viewerEntry?.rank_status === "flagged") return { status: "succeeded_not_visible" as const, reason: "flagged" as const };
+    return { status: "succeeded_not_visible" as const, reason: "unknown" as const };
+  })();
 
   return {
     status: "ready",
     publishDateKst: publication.publish_date_kst,
     rows,
     myRank,
-    canWriteWinnerMessage: await canWriteWinnerMessage(publication.id, actor.userId)
+    canWriteWinnerMessage: await canWriteWinnerMessage(publication.id, actor.userId),
+    participation
   };
 }
 

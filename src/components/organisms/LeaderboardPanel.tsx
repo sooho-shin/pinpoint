@@ -24,11 +24,21 @@ type LeaderboardState =
       status: "ready" | "no_puzzle";
       publishDateKst: string;
       rows: RankingRowData[];
+      myRank: RankingRowData | null;
       canWriteWinnerMessage: boolean;
       winnerMessage: WinnerMessage | null;
       puzzleFeedback: PuzzleFeedbackState;
       streakLeaderboard: StreakLeaderboardState;
+      participation?: DailyRankingParticipation;
     };
+
+type DailyRankingParticipation =
+  | { status: "requires_sign_in" }
+  | { status: "requires_nickname" }
+  | { status: "not_completed" }
+  | { status: "failed" }
+  | { status: "ranked" }
+  | { status: "succeeded_not_visible"; reason: "flagged" | "unknown" };
 
 type GroupLeaderboardState =
   | { status: "loading" }
@@ -59,6 +69,58 @@ async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
 function getGroupUrl(inviteCode: string) {
   if (typeof window === "undefined") return `/ranking?group=${encodeURIComponent(inviteCode)}`;
   return `${window.location.origin}/ranking?group=${encodeURIComponent(inviteCode)}`;
+}
+
+function RankingParticipationPanel({ participation, myRank }: { participation?: DailyRankingParticipation; myRank: RankingRowData | null }) {
+  if (!participation) return null;
+
+  const content = (() => {
+    switch (participation.status) {
+      case "requires_sign_in":
+        return {
+          title: "내 기록 올리기",
+          message: "로그인하면 성공 기록이 오늘의 랭킹에 표시됩니다.",
+          action: <ButtonLink href="/signin?next=/ranking" variant="secondary">로그인하기</ButtonLink>
+        };
+      case "requires_nickname":
+        return {
+          title: "닉네임 설정",
+          message: "닉네임을 설정하면 성공 기록이 오늘의 랭킹에 표시됩니다.",
+          action: <ButtonLink href="/nickname?next=/ranking" variant="secondary">닉네임 설정</ButtonLink>
+        };
+      case "not_completed":
+        return {
+          title: "오늘 문제 진행 중",
+          message: "오늘 문제를 완료하면 랭킹 참여 상태가 반영됩니다.",
+          action: <ButtonLink href="/" variant="secondary">문제로 돌아가기</ButtonLink>
+        };
+      case "failed":
+        return {
+          title: "오늘은 랭킹 미등록",
+          message: "오늘 문제를 맞히지 못해서 랭킹에는 등록되지 않았습니다."
+        };
+      case "ranked":
+        return {
+          title: "내 기록 등록 완료",
+          message: myRank ? `현재 내 순위는 ${myRank.rank}위입니다.` : "내 성공 기록이 오늘의 랭킹에 등록되었습니다."
+        };
+      case "succeeded_not_visible":
+        return {
+          title: "기록 검토 중",
+          message: participation.reason === "flagged"
+            ? "매우 빠른 기록이라 검토 후 랭킹에 표시됩니다."
+            : "성공 기록은 저장됐지만 현재 공개 랭킹에는 표시되지 않습니다."
+        };
+    }
+  })();
+
+  return (
+    <div className="muted-surface p-4">
+      <div className="text-sm font-semibold text-[var(--text-primary)]">{content.title}</div>
+      <p className="mt-2 text-sm leading-5 text-[var(--text-secondary)]">{content.message}</p>
+      {content.action ? <div className="mt-4">{content.action}</div> : null}
+    </div>
+  );
 }
 
 export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode?: string; activeTab?: "daily" | "group" }) {
@@ -313,15 +375,9 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
           <Button type="submit" disabled={pending || !message.trim()}>{state.winnerMessage ? "메시지 갱신" : "메시지 등록"}</Button>
           {feedback ? <p className="text-sm text-[var(--text-secondary)]">{feedback}</p> : null}
         </form>
-      ) : !state.winnerMessage ? (
-        <div className="muted-surface p-4">
-          <div className="text-sm font-semibold text-[var(--text-primary)]">내 기록 올리기</div>
-          <p className="mt-2 text-sm leading-5 text-[var(--text-secondary)]">로그인 후 닉네임을 연결하면 성공 기록이 오늘의 랭킹에 표시됩니다.</p>
-          <div className="mt-4">
-            <ButtonLink href="/signin?next=/ranking" variant="secondary">로그인하기</ButtonLink>
-          </div>
-        </div>
-      ) : null}
+      ) : (
+        <RankingParticipationPanel participation={state.participation} myRank={state.myRank} />
+      )}
 
       <div className="mt-6 border-t border-[var(--border)] pt-5">
         <div className="text-sm font-semibold text-[var(--text-primary)]">오늘 문제 한마디</div>
