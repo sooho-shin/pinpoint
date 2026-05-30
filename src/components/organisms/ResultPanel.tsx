@@ -6,7 +6,53 @@ import { TextInput } from "@/components/atoms/TextInput";
 import { ClueRow } from "@/components/molecules/ClueRow";
 import { ScoreBadge } from "@/components/molecules/ScoreBadge";
 import { ShareActionGroup } from "@/components/molecules/ShareActionGroup";
-import type { SubmitResult } from "@/lib/puzzle/types";
+import type { DailyRankingParticipation, SubmitResult } from "@/lib/puzzle/types";
+
+function RankingRegistrationPanel({ participation }: { participation?: DailyRankingParticipation }) {
+  const content = (() => {
+    switch (participation?.status) {
+      case "requires_sign_in":
+        return {
+          title: "랭킹 등록",
+          message: "로그인하면 오늘의 성공 기록을 랭킹에 올릴 수 있습니다.",
+          action: <ButtonLink href="/signin?next=/ranking">랭킹 등록하기</ButtonLink>
+        };
+      case "requires_nickname":
+        return {
+          title: "닉네임 설정",
+          message: "닉네임을 설정하면 오늘의 성공 기록이 랭킹에 표시됩니다.",
+          action: <ButtonLink href="/nickname?next=/ranking">닉네임 설정하기</ButtonLink>
+        };
+      case "succeeded_not_visible":
+        return {
+          title: "기록 검토 중",
+          message: participation.reason === "flagged"
+            ? "매우 빠른 기록이라 검토 후 랭킹에 표시됩니다."
+            : "성공 기록은 저장됐지만 현재 공개 랭킹에는 표시되지 않습니다."
+        };
+      case "not_completed":
+      case "failed":
+      case "ranked":
+        return null;
+      default:
+        return {
+          title: "랭킹 등록",
+          message: "Google 로그인과 닉네임 설정을 마치면 오늘의 랭킹에 기록할 수 있습니다.",
+          action: <ButtonLink href="/signin?next=/ranking">랭킹 등록하기</ButtonLink>
+        };
+    }
+  })();
+
+  if (!content) return null;
+
+  return (
+    <div className="muted-surface mb-4 p-4">
+      <div className="text-sm font-semibold text-[var(--text-primary)]">{content.title}</div>
+      <p className="mt-2 text-sm leading-5 text-[var(--text-secondary)]">{content.message}</p>
+      {content.action ? <div className="mt-4">{content.action}</div> : null}
+    </div>
+  );
+}
 
 export function ResultPanel() {
   const [result, setResult] = useState<SubmitResult | null>(null);
@@ -111,6 +157,7 @@ export function ResultPanel() {
   }
 
   const solved = result.status === "succeeded";
+  const shouldShowRankingPanel = solved && (!result.isRanked || result.participation?.status === "succeeded_not_visible");
 
   return (
     <section className="surface min-h-[590px] p-6">
@@ -131,15 +178,7 @@ export function ResultPanel() {
         <div className="mt-1 text-xl font-bold">{result.answer}</div>
       </div>
 
-      {solved && !result.isRanked ? (
-        <div className="muted-surface mb-4 p-4">
-          <div className="text-sm font-semibold text-[var(--text-primary)]">랭킹 등록</div>
-          <p className="mt-2 text-sm leading-5 text-[var(--text-secondary)]">Google 로그인과 닉네임 설정을 마치면 오늘의 랭킹에 기록할 수 있습니다.</p>
-          <div className="mt-4">
-            <ButtonLink href="/signin?next=/ranking">랭킹 등록하기</ButtonLink>
-          </div>
-        </div>
-      ) : null}
+      {shouldShowRankingPanel ? <RankingRegistrationPanel participation={result.participation} /> : null}
 
       <ShareActionGroup onCopy={shareResult} copied={copied} />
 

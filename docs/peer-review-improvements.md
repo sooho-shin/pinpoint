@@ -16,7 +16,7 @@
 
 ## 현재 요약
 
-마지막 업데이트: 2026-05-23 18:32:00 KST
+마지막 업데이트: 2026-05-30 21:10:00 KST
 
 | ID | 우선순위 | 상태 | 영역 | 요약 |
 | --- | --- | --- | --- | --- |
@@ -43,6 +43,8 @@
 | PR-021 | Medium | done | Operations | `db:sync-puzzles`가 이미 published인 publication을 로컬 JSON으로 덮을 수 있다. |
 | PR-022 | Medium | done | Puzzle Harness | 새 alias가 기존 정답/alias와 겹치는 교차 중복을 잡지 못한다. |
 | PR-023 | Medium | done | Observability | cron/API route가 실패 원인을 로그에 남기지 않는다. |
+| PR-024 | Medium | done | Result UX | 결과 화면의 랭킹 CTA가 로그인/닉네임/검토 상태를 구분하지 못한다. |
+| PR-025 | Medium | done | Security/Abuse | 비로그인 공유 버튼이 호출하는 그룹 생성 API에 남용 방어가 없다. |
 
 ## 발견 항목
 
@@ -246,6 +248,26 @@
 - 개선 후보: 메시지 span에 `break-words`/`overflow-wrap:anywhere`를 적용하거나 닉네임과 메시지를 block/flex column 구조로 분리한다.
 - 이전 발견과 비교: PR-005는 메시지 내용 moderation이고, PR-020은 허용된 메시지가 모바일 레이아웃을 깨뜨리는 표시 문제다.
 
+### PR-024: Result 화면 랭킹 CTA가 참여 상태를 세분화하지 못함
+
+- 우선순위: Medium
+- 상태: done
+- 근거: `src/components/organisms/ResultPanel.tsx:134`, `src/components/organisms/LeaderboardPanel.tsx:74`, `src/lib/puzzle/api.ts:771`
+- 내용: 랭킹 페이지는 `participation` 상태로 `requires_sign_in`, `requires_nickname`, `failed`, `ranked`, `succeeded_not_visible`를 구분하지만, 결과 화면은 `solved && !result.isRanked`이면 항상 “Google 로그인과 닉네임 설정” CTA를 보여준다.
+- 영향: 로그인했지만 닉네임이 없거나, 너무 빠른 기록으로 `flagged` 처리된 사용자도 결과 화면에서는 다시 로그인해야 하는 것처럼 보일 수 있다. 최근 랭킹 페이지에서 고친 “로그인 상태 오인” UX가 Result 화면에 남아 있는 형태다.
+- 개선 후보: `SubmitResult`에도 랭킹 참여 실패 사유를 내려주거나, Result 화면에서 `/api/leaderboard/daily`의 `participation`과 같은 상태 모델을 재사용한다. 최소한 `rankStatus === "flagged"`와 로그인/닉네임 필요 상태는 서로 다른 문구로 분기한다.
+- 이전 발견과 비교: PR-013은 깨진 `sessionStorage` 복원력 이슈였고, PR-024는 정상 결과 데이터 안에서 랭킹 참여 상태를 잘못 설명하는 UX 이슈다. 2026-05-26 랭킹 페이지 CTA 수정으로 일부 해결됐지만 결과 화면에는 남아 있다.
+
+### PR-025: 비로그인 공유 그룹 생성 API 남용 방어 부족
+
+- 우선순위: Medium
+- 상태: done
+- 근거: `src/components/molecules/ShareButton.tsx:12`, `src/app/api/groups/route.ts:5`, `src/lib/puzzle/api.ts:871`, `supabase/migrations/20260523190000_allow_anonymous_share_groups.sql:3`
+- 내용: 메인 공유 버튼은 비로그인 상태에서도 `POST /api/groups`로 새 그룹을 만들 수 있고, DB도 `owner_user_id` nullable을 허용한다. 현재 API에는 같은 익명 세션의 기존 그룹 재사용, per-session 제한, rate limit, captcha, idempotency key 같은 남용 방어가 없다.
+- 영향: 자동화된 요청이나 반복 클릭으로 오늘 publication에 owner 없는 `groups` row가 대량 생성될 수 있다. 직접 개인정보 노출은 아니지만 DB 팽창, 초대 코드 namespace 오염, 운영 분석 왜곡이 생긴다.
+- 개선 후보: anonymous session cookie 기준으로 오늘 생성한 그룹을 재사용하고, 동일 세션/동일 IP 단위의 생성 제한을 둔다. 필요하면 그룹 생성은 signed-in 사용자 기본 경로로 두고 비로그인 공유는 임시 URL 또는 클라이언트 공유 텍스트로 분리한다.
+- 이전 발견과 비교: PR-012는 direct Supabase 권한으로 attempts를 조작할 수 있던 문제였고, PR-025는 공식 Route Handler가 열어둔 익명 생성 엔드포인트의 남용 가능성이다.
+
 ## 리뷰 로그
 
 ### 2026-05-23 17:41 KST
@@ -323,4 +345,90 @@
   - `npm run app:implementation:check`
   - `npm run figma:layout:contract`
   - `npm run figma:composition:contract`
+  - `npm run build`
+
+### 2026-05-30 20:56 KST - Review 6
+
+#### Scope
+
+- 현재 코드 기준으로 라우팅, 핵심 API, Supabase 권한 보강 마이그레이션, 랭킹/결과 UI, 공유 그룹 생성 흐름, 퍼즐 하네스를 다시 점검했다.
+- 기존 `done` 항목 중 DB grant, 긴 텍스트 overflow, 게임 방법 팝업, 모바일 버튼 폭, 에러 로깅은 현재 코드에서 반영 상태를 재확인했다.
+
+#### Compared With Previous Review Log
+
+- 유지됨: PR-001부터 PR-023까지는 현재 코드와 검증 스크립트 기준으로 계속 `done` 상태다.
+- 신규: PR-024, PR-025를 추가했다.
+- 변경됨: 2026-05-26 랭킹 페이지 CTA 상태 분기는 `LeaderboardPanel`과 `getDailyLeaderboard`에 반영됐지만, 같은 상태 모델이 `ResultPanel`까지 확장되지는 않았다.
+
+#### Findings
+
+1. Result 화면 랭킹 CTA가 참여 상태를 세분화하지 못함
+   - Evidence: `src/components/organisms/ResultPanel.tsx:134`, `src/components/organisms/LeaderboardPanel.tsx:74`, `src/lib/puzzle/api.ts:771`.
+   - Current impact: 성공했지만 랭킹에 표시되지 않는 사용자가 로그인/닉네임 문제로 오해할 수 있다.
+   - Recommended action: Result 화면도 daily leaderboard의 `participation` 상태 모델을 재사용하거나 `SubmitResult`에 랭킹 비노출 사유를 명시한다.
+
+2. 비로그인 공유 그룹 생성 API 남용 방어 부족
+   - Evidence: `src/components/molecules/ShareButton.tsx:12`, `src/app/api/groups/route.ts:5`, `src/lib/puzzle/api.ts:871`, `supabase/migrations/20260523190000_allow_anonymous_share_groups.sql:3`.
+   - Current impact: 반복 요청으로 owner 없는 그룹 row가 대량 생성될 수 있다.
+   - Recommended action: anonymous session 기준 재사용/idempotency와 생성 제한을 추가한다.
+
+#### Verification
+
+- `npm run typecheck`: 통과.
+- `npm run app:implementation:check`: 통과.
+- `npm run db:check`: 통과.
+- `npm run puzzles:test`: 통과.
+- `npm run build`: 통과.
+
+#### Next Review Angle
+
+- Result 화면과 랭킹 화면의 상태 모델 중복, 그룹 공유 생성 정책, anonymous session 기반 idempotency를 우선 재점검한다.
+
+### 2026-05-30 21:00 KST - Review 7
+
+#### Scope
+
+- Review 6 이후 현재 코드 기준으로 Result/Ranking 상태 모델, 공유 그룹 생성 API, Supabase direct access 권한, 클라이언트 storage/clipboard 사용부, 주요 검증 스크립트를 다시 점검했다.
+- `grep` 기반 패턴 검색으로 `sessionStorage`, `navigator.clipboard`, `window.location`, `target="_blank"`, service role key, answer/alias/clue 노출 가능 지점을 재확인했다.
+
+#### Compared With Previous Review Log
+
+- 유지됨: PR-024는 `ResultPanel`의 `solved && !result.isRanked` 조건이 그대로 남아 있어 여전히 `open`이다.
+- 유지됨: PR-025는 `ShareButton -> POST /api/groups -> createRankingGroup` 경로에 익명 그룹 생성 재사용/idempotency/rate limit이 없어 여전히 `open`이다.
+- 신규 없음: 이번 회차에서 PR-024/PR-025보다 우선순위가 높거나 별도 ID로 분리할 만큼 명확한 신규 문제는 확인하지 못했다.
+
+#### Findings
+
+1. PR-024 유지: Result 화면 랭킹 CTA가 참여 상태를 세분화하지 못함
+   - Evidence: `src/components/organisms/ResultPanel.tsx:134`, `src/components/organisms/LeaderboardPanel.tsx:74`, `src/lib/puzzle/api.ts:771`.
+   - Current impact: 랭킹 페이지는 상태 분기를 갖지만 결과 화면은 같은 상태 모델을 재사용하지 않아 성공 후 비노출 사유를 오해하게 만들 수 있다.
+   - Recommended action: `SubmitResult` 또는 Result 화면 데이터 로딩에서 `participation` 상태를 일관되게 사용한다.
+
+2. PR-025 유지: 비로그인 공유 그룹 생성 API 남용 방어 부족
+   - Evidence: `src/components/molecules/ShareButton.tsx:12`, `src/app/api/groups/route.ts:5`, `src/lib/puzzle/api.ts:871`, `supabase/migrations/20260523190000_allow_anonymous_share_groups.sql:3`.
+   - Current impact: 반복 요청이 owner 없는 그룹 row를 계속 만들 수 있다.
+   - Recommended action: anonymous session 기준 기존 그룹 재사용, 생성 제한, idempotency key 중 최소 하나를 적용한다.
+
+#### Verification
+
+- `npm run typecheck`: 통과.
+- `npm run app:implementation:check`: 통과.
+- `npm run db:check`: 통과.
+- `npm run puzzles:test`: 통과.
+- `npm run build`: 통과.
+
+#### Next Review Angle
+
+- PR-024/PR-025 해결 여부를 먼저 비교하고, 이후 clipboard 실패 UX와 공유 그룹 만료/정리 정책을 낮은 우선순위로 재검토한다.
+
+### 2026-05-30 21:10 KST
+
+- 수정 반영: PR-024, PR-025를 코드에 반영하고 상태를 `done`으로 갱신했다.
+- PR-024: `SubmitResult`에 `participation` 상태를 추가하고 Result 화면이 로그인 필요, 닉네임 필요, 검토 중 상태를 구분해 표시하도록 수정했다.
+- PR-025: 같은 공개일에서 로그인 사용자의 기존 그룹을 재사용하고, 비로그인 공유 그룹은 httpOnly `pinpoint_share_group` 쿠키로 publication/invite code를 저장해 반복 생성 대신 재사용하도록 수정했다.
+- 검증:
+  - `npm run typecheck`
+  - `npm run app:implementation:check`
+  - `npm run db:check`
+  - `npm run puzzles:test`
   - `npm run build`

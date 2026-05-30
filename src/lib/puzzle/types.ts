@@ -83,6 +83,14 @@ export type StreakLeaderboardState = {
   myRank: StreakLeaderboardRow | null;
 };
 
+export type DailyRankingParticipation =
+  | { status: "requires_sign_in" }
+  | { status: "requires_nickname" }
+  | { status: "not_completed" }
+  | { status: "failed" }
+  | { status: "ranked" }
+  | { status: "succeeded_not_visible"; reason: "flagged" | "unknown" };
+
 export type SubmitResult = {
   status: "playing" | "succeeded" | "failed";
   isCorrect: boolean;
@@ -97,5 +105,6 @@ export type SubmitResult = {
   answer?: string;
   isRanked?: boolean;
   rankStatus?: "visible" | "flagged" | "hidden";
+  participation?: DailyRankingParticipation;
   canWriteWinnerMessage?: boolean;
 };

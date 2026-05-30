@@ -5,6 +5,7 @@ import { isAcceptedAnswer, normalizeAnswer } from "@/lib/puzzle/normalize";
 import { publishDailyPuzzle } from "@/lib/puzzle/publication-admin";
 import { getActivePublicationDateKst, getNextPublicationIso } from "@/lib/puzzle/time";
 import type {
+  DailyRankingParticipation,
   NoPuzzleState,
   PublicAttempt,
   PuzzleFeedbackItem,
@@ -86,6 +87,7 @@ const TERMINAL_STATUSES = new Set(["succeeded", "failed", "abandoned"]);
 const COMPLETED_FEEDBACK_STATUSES = new Set(["succeeded", "failed"]);
 const FEEDBACK_REACTIONS = new Set<PuzzleFeedbackReaction>(["easy", "good", "hard", "tricky", "fun"]);
 const ANONYMOUS_SESSION_COOKIE = "pinpoint_anon_session";
+const SHARE_GROUP_COOKIE = "pinpoint_share_group";
 const LEADERBOARD_DISPLAY_LIMIT = 50;
 const LEADERBOARD_RANK_SCAN_LIMIT = 5000;
 
@@ -519,6 +521,33 @@ async function getVisibleLeaderboardEntry(publicationId: string, userId: string)
   return data ? String(data.id) : null;
 }
 
+async function getLeaderboardEntryRankStatus(publicationId: string, userId: string) {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("leaderboard_entries")
+    .select("rank_status")
+    .eq("publication_id", publicationId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return data?.rank_status ? String(data.rank_status) : null;
+}
+
+async function getDailyRankingParticipation(publicationId: string, actor: Actor, attempt: AttemptRow | null): Promise<DailyRankingParticipation> {
+  if (!actor.userId) return { status: "requires_sign_in" };
+
+  const profile = await getProfile(actor.userId);
+  if (!profile) return { status: "requires_nickname" };
+  if (!attempt || attempt.status === "playing") return { status: "not_completed" };
+  if (attempt.status === "failed") return { status: "failed" };
+  if (attempt.status !== "succeeded") return { status: "not_completed" };
+
+  const rankStatus = await getLeaderboardEntryRankStatus(publicationId, actor.userId);
+  if (rankStatus === "visible") return { status: "ranked" };
+  if (rankStatus === "flagged") return { status: "succeeded_not_visible", reason: "flagged" };
+  return { status: "succeeded_not_visible", reason: "unknown" };
+}
+
 async function syncUserGroupLeaderboardEntries(publicationId: string, userId: string) {
   const leaderboardEntryId = await getVisibleLeaderboardEntry(publicationId, userId);
   if (!leaderboardEntryId) return;
@@ -650,6 +679,7 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
   const usedClueCount = Math.max(1, Math.min(5, Number(attempt.used_clue_count ?? 1)));
   if (TERMINAL_STATUSES.has(attempt.status)) {
     const canWrite = attempt.status === "succeeded" ? await canWriteWinnerMessage(publication.id, actor.userId) : false;
+    const participation = await getDailyRankingParticipation(publication.id, actor, attempt);
     return {
       status: attempt.status === "succeeded" ? "succeeded" : "failed",
       isCorrect: attempt.is_correct,
@@ -663,6 +693,7 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
       elapsedMs: attempt.elapsed_ms,
       answer: puzzle.answer,
       isRanked: attempt.is_ranked,
+      participation,
       canWriteWinnerMessage: canWrite
     };
   }
@@ -713,6 +744,7 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
   if (terminal) await recordDailyResult(publication, updatedAttempt);
 
   const canWrite = terminal && isCorrect ? await canWriteWinnerMessage(publication.id, actor.userId) : false;
+  const participation = terminal ? await getDailyRankingParticipation(publication.id, actor, updatedAttempt) : undefined;
   return {
     status: nextStatus,
     isCorrect,
@@ -726,6 +758,7 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
     elapsedMs: updatedAttempt.elapsed_ms,
     ...(terminal ? { answer: puzzle.answer } : {}),
     ...(canRank ? { isRanked: true, rankStatus } : { isRanked: false }),
+    ...(participation ? { participation } : {}),
     canWriteWinnerMessage: canWrite
   };
 }
@@ -738,10 +771,7 @@ export async function getDailyLeaderboard() {
   }
 
   const claimedAttempt = await claimAnonymousAttempt(publication.id, actor);
-  const [viewerAttempt, viewerProfile] = await Promise.all([
-    claimedAttempt ? Promise.resolve(claimedAttempt) : getAttempt(publication.id, actor),
-    actor.userId ? getProfile(actor.userId) : Promise.resolve(null)
-  ]);
+  const viewerAttempt = claimedAttempt ?? await getAttempt(publication.id, actor);
 
   const admin = createAdminClient();
   const { data, error } = await admin
@@ -767,17 +797,7 @@ export async function getDailyLeaderboard() {
   }));
   const rows = allRows.slice(0, LEADERBOARD_DISPLAY_LIMIT);
   const myRank = allRows.find((row) => row.isMe) ?? null;
-  const viewerEntry = actor.userId ? (data ?? []).find((row) => row.user_id === actor.userId) : null;
-  const participation = (() => {
-    if (!actor.userId) return { status: "requires_sign_in" as const };
-    if (!viewerProfile) return { status: "requires_nickname" as const };
-    if (!viewerAttempt || viewerAttempt.status === "playing") return { status: "not_completed" as const };
-    if (viewerAttempt.status === "failed") return { status: "failed" as const };
-    if (viewerAttempt.status !== "succeeded") return { status: "not_completed" as const };
-    if (viewerEntry?.rank_status === "visible") return { status: "ranked" as const };
-    if (viewerEntry?.rank_status === "flagged") return { status: "succeeded_not_visible" as const, reason: "flagged" as const };
-    return { status: "succeeded_not_visible" as const, reason: "unknown" as const };
-  })();
+  const participation = await getDailyRankingParticipation(publication.id, actor, viewerAttempt);
 
   return {
     status: "ready",
@@ -868,6 +888,14 @@ async function addGroupMemberAndProjection(group: GroupRow, userId: string) {
   await syncUserGroupLeaderboardEntries(group.publication_id, userId);
 }
 
+function publicGroup(group: GroupRow) {
+  return {
+    id: group.id,
+    name: group.name ?? "그룹 랭킹",
+    inviteCode: group.invite_code
+  };
+}
+
 export async function createRankingGroup(input: { name?: string }) {
   const actor = await getActor();
   const { publication } = await getTodayPublication();
@@ -878,6 +906,37 @@ export async function createRankingGroup(input: { name?: string }) {
   const trimmedName = String(input.name ?? "").trim();
   const groupName = trimmedName.length > 0 ? trimmedName.slice(0, 24) : profile ? `${profile.nickname}의 그룹` : "공유 그룹";
   const admin = createAdminClient();
+  const cookieStore = await cookies();
+
+  if (actor.userId && !trimmedName) {
+    const { data: existing, error } = await admin
+      .from("groups")
+      .select("id,owner_user_id,publication_id,name,invite_code")
+      .eq("publication_id", publication.id)
+      .eq("owner_user_id", actor.userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw error;
+    if (existing) {
+      const group = existing as GroupRow;
+      if (profile) await addGroupMemberAndProjection(group, actor.userId);
+      return { ok: true, group: publicGroup(group), reused: true };
+    }
+  } else if (!actor.userId) {
+    const [cookiePublicationId, cookieInviteCode] = String(cookieStore.get(SHARE_GROUP_COOKIE)?.value ?? "").split(":");
+    if (cookiePublicationId === publication.id && /^[0-9a-z]{6,24}$/i.test(cookieInviteCode ?? "")) {
+      const { data: existing, error } = await admin
+        .from("groups")
+        .select("id,owner_user_id,publication_id,name,invite_code")
+        .eq("publication_id", publication.id)
+        .eq("invite_code", cookieInviteCode)
+        .is("owner_user_id", null)
+        .maybeSingle();
+      if (error) throw error;
+      if (existing) return { ok: true, group: publicGroup(existing as GroupRow), reused: true };
+    }
+  }
 
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const inviteCode = createInviteCode();
@@ -897,14 +956,16 @@ export async function createRankingGroup(input: { name?: string }) {
 
     const group = data as GroupRow;
     if (actor.userId && profile) await addGroupMemberAndProjection(group, actor.userId);
-    return {
-      ok: true,
-      group: {
-        id: group.id,
-        name: group.name ?? "그룹 랭킹",
-        inviteCode: group.invite_code
-      }
-    };
+    if (!actor.userId) {
+      cookieStore.set(SHARE_GROUP_COOKIE, `${publication.id}:${group.invite_code}`, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 2
+      });
+    }
+    return { ok: true, group: publicGroup(group), reused: false };
   }
 
   return { ok: false, error: "초대 코드를 만들지 못했습니다. 다시 시도해 주세요." };
@@ -926,11 +987,7 @@ export async function joinRankingGroup(inviteCode: string) {
   await addGroupMemberAndProjection(group, actor.userId);
   return {
     ok: true,
-    group: {
-      id: group.id,
-      name: group.name ?? "그룹 랭킹",
-      inviteCode: group.invite_code
-    }
+    group: publicGroup(group)
   };
 }
 

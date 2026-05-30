@@ -7,7 +7,7 @@ import { TextInput } from "@/components/atoms/TextInput";
 import { LeaderboardTabs } from "@/components/molecules/LeaderboardTabs";
 import { RankingRow, type RankingRowData } from "@/components/molecules/RankingRow";
 import { formatKoreanDate } from "@/lib/format";
-import type { PuzzleFeedbackReaction, PuzzleFeedbackState, StreakLeaderboardState, WinnerMessage } from "@/lib/puzzle/types";
+import type { DailyRankingParticipation, PuzzleFeedbackReaction, PuzzleFeedbackState, StreakLeaderboardState, WinnerMessage } from "@/lib/puzzle/types";
 
 const feedbackReactions: Array<{ value: PuzzleFeedbackReaction; label: string }> = [
   { value: "good", label: "좋았어요" },
@@ -31,14 +31,6 @@ type LeaderboardState =
       streakLeaderboard: StreakLeaderboardState;
       participation?: DailyRankingParticipation;
     };
-
-type DailyRankingParticipation =
-  | { status: "requires_sign_in" }
-  | { status: "requires_nickname" }
-  | { status: "not_completed" }
-  | { status: "failed" }
-  | { status: "ranked" }
-  | { status: "succeeded_not_visible"; reason: "flagged" | "unknown" };
 
 type GroupLeaderboardState =
   | { status: "loading" }
