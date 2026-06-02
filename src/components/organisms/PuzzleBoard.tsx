@@ -6,6 +6,7 @@ import { Button, ButtonLink } from "@/components/atoms/Button";
 import { ClueRow } from "@/components/molecules/ClueRow";
 import { FeedbackMessage } from "@/components/molecules/FeedbackMessage";
 import { GuessInputGroup } from "@/components/molecules/GuessInputGroup";
+import { LoadingSurface } from "@/components/molecules/LoadingSurface";
 import { formatKoreanDate } from "@/lib/format";
 import type { NoPuzzleState, PuzzlePlayState, SubmitResult } from "@/lib/puzzle/types";
 
@@ -29,7 +30,7 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
   const [state, setState] = useState<BoardState>({ status: "loading" });
   const [guess, setGuess] = useState("");
   const [feedback, setFeedback] = useState("");
-  const [pending, setPending] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"submit" | "reveal" | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -55,7 +56,7 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
   }, [groupCode]);
 
   async function reveal() {
-    setPending(true);
+    setPendingAction("reveal");
     setFeedback("");
     try {
       const payload = await requestJson<PuzzlePlayState | NoPuzzleState>("/api/attempts/reveal", { method: "POST", body: "{}" });
@@ -63,7 +64,7 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : "단서를 열지 못했습니다.");
     } finally {
-      setPending(false);
+      setPendingAction(null);
     }
   }
 
@@ -84,7 +85,7 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
         sessionStorage.setItem(promptKey, "1");
       }
     }
-    setPending(true);
+    setPendingAction("submit");
     setFeedback("");
     try {
       const payload = await requestJson<SubmitResult | NoPuzzleState>("/api/attempts/submit", {
@@ -117,12 +118,12 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : "제출을 처리하지 못했습니다.");
     } finally {
-      setPending(false);
+      setPendingAction(null);
     }
   }
 
   if (state.status === "loading") {
-    return <div className="surface min-h-[590px] p-6 text-sm text-[var(--text-secondary)]">오늘 문제를 불러오는 중입니다.</div>;
+    return <LoadingSurface message="오늘 문제를 불러오는 중입니다." />;
   }
 
   if (state.status === "error") {
@@ -177,8 +178,9 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
             onChange={setGuess}
             onSubmit={submit}
             onReveal={reveal}
-            disabled={pending}
+            disabled={pendingAction !== null}
             canReveal={state.lockedCount > 0}
+            pendingAction={pendingAction}
           />
           {feedback ? <FeedbackMessage tone="warning">{feedback}</FeedbackMessage> : null}
         </div>

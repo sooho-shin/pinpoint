@@ -2,6 +2,7 @@
 
 import type { FormEvent } from "react";
 import { Button } from "@/components/atoms/Button";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { TextInput } from "@/components/atoms/TextInput";
 
 export function GuessInputGroup({
@@ -10,7 +11,8 @@ export function GuessInputGroup({
   onSubmit,
   onReveal,
   disabled,
-  canReveal
+  canReveal,
+  pendingAction
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -18,6 +20,7 @@ export function GuessInputGroup({
   onReveal: () => void;
   disabled?: boolean;
   canReveal: boolean;
+  pendingAction?: "submit" | "reveal" | null;
 }) {
   return (
     <form className="min-h-40 w-full space-y-3" onSubmit={onSubmit}>
@@ -29,9 +32,13 @@ export function GuessInputGroup({
         disabled={disabled}
       />
       <div className="grid w-full grid-cols-2 gap-3">
-        <Button type="submit" disabled={disabled || !value.trim()}>제출</Button>
+        <Button type="submit" disabled={disabled || !value.trim()}>
+          {pendingAction === "submit" ? <LoadingSpinner size="sm" label="제출 중" /> : null}
+          <span>제출</span>
+        </Button>
         <Button type="button" variant="secondary" onClick={onReveal} disabled={disabled || !canReveal}>
-          다음 단서
+          {pendingAction === "reveal" ? <LoadingSpinner size="sm" label="다음 단서 여는 중" /> : null}
+          <span>다음 단서</span>
         </Button>
       </div>
     </form>

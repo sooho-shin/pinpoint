@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Button, ButtonLink } from "@/components/atoms/Button";
 import { TextInput } from "@/components/atoms/TextInput";
 import { LeaderboardTabs } from "@/components/molecules/LeaderboardTabs";
+import { LoadingSurface } from "@/components/molecules/LoadingSurface";
 import { RankingRow, type RankingRowData } from "@/components/molecules/RankingRow";
 import { formatKoreanDate } from "@/lib/format";
 import type { DailyRankingParticipation, PuzzleFeedbackReaction, PuzzleFeedbackState, StreakLeaderboardState, WinnerMessage } from "@/lib/puzzle/types";
@@ -209,7 +210,7 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
 
   if (isGroupMode) {
     if (groupState.status === "loading") {
-      return <section className="surface min-h-[544px] p-6 text-sm text-[var(--text-secondary)]">그룹 랭킹을 불러오는 중입니다.</section>;
+      return <LoadingSurface message="그룹 랭킹을 불러오는 중입니다." minHeightClass="min-h-[544px]" />;
     }
 
     if (groupState.status === "error") {
@@ -275,7 +276,7 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
   }
 
   if (state.status === "loading") {
-    return <section className="surface min-h-[544px] p-6 text-sm text-[var(--text-secondary)]">랭킹을 불러오는 중입니다.</section>;
+    return <LoadingSurface message="랭킹을 불러오는 중입니다." minHeightClass="min-h-[544px]" />;
   }
 
   if (state.status === "error") {

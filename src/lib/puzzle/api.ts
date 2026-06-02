@@ -230,6 +230,28 @@ async function getActor(): Promise<Actor> {
   const cookieStore = await cookies();
   const existing = cookieStore.get(ANONYMOUS_SESSION_COOKIE)?.value;
   const existingAnonymousSessionId = existing && existing.length >= 16 ? existing : null;
+  const hasSupabaseAuthCookie = cookieStore
+    .getAll()
+    .some((cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("auth-token"));
+
+  if (!hasSupabaseAuthCookie) {
+    const anonymousSessionId = existingAnonymousSessionId ?? crypto.randomUUID();
+    if (!existingAnonymousSessionId) {
+      cookieStore.set(ANONYMOUS_SESSION_COOKIE, anonymousSessionId, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 45
+      });
+    }
+
+    return {
+      userId: null,
+      anonymousSessionId
+    };
+  }
+
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
@@ -395,12 +417,9 @@ export async function getTodayPayload(): Promise<PuzzlePlayState | NoPuzzleState
   const { publishDateKst, publication, puzzle } = await getTodayPublication();
   if (!publication || !puzzle) return { status: "no_puzzle", publishDateKst };
 
-  const [attempt, winnerMessage] = await Promise.all([
-    claimAnonymousAttempt(publication.id, actor).then((claimed) => claimed ?? getAttempt(publication.id, actor)),
-    getWinnerMessage(publication.id)
-  ]);
+  const attempt = await claimAnonymousAttempt(publication.id, actor).then((claimed) => claimed ?? getAttempt(publication.id, actor));
 
-  return visiblePuzzleState(publication, puzzle, attempt, winnerMessage, !actor.userId);
+  return visiblePuzzleState(publication, puzzle, attempt, null, !actor.userId);
 }
 
 export async function startAttempt(): Promise<PuzzlePlayState | NoPuzzleState> {
@@ -410,8 +429,7 @@ export async function startAttempt(): Promise<PuzzlePlayState | NoPuzzleState> {
 
   const existing = (await claimAnonymousAttempt(publication.id, actor)) ?? (await getAttempt(publication.id, actor));
   if (existing) {
-    const winnerMessage = await getWinnerMessage(publication.id);
-    return visiblePuzzleState(publication, puzzle, existing, winnerMessage, !actor.userId);
+    return visiblePuzzleState(publication, puzzle, existing, null, !actor.userId);
   }
 
   const admin = createAdminClient();
@@ -431,8 +449,7 @@ export async function startAttempt(): Promise<PuzzlePlayState | NoPuzzleState> {
 
   if (error) throw error;
 
-  const winnerMessage = await getWinnerMessage(publication.id);
-  return visiblePuzzleState(publication, puzzle, attempt as AttemptRow, winnerMessage, !actor.userId);
+  return visiblePuzzleState(publication, puzzle, attempt as AttemptRow, null, !actor.userId);
 }
 
 export async function revealNextClue(): Promise<PuzzlePlayState | NoPuzzleState> {
@@ -446,8 +463,7 @@ export async function revealNextClue(): Promise<PuzzlePlayState | NoPuzzleState>
     return revealNextClue();
   }
   if (TERMINAL_STATUSES.has(attempt.status)) {
-    const winnerMessage = await getWinnerMessage(publication.id);
-    return visiblePuzzleState(publication, puzzle, attempt, winnerMessage, !actor.userId);
+    return visiblePuzzleState(publication, puzzle, attempt, null, !actor.userId);
   }
 
   const nextCount = Math.min(5, Number(attempt.used_clue_count ?? 1) + 1);
@@ -461,8 +477,7 @@ export async function revealNextClue(): Promise<PuzzlePlayState | NoPuzzleState>
 
   if (error) throw error;
 
-  const winnerMessage = await getWinnerMessage(publication.id);
-  return visiblePuzzleState(publication, puzzle, updated as AttemptRow, winnerMessage, !actor.userId);
+  return visiblePuzzleState(publication, puzzle, updated as AttemptRow, null, !actor.userId);
 }
 
 async function getProfile(userId: string) {
@@ -678,8 +693,12 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
 
   const usedClueCount = Math.max(1, Math.min(5, Number(attempt.used_clue_count ?? 1)));
   if (TERMINAL_STATUSES.has(attempt.status)) {
-    const canWrite = attempt.status === "succeeded" ? await canWriteWinnerMessage(publication.id, actor.userId) : false;
-    const participation = await getDailyRankingParticipation(publication.id, actor, attempt);
+    const [canWrite, participation] = attempt.status === "succeeded" && actor.userId
+      ? await Promise.all([
+          canWriteWinnerMessage(publication.id, actor.userId),
+          getDailyRankingParticipation(publication.id, actor, attempt)
+        ])
+      : [false, actor.userId ? await getDailyRankingParticipation(publication.id, actor, attempt) : { status: "requires_sign_in" } as DailyRankingParticipation];
     return {
       status: attempt.status === "succeeded" ? "succeeded" : "failed",
       isCorrect: attempt.is_correct,
@@ -743,8 +762,20 @@ export async function submitGuess(rawGuess: string): Promise<SubmitResult | NoPu
   const terminal = nextStatus !== "playing";
   if (terminal) await recordDailyResult(publication, updatedAttempt);
 
-  const canWrite = terminal && isCorrect ? await canWriteWinnerMessage(publication.id, actor.userId) : false;
-  const participation = terminal ? await getDailyRankingParticipation(publication.id, actor, updatedAttempt) : undefined;
+  const canWrite = terminal && isCorrect && canRank && actor.userId
+    ? await canWriteWinnerMessage(publication.id, actor.userId)
+    : false;
+  const participation = terminal && isCorrect
+    ? canRank
+      ? rankStatus === "flagged"
+        ? { status: "succeeded_not_visible", reason: "flagged" } satisfies DailyRankingParticipation
+        : { status: "ranked" } satisfies DailyRankingParticipation
+      : actor.userId
+        ? { status: "requires_nickname" } satisfies DailyRankingParticipation
+        : { status: "requires_sign_in" } satisfies DailyRankingParticipation
+    : terminal
+      ? { status: "failed" } satisfies DailyRankingParticipation
+      : undefined;
   return {
     status: nextStatus,
     isCorrect,
@@ -778,6 +809,7 @@ export async function getDailyLeaderboard() {
     .from("leaderboard_entries")
     .select("id,user_id,nickname_snapshot,used_clue_count,elapsed_ms,submitted_at,rank_status")
     .eq("publication_id", publication.id)
+    .eq("rank_status", "visible")
     .order("used_clue_count", { ascending: true })
     .order("elapsed_ms", { ascending: true })
     .order("submitted_at", { ascending: true })
@@ -785,8 +817,7 @@ export async function getDailyLeaderboard() {
 
   if (error) throw error;
 
-  const visibleEntries = (data ?? []).filter((row) => row.rank_status === "visible");
-  const allRows = visibleEntries.map((row, index) => ({
+  const allRows = (data ?? []).map((row, index) => ({
     id: String(row.id),
     rank: index + 1,
     nickname: String(row.nickname_snapshot),
