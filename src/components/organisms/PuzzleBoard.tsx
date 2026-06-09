@@ -30,6 +30,7 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
   const [state, setState] = useState<BoardState>({ status: "loading" });
   const [guess, setGuess] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [recentWrongGuess, setRecentWrongGuess] = useState("");
   const [pendingAction, setPendingAction] = useState<"submit" | "reveal" | null>(null);
 
   useEffect(() => {
@@ -58,6 +59,7 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
   async function reveal() {
     setPendingAction("reveal");
     setFeedback("");
+    setRecentWrongGuess("");
     try {
       const payload = await requestJson<PuzzlePlayState | NoPuzzleState>("/api/attempts/reveal", { method: "POST", body: "{}" });
       setState(payload);
@@ -70,7 +72,8 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!guess.trim()) return;
+    const submittedGuess = guess.trim();
+    if (!submittedGuess) return;
     if (state.status === "ready" && state.requiresSignInForRanking) {
       const promptKey = `pinpoint:anonymous-ranking-confirmed:${state.publicationId}`;
       if (!sessionStorage.getItem(promptKey)) {
@@ -90,7 +93,7 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
     try {
       const payload = await requestJson<SubmitResult | NoPuzzleState>("/api/attempts/submit", {
         method: "POST",
-        body: JSON.stringify({ guess })
+        body: JSON.stringify({ guess: submittedGuess })
       });
       if (payload.status === "no_puzzle") {
         setState(payload);
@@ -98,6 +101,7 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
       }
       if (payload.status === "playing") {
         setGuess("");
+        setRecentWrongGuess(submittedGuess);
         setFeedback("아직 아니에요. 다음 단서를 열었습니다.");
         setState({
           status: "ready",
@@ -113,6 +117,7 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
         });
         return;
       }
+      setRecentWrongGuess("");
       sessionStorage.setItem("pinpoint:last-result", JSON.stringify(payload));
       router.push("/result");
     } catch (error) {
@@ -182,6 +187,12 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
             canReveal={state.lockedCount > 0}
             pendingAction={pendingAction}
           />
+          {recentWrongGuess ? (
+            <div className="rounded-md border border-[var(--warning)] bg-[var(--surface-muted)] px-4 py-3 text-sm text-[var(--text-primary)]">
+              <span className="font-semibold">방금 입력한 오답</span>
+              <span className="ml-2 break-all">{recentWrongGuess}</span>
+            </div>
+          ) : null}
           {feedback ? <FeedbackMessage tone="warning">{feedback}</FeedbackMessage> : null}
         </div>
       )}

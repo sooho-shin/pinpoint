@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import { AnalyticsConsent } from "@/components/organisms/AnalyticsConsent";
 import { getSiteUrl, siteConfig } from "@/lib/site";
 import "./globals.css";
@@ -56,7 +57,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
   const adsenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT ?? "ca-pub-4621241846705196";
-  const adsenseScriptEnabled = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SCRIPT_ENABLED !== "false";
+  const adsenseScriptEnabled = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SCRIPT_ENABLED === "true";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -72,20 +73,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="ko">
-      <head>
-        <script
+      <body>
+        <Script
+          id="website-json-ld"
           type="application/ld+json"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
         {adsenseScriptEnabled ? (
-          <script
+          <Script
+            id="google-adsense"
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
             crossOrigin="anonymous"
+            strategy="afterInteractive"
           />
         ) : null}
-      </head>
-      <body>
         <AnalyticsConsent measurementId={gaMeasurementId} />
         <header className="site-header" aria-label="주요 메뉴">
           <nav className="site-nav">
