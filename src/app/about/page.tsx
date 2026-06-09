@@ -55,6 +55,15 @@ export default function AboutPage() {
           </section>
 
           <section className="mt-6">
+            <h2 className="text-base font-bold">지난 문제를 콘텐츠로 남기는 이유</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              공개 기간이 끝난 문제는 단순한 결과 목록이 아니라 단서 해설과 배경 지식으로 정리합니다. 사용자는 정답만 확인하는 것이 아니라
+              어떤 단서가 어떤 후보를 지우고, 어떤 단서가 정답을 확정했는지 복기할 수 있습니다. 이 기록은 다음 문제를 더 잘 풀기 위한
+              읽을거리이기도 합니다.
+            </p>
+          </section>
+
+          <section className="mt-6">
             <h2 className="text-base font-bold">운영과 개인정보</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
               비로그인 사용자는 브라우저별 익명 세션으로 풀이를 이어가고, Google 로그인 사용자는 닉네임으로만 랭킹에 표시됩니다.
@@ -66,6 +75,12 @@ export default function AboutPage() {
           <div className="mt-8 grid gap-3">
             <Link className="focus-ring inline-flex h-10 items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--accent)]" href="/how-to-play">
               플레이 방법 보기
+            </Link>
+            <Link className="focus-ring inline-flex h-10 items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--accent)]" href="/puzzle-strategy">
+              퍼즐 읽는 법
+            </Link>
+            <Link className="focus-ring inline-flex h-10 items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--accent)]" href="/archive">
+              지난 문제 해설
             </Link>
             <Link className="focus-ring inline-flex h-10 items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--accent)]" href="/">
               오늘 문제 풀기

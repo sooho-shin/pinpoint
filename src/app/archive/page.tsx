@@ -72,6 +72,7 @@ export default async function ArchivePage() {
           <h1 className="mt-1 text-[24px] font-bold leading-8">지난 문제</h1>
           <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
             오늘 활성 문제를 제외한 이전 공개 문제를 모았습니다. 이미 공개 기간이 지난 문제의 정답과 단서를 확인할 수 있습니다.
+            각 문제의 상세 페이지에서는 단서가 어떻게 정답으로 수렴했는지와 관련 배경 지식을 함께 읽을 수 있습니다.
           </p>
 
           <div className="mt-6 space-y-4">
@@ -99,6 +100,12 @@ export default async function ArchivePage() {
                         </li>
                       ))}
                     </ol>
+                    <Link
+                      className="focus-ring mt-4 inline-flex h-9 items-center justify-center rounded-md border border-[var(--border)] bg-white px-3 text-sm font-semibold text-[var(--accent)]"
+                      href={`/archive/${row.id}`}
+                    >
+                      단서 해설 읽기
+                    </Link>
                   </section>
                 );
               })

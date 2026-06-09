@@ -98,6 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="site-nav-links">
               <Link href="/how-to-play">플레이 방법</Link>
               <Link href="/archive">지난 문제</Link>
+              <Link href="/puzzle-strategy">퍼즐 읽기</Link>
             </div>
           </nav>
         </header>

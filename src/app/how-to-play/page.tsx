@@ -49,6 +49,14 @@ export default function HowToPlayPage() {
           </section>
 
           <section className="mt-6">
+            <h2 className="text-base font-bold">오답 후 화면을 읽는 법</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              오답을 제출하면 방금 입력한 오답이 화면에 남고 다음 단서가 열립니다. 새 단서와 오답을 함께 보면 어떤 추론이 빗나갔는지
+              바로 비교할 수 있습니다. 직접 다음 단서를 열 때는 오답 표시가 사라지며, 이는 사용자가 답을 제출하지 않고 힌트만 추가한 상태를 뜻합니다.
+            </p>
+          </section>
+
+          <section className="mt-6">
             <h2 className="text-base font-bold">랭킹 정렬</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
               오늘의 랭킹은 사용한 단서 수가 적은 기록을 먼저 보여주고, 같은 단서 수에서는 풀이 시간이 짧은 기록을 앞에 둡니다.
@@ -98,6 +106,14 @@ export default function HowToPlayPage() {
           >
             오늘 문제 풀기
           </Link>
+          <div className="mt-3 grid gap-3">
+            <Link className="focus-ring inline-flex h-10 items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--accent)]" href="/difficulty">
+              난이도 기준 보기
+            </Link>
+            <Link className="focus-ring inline-flex h-10 items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--accent)]" href="/faq">
+              자주 묻는 질문
+            </Link>
+          </div>
         </div>
       </article>
     </main>
