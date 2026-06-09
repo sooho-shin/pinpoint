@@ -10,12 +10,12 @@
         "권력분립론"
       ],
       "category": "정치/제도",
-      "difficulty": 4,
+      "difficulty": 3,
       "clues": [
         "균형",
-        "견제",
-        "입법",
-        "사법",
+        "권력",
+        "국회",
+        "법원",
         "행정"
       ],
       "rationale": "균형과 견제로 권력 구조를 열어두고, 입법·사법·행정으로 국가 권력의 분립에 수렴한다.",
@@ -25,7 +25,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.356Z",
-      "updatedAt": "2026-05-11T07:41:23.356Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-fe7gg",
@@ -36,12 +36,12 @@
         "중력 우물"
       ],
       "category": "과학/천문",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "그림자",
-        "붕괴",
+        "우주",
+        "중력",
         "사건지평선",
-        "중력파",
         "특이점"
       ],
       "rationale": "초반에는 어둠과 붕괴로 넓게 시작하고, 사건지평선과 특이점으로 천체 물리 개념에 수렴한다.",
@@ -51,7 +51,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-05-11T07:41:23.357Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-znftd",
@@ -62,10 +62,10 @@
         "임프레셔니즘"
       ],
       "category": "예술/미술",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "빛",
-        "순간",
+        "그림",
         "붓질",
         "모네",
         "해돋이"
@@ -77,7 +77,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-05-11T07:41:23.357Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-vggkm",
@@ -88,11 +88,11 @@
         "금화 본위"
       ],
       "category": "경제/화폐",
-      "difficulty": 4,
+      "difficulty": 3,
       "clues": [
         "신뢰",
-        "교환성",
-        "준비금",
+        "화폐",
+        "금 보유",
         "브레튼우즈",
         "금괴"
       ],
@@ -103,7 +103,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-05-11T07:41:23.357Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-rw5w6",
@@ -114,10 +114,10 @@
         "전통 성악"
       ],
       "category": "문화/음악",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "마당",
-        "서사",
+        "이야기",
         "북장단",
         "소리꾼",
         "춘향가"
@@ -129,7 +129,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-05-11T07:41:23.357Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-20xkm",
@@ -137,16 +137,17 @@
       "aliases": [
         "quantum entanglement",
         "얽힘 상태",
-        "EPR 상관"
+        "EPR 상관",
+        "양자"
       ],
       "category": "과학/물리",
-      "difficulty": 5,
+      "difficulty": 3,
       "clues": [
         "쌍",
-        "측정",
-        "비국소성",
-        "벨부등식",
-        "EPR"
+        "입자",
+        "두 입자",
+        "EPR",
+        "벨부등식"
       ],
       "rationale": "쌍과 측정은 넓지만, 비국소성·벨부등식·EPR로 양자얽힘에 공정하게 수렴한다.",
       "status": "generated",
@@ -155,7 +156,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-05-11T07:41:23.357Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-4nl7j",
@@ -166,10 +167,10 @@
         "르네상스 시대"
       ],
       "category": "역사/문화",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "부활",
-        "인문",
+        "예술",
         "피렌체",
         "메디치",
         "다빈치"
@@ -181,7 +182,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-05-11T07:41:23.357Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-bx8bi",
@@ -192,10 +193,10 @@
         "적자생존 과정"
       ],
       "category": "과학/생물",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "적응",
-        "경쟁",
+        "생존",
         "변이",
         "갈라파고스",
         "다윈"
@@ -207,7 +208,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-05-11T07:41:23.357Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-vub0b",
@@ -218,10 +219,10 @@
         "문자 창제"
       ],
       "category": "역사/언어",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "소리",
-        "백성",
+        "글자",
         "자모",
         "세종",
         "훈민정음"
@@ -233,7 +234,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-05-11T07:41:23.357Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-v3tlk",
@@ -244,10 +245,10 @@
         "영화 몽타주"
       ],
       "category": "영화/기법",
-      "difficulty": 4,
+      "difficulty": 3,
       "clues": [
         "조각",
-        "충돌",
+        "영화",
         "편집",
         "에이젠슈테인",
         "전함 포템킨"
@@ -259,7 +260,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-m3srd",
@@ -270,11 +271,11 @@
         "공매도 거래"
       ],
       "category": "경제/금융",
-      "difficulty": 4,
+      "difficulty": 3,
       "clues": [
         "하락",
-        "차입",
-        "매도",
+        "주식",
+        "빌려 팔기",
         "숏커버링",
         "주식시장"
       ],
@@ -285,7 +286,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-kzx1b",
@@ -296,10 +297,10 @@
         "원형감옥"
       ],
       "category": "철학/사회",
-      "difficulty": 4,
+      "difficulty": 3,
       "clues": [
         "시선",
-        "감시",
+        "감옥",
         "원형",
         "벤담",
         "푸코"
@@ -311,7 +312,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-8ex48",
@@ -322,10 +323,10 @@
         "오아시스 루트"
       ],
       "category": "역사/지리",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "낙타",
-        "교역",
+        "무역",
         "오아시스",
         "장건",
         "비단"
@@ -337,7 +338,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-uk37x",
@@ -348,12 +349,12 @@
         "국제 준비자산 통화"
       ],
       "category": "경제/국제",
-      "difficulty": 4,
+      "difficulty": 3,
       "clues": [
         "결제",
-        "신뢰",
-        "외환보유액",
         "달러",
+        "외환보유액",
+        "국제 거래",
         "브레튼우즈"
       ],
       "rationale": "결제와 신뢰로 국제 금융을 열고, 외환보유액·달러·브레튼우즈로 기축통화에 수렴한다.",
@@ -363,7 +364,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-fcohd",
@@ -374,11 +375,11 @@
         "고전 소나타 구조"
       ],
       "category": "음악/이론",
-      "difficulty": 5,
+      "difficulty": 3,
       "clues": [
         "대비",
-        "주제",
-        "발전부",
+        "클래식",
+        "주제 전개",
         "재현부",
         "고전주의"
       ],
@@ -389,7 +390,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-ydzwg",
@@ -400,10 +401,10 @@
         "동풍"
       ],
       "category": "지리/기후",
-      "difficulty": 4,
+      "difficulty": 3,
       "clues": [
         "항해",
-        "동쪽",
+        "바람",
         "적도",
         "해들리순환",
         "범선"
@@ -415,7 +416,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-c3s3c",
@@ -426,11 +427,11 @@
         "Freud"
       ],
       "category": "심리/사상",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "꿈",
+        "심리학",
         "무의식",
-        "리비도",
         "오이디푸스",
         "정신분석"
       ],
@@ -441,7 +442,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-5sevc",
@@ -452,11 +453,11 @@
         "최초 암호자산"
       ],
       "category": "기술/경제",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "채굴",
+        "코인",
         "지갑",
-        "해시",
         "사토시",
         "블록체인"
       ],
@@ -467,7 +468,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-mtymu",
@@ -478,11 +479,11 @@
         "조일 전쟁"
       ],
       "category": "역사/한국",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "침략",
+        "조선",
         "해전",
-        "의병",
         "도요토미",
         "이순신"
       ],
@@ -493,7 +494,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-er5pz",
@@ -504,13 +505,13 @@
         "특수 일반 상대론"
       ],
       "category": "과학/물리",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "시간",
-        "관측자",
+        "아인슈타인",
         "광속",
         "시공간",
-        "아인슈타인"
+        "상대성"
       ],
       "rationale": "시간과 관측자로 물리 개념을 열고, 광속·시공간·아인슈타인으로 상대성이론에 수렴한다.",
       "status": "generated",
@@ -519,7 +520,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-k0ly6",
@@ -530,11 +531,11 @@
         "잉글랜드 대헌장"
       ],
       "category": "역사/법",
-      "difficulty": 4,
+      "difficulty": 3,
       "clues": [
         "서명",
-        "귀족",
-        "왕권",
+        "영국",
+        "왕권 제한",
         "1215년",
         "존왕"
       ],
@@ -545,7 +546,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-q5gm8",
@@ -556,11 +557,11 @@
         "浮力"
       ],
       "category": "과학/물리",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "떠오름",
+        "물",
         "밀도",
-        "배수량",
         "아르키메데스",
         "유체"
       ],
@@ -571,7 +572,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-mjzlt",
@@ -582,10 +583,10 @@
         "초현실파"
       ],
       "category": "예술/문학",
-      "difficulty": 4,
+      "difficulty": 3,
       "clues": [
         "꿈",
-        "자동기술",
+        "미술",
         "무의식",
         "브르통",
         "달리"
@@ -597,7 +598,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-tua79",
@@ -608,10 +609,10 @@
         "판게아 가설"
       ],
       "category": "과학/지구",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "퍼즐",
-        "해안선",
+        "대륙",
         "화석",
         "판게아",
         "베게너"
@@ -623,7 +624,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-15i86",
@@ -634,10 +635,10 @@
         "코페르니쿠스 혁명"
       ],
       "category": "과학/역사",
-      "difficulty": 4,
+      "difficulty": 3,
       "clues": [
         "전환",
-        "천구",
+        "천문학",
         "태양중심",
         "프톨레마이오스",
         "지동설"
@@ -649,7 +650,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-9ioo8",
@@ -660,11 +661,11 @@
         "더블 헬릭스"
       ],
       "category": "과학/생명",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "꼬임",
+        "DNA",
         "염기",
-        "복제",
         "왓슨",
         "크릭"
       ],
@@ -675,7 +676,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-mgypn",
@@ -686,10 +687,10 @@
         "인민주권"
       ],
       "category": "정치/헌법",
-      "difficulty": 4,
+      "difficulty": 3,
       "clues": [
         "동의",
-        "대표",
+        "국민",
         "헌법",
         "선거권",
         "제1조"
@@ -701,7 +702,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-4nt6o",
@@ -712,11 +713,11 @@
         "대위법 푸가"
       ],
       "category": "음악/형식",
-      "difficulty": 5,
+      "difficulty": 3,
       "clues": [
         "추적",
-        "모방",
-        "주제",
+        "음악",
+        "반복 주제",
         "대위법",
         "바흐"
       ],
@@ -727,7 +728,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-qtbft",
@@ -738,10 +739,10 @@
         "사이드의 오리엔탈리즘"
       ],
       "category": "문화/비평",
-      "difficulty": 5,
+      "difficulty": 3,
       "clues": [
         "시선",
-        "타자",
+        "동양 이미지",
         "제국",
         "에드워드 사이드",
         "동양"
@@ -753,7 +754,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     },
     {
       "id": "ko-20260511074123-6rnph",
@@ -764,10 +765,10 @@
         "아카데메이아"
       ],
       "category": "철학/고대",
-      "difficulty": 4,
+      "difficulty": 2,
       "clues": [
         "대화",
-        "동굴",
+        "철학자",
         "이데아",
         "소크라테스",
         "국가"
@@ -779,7 +780,7 @@
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-05-11T07:41:23.358Z"
+      "updatedAt": "2026-06-09T08:18:50.297Z"
     }
   ]
 }

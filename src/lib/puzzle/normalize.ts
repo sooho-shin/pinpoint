@@ -46,6 +46,17 @@ export function isAcceptedAnswer(guess: string, acceptedAnswers: string[]) {
   const normalizedAccepted = acceptedAnswers.map(normalizeAnswer).filter(Boolean);
 
   if (normalizedAccepted.includes(normalizedGuess)) return true;
+  if (normalizedGuess.length >= 2) {
+    const hasCoreTermMatch = normalizedAccepted.some((answer) => {
+      if (answer.length < 3) return false;
+      if (answer.startsWith(normalizedGuess)) {
+        return normalizedGuess.length / answer.length >= 0.5;
+      }
+      return normalizedGuess.length >= 3 && answer.includes(normalizedGuess);
+    });
+    if (hasCoreTermMatch) return true;
+  }
+
   if (normalizedGuess.length < 5) return false;
 
   return normalizedAccepted.some((answer) => {
