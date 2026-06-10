@@ -170,6 +170,8 @@ $make-figma-design
 
 운영 후보 생성/검증은 JSON 파일을 기준으로 한다. 실제 앱은 Supabase DB를 읽으므로, 공개 예약 후에는 반드시 DB 동기화가 필요하다.
 
+현재 문제 운영 기준은 "누구나 아는 단어"다. 새 후보를 만들 때는 난이도 2~3만 사용하고, 정답 자체를 알기 위해 전문 교양이나 분야 배경지식이 필요한 문제는 만들지 않는다. `config/puzzle-policy.json`의 `allowedDifficulties`, `specializedAnswerTerms`, `specializedClueTerms`가 이 기준의 자동 게이트다.
+
 ```bash
 npm run db:sync-puzzles
 ```

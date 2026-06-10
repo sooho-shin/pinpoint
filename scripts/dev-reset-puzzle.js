@@ -291,6 +291,7 @@ async function choosePuzzle(currentPuzzleId, args, history) {
 
   const baseCandidates = (puzzles ?? []).filter((puzzle) => (
     puzzle.id !== currentPuzzleId &&
+    ["generated", "approved"].includes(String(puzzle.status)) &&
     !usedByOtherPublication.has(puzzle.id) &&
     Number(puzzle.quality_score ?? 0) >= 70
   ));

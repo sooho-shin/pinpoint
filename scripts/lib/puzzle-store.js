@@ -37,7 +37,10 @@ export async function readPolicy(filePath = POLICY_PATH) {
   const parsed = JSON.parse(raw);
   return {
     minimumQualityScore: Number(parsed.minimumQualityScore || 70),
-    weakAnswers: Array.isArray(parsed.weakAnswers) ? parsed.weakAnswers : []
+    allowedDifficulties: Array.isArray(parsed.allowedDifficulties) ? parsed.allowedDifficulties.map(Number) : [2, 3],
+    weakAnswers: Array.isArray(parsed.weakAnswers) ? parsed.weakAnswers : [],
+    specializedAnswerTerms: Array.isArray(parsed.specializedAnswerTerms) ? parsed.specializedAnswerTerms : [],
+    specializedClueTerms: Array.isArray(parsed.specializedClueTerms) ? parsed.specializedClueTerms : []
   };
 }
 
@@ -89,8 +92,10 @@ export function toCandidate(input) {
   };
 }
 
-export function validatePuzzle(puzzle, existing = [], policy = { weakAnswers: [] }) {
+export function validatePuzzle(puzzle, existing = [], policy = { weakAnswers: [], allowedDifficulties: [2, 3], specializedAnswerTerms: [], specializedClueTerms: [] }) {
   const issues = [];
+  const status = String(puzzle.status || "");
+  const enforceCandidatePolicy = status !== "rejected";
 
   if (typeof puzzle !== "object" || puzzle === null || Array.isArray(puzzle)) {
     return ["puzzle_not_object"];
@@ -109,6 +114,9 @@ export function validatePuzzle(puzzle, existing = [], policy = { weakAnswers: []
   if (!Number.isFinite(Number(puzzle.difficulty))) issues.push("missing_difficulty");
   if (Number.isFinite(Number(puzzle.difficulty)) && (Number(puzzle.difficulty) < 1 || Number(puzzle.difficulty) > 5)) {
     issues.push("difficulty_out_of_range");
+  }
+  if (enforceCandidatePolicy && Number.isFinite(Number(puzzle.difficulty)) && Array.isArray(policy.allowedDifficulties) && !policy.allowedDifficulties.includes(Number(puzzle.difficulty))) {
+    issues.push("difficulty_not_allowed");
   }
   if (!["generated", "approved", "scheduled", "published", "rejected"].includes(String(puzzle.status || ""))) {
     issues.push("invalid_status");
@@ -130,7 +138,17 @@ export function validatePuzzle(puzzle, existing = [], policy = { weakAnswers: []
   }
 
   const weakAnswers = policy.weakAnswers.map(normalizeText);
-  if (weakAnswers.includes(normalizedAnswer)) issues.push("too_broad_or_easy_answer");
+  if (enforceCandidatePolicy && weakAnswers.includes(normalizedAnswer)) issues.push("too_broad_or_easy_answer");
+
+  const specializedAnswerTerms = (policy.specializedAnswerTerms || []).map(normalizeText).filter(Boolean);
+  if (enforceCandidatePolicy && specializedAnswerTerms.some((term) => normalizedAnswer.includes(term))) {
+    issues.push("specialized_answer");
+  }
+
+  const specializedClueTerms = (policy.specializedClueTerms || []).map(normalizeText).filter(Boolean);
+  if (enforceCandidatePolicy && normalizedClues.some((clue) => specializedClueTerms.some((term) => clue.includes(term)))) {
+    issues.push("specialized_clue");
+  }
 
   const allAcceptedAnswers = [normalizedAnswer, ...normalizedAliases].filter(Boolean);
   const existingAcceptedAnswers = new Set(
@@ -147,12 +165,11 @@ export function validatePuzzle(puzzle, existing = [], policy = { weakAnswers: []
   return issues;
 }
 
-export function scorePuzzle(puzzle, existing = [], policy = { weakAnswers: [] }) {
+export function scorePuzzle(puzzle, existing = [], policy = { weakAnswers: [], allowedDifficulties: [2, 3], specializedAnswerTerms: [], specializedClueTerms: [] }) {
   const issues = validatePuzzle(puzzle, existing, policy);
   let score = 100;
 
   score -= issues.length * 12;
-  if (Number(puzzle.difficulty) < 4) score -= 15;
   if ((puzzle.aliases || []).length < 2) score -= 8;
   if (!puzzle.rationale) score -= 8;
 

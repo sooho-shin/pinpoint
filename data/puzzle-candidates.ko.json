@@ -19,13 +19,17 @@
         "행정"
       ],
       "rationale": "균형과 견제로 권력 구조를 열어두고, 입법·사법·행정으로 국가 권력의 분립에 수렴한다.",
-      "status": "generated",
-      "qualityScore": 100,
-      "issueFlags": [],
+      "status": "rejected",
+      "qualityScore": 80,
+      "issueFlags": [
+        "early_clue_too_direct"
+      ],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.356Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:04.400Z",
+      "reviewReason": "새 운영 기준: 누구나 아는 일상 단어가 아니거나 배경지식이 필요해 제외",
+      "reviewedAt": "2026-06-10T09:37:03.962Z"
     },
     {
       "id": "ko-20260511074123-fe7gg",
@@ -45,13 +49,15 @@
         "특이점"
       ],
       "rationale": "초반에는 어둠과 붕괴로 넓게 시작하고, 사건지평선과 특이점으로 천체 물리 개념에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:03.962Z",
+      "reviewReason": "새 운영 기준: 누구나 아는 일상 단어가 아니거나 배경지식이 필요해 제외",
+      "reviewedAt": "2026-06-10T09:37:03.962Z"
     },
     {
       "id": "ko-20260511074123-znftd",
@@ -71,13 +77,15 @@
         "해돋이"
       ],
       "rationale": "빛과 순간으로 미술적 분위기를 만들고, 모네와 해돋이로 인상주의 회화에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "미술사 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-vggkm",
@@ -97,13 +105,15 @@
         "금괴"
       ],
       "rationale": "신뢰와 교환성에서 화폐 제도로 좁히고, 브레튼우즈와 금괴로 금본위제에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "경제사 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-rw5w6",
@@ -123,13 +133,15 @@
         "춘향가"
       ],
       "rationale": "마당과 서사로 전통 공연을 열어두고, 소리꾼과 춘향가로 판소리에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:03.962Z",
+      "reviewReason": "새 운영 기준: 누구나 아는 일상 단어가 아니거나 배경지식이 필요해 제외",
+      "reviewedAt": "2026-06-10T09:37:03.962Z"
     },
     {
       "id": "ko-20260511074123-20xkm",
@@ -150,13 +162,15 @@
         "벨부등식"
       ],
       "rationale": "쌍과 측정은 넓지만, 비국소성·벨부등식·EPR로 양자얽힘에 공정하게 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "전문 물리 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-4nl7j",
@@ -176,13 +190,15 @@
         "다빈치"
       ],
       "rationale": "부활과 인문으로 사상적 흐름을 열고, 피렌체·메디치·다빈치로 르네상스에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:03.962Z",
+      "reviewReason": "새 운영 기준: 누구나 아는 일상 단어가 아니거나 배경지식이 필요해 제외",
+      "reviewedAt": "2026-06-10T09:37:03.962Z"
     },
     {
       "id": "ko-20260511074123-bx8bi",
@@ -202,13 +218,17 @@
         "다윈"
       ],
       "rationale": "적응과 경쟁으로 생물학적 방향을 만들고, 갈라파고스와 다윈으로 자연선택에 수렴한다.",
-      "status": "generated",
-      "qualityScore": 100,
-      "issueFlags": [],
+      "status": "rejected",
+      "qualityScore": 80,
+      "issueFlags": [
+        "early_clue_too_direct"
+      ],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:04.402Z",
+      "reviewReason": "진화론 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-vub0b",
@@ -228,13 +248,15 @@
         "훈민정음"
       ],
       "rationale": "소리와 백성으로 문자 정책을 열고, 세종과 훈민정음으로 한글창제에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.357Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:03.962Z",
+      "reviewReason": "새 운영 기준: 누구나 아는 일상 단어가 아니거나 배경지식이 필요해 제외",
+      "reviewedAt": "2026-06-10T09:37:03.962Z"
     },
     {
       "id": "ko-20260511074123-v3tlk",
@@ -254,13 +276,17 @@
         "전함 포템킨"
       ],
       "rationale": "조각과 충돌로 구성 방식을 열고, 편집·에이젠슈테인·전함 포템킨으로 몽타주에 수렴한다.",
-      "status": "generated",
-      "qualityScore": 100,
-      "issueFlags": [],
+      "status": "rejected",
+      "qualityScore": 80,
+      "issueFlags": [
+        "early_clue_too_direct"
+      ],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:04.402Z",
+      "reviewReason": "영화 이론 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-m3srd",
@@ -280,13 +306,15 @@
         "주식시장"
       ],
       "rationale": "하락과 차입으로 금융 거래를 열고, 숏커버링과 주식시장으로 공매도에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "금융 거래 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-kzx1b",
@@ -306,13 +334,17 @@
         "푸코"
       ],
       "rationale": "시선과 감시로 사회적 주제를 열고, 원형·벤담·푸코로 판옵티콘에 수렴한다.",
-      "status": "generated",
-      "qualityScore": 100,
-      "issueFlags": [],
+      "status": "rejected",
+      "qualityScore": 80,
+      "issueFlags": [
+        "early_clue_too_direct"
+      ],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:04.402Z",
+      "reviewReason": "철학/사회이론 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-8ex48",
@@ -332,13 +364,15 @@
         "비단"
       ],
       "rationale": "낙타와 교역으로 이동로를 열고, 장건과 비단으로 실크로드에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:03.962Z",
+      "reviewReason": "새 운영 기준: 누구나 아는 일상 단어가 아니거나 배경지식이 필요해 제외",
+      "reviewedAt": "2026-06-10T09:37:03.962Z"
     },
     {
       "id": "ko-20260511074123-uk37x",
@@ -358,13 +392,15 @@
         "브레튼우즈"
       ],
       "rationale": "결제와 신뢰로 국제 금융을 열고, 외환보유액·달러·브레튼우즈로 기축통화에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "국제경제 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-fcohd",
@@ -384,13 +420,15 @@
         "고전주의"
       ],
       "rationale": "대비와 주제로 음악 구조를 열고, 발전부·재현부·고전주의로 소나타형식에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "음악 이론 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-ydzwg",
@@ -410,13 +448,15 @@
         "범선"
       ],
       "rationale": "항해와 동쪽으로 바람을 암시하고, 적도·해들리순환·범선으로 무역풍에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "지리/기후 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-c3s3c",
@@ -436,13 +476,15 @@
         "정신분석"
       ],
       "rationale": "꿈과 무의식으로 심리학을 열고, 오이디푸스와 정신분석으로 프로이트에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "심리학/사상 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-5sevc",
@@ -462,13 +504,17 @@
         "블록체인"
       ],
       "rationale": "채굴과 지갑으로 디지털 자산을 열고, 사토시와 블록체인으로 비트코인에 수렴한다.",
-      "status": "generated",
-      "qualityScore": 100,
-      "issueFlags": [],
+      "status": "rejected",
+      "qualityScore": 80,
+      "issueFlags": [
+        "early_clue_too_direct"
+      ],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:04.403Z",
+      "reviewReason": "새 운영 기준: 누구나 아는 일상 단어가 아니거나 배경지식이 필요해 제외",
+      "reviewedAt": "2026-06-10T09:37:03.962Z"
     },
     {
       "id": "ko-20260511074123-mtymu",
@@ -488,13 +534,15 @@
         "이순신"
       ],
       "rationale": "침략과 해전으로 전쟁을 열고, 도요토미와 이순신으로 임진왜란에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:03.962Z",
+      "reviewReason": "새 운영 기준: 누구나 아는 일상 단어가 아니거나 배경지식이 필요해 제외",
+      "reviewedAt": "2026-06-10T09:37:03.962Z"
     },
     {
       "id": "ko-20260511074123-er5pz",
@@ -514,13 +562,17 @@
         "상대성"
       ],
       "rationale": "시간과 관측자로 물리 개념을 열고, 광속·시공간·아인슈타인으로 상대성이론에 수렴한다.",
-      "status": "generated",
-      "qualityScore": 100,
-      "issueFlags": [],
+      "status": "rejected",
+      "qualityScore": 80,
+      "issueFlags": [
+        "early_clue_too_direct"
+      ],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:04.403Z",
+      "reviewReason": "물리 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-k0ly6",
@@ -540,13 +592,15 @@
         "존왕"
       ],
       "rationale": "서명과 귀족으로 정치 문서를 열고, 1215년과 존왕으로 마그나카르타에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "서양 법제사 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-q5gm8",
@@ -566,13 +620,15 @@
         "유체"
       ],
       "rationale": "떠오름과 밀도로 현상을 열고, 배수량·아르키메데스·유체로 부력에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "과학 개념 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-mjzlt",
@@ -592,13 +648,15 @@
         "달리"
       ],
       "rationale": "꿈과 자동기술로 예술 사조를 열고, 브르통과 달리로 초현실주의에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "예술사 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-tua79",
@@ -618,13 +676,17 @@
         "베게너"
       ],
       "rationale": "퍼즐과 해안선으로 지형 단서를 열고, 판게아와 베게너로 대륙이동설에 수렴한다.",
-      "status": "generated",
-      "qualityScore": 100,
-      "issueFlags": [],
+      "status": "rejected",
+      "qualityScore": 80,
+      "issueFlags": [
+        "early_clue_too_direct"
+      ],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:04.403Z",
+      "reviewReason": "지구과학 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-15i86",
@@ -644,13 +706,15 @@
         "지동설"
       ],
       "rationale": "전환과 천구로 천문 사상을 열고, 태양중심·프톨레마이오스·지동설로 코페르니쿠스에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "과학사 인물 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-9ioo8",
@@ -670,13 +734,17 @@
         "크릭"
       ],
       "rationale": "꼬임과 염기로 분자 구조를 열고, 왓슨과 크릭으로 이중나선에 수렴한다.",
-      "status": "generated",
-      "qualityScore": 100,
-      "issueFlags": [],
+      "status": "rejected",
+      "qualityScore": 80,
+      "issueFlags": [
+        "early_clue_too_direct"
+      ],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:04.404Z",
+      "reviewReason": "생명과학 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-mgypn",
@@ -696,13 +764,17 @@
         "제1조"
       ],
       "rationale": "동의와 대표로 정치 원리를 열고, 선거권과 헌법 제1조로 국민주권에 수렴한다.",
-      "status": "generated",
-      "qualityScore": 100,
-      "issueFlags": [],
+      "status": "rejected",
+      "qualityScore": 80,
+      "issueFlags": [
+        "early_clue_too_direct"
+      ],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:37:04.404Z",
+      "reviewReason": "정치/헌법 개념 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-4nt6o",
@@ -722,13 +794,15 @@
         "바흐"
       ],
       "rationale": "추적과 모방으로 음악적 구조를 열고, 대위법과 바흐로 푸가에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "음악 형식 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-qtbft",
@@ -748,13 +822,15 @@
         "동양"
       ],
       "rationale": "시선과 타자로 문화 비평을 열고, 제국·에드워드 사이드·동양으로 오리엔탈리즘에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "문화비평 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
     },
     {
       "id": "ko-20260511074123-6rnph",
@@ -774,13 +850,795 @@
         "국가"
       ],
       "rationale": "대화와 동굴로 고대 철학을 열고, 이데아·소크라테스·국가로 플라톤에 수렴한다.",
-      "status": "generated",
+      "status": "rejected",
       "qualityScore": 100,
       "issueFlags": [],
       "scheduledAt": null,
       "publishedAt": null,
       "createdAt": "2026-05-11T07:41:23.358Z",
-      "updatedAt": "2026-06-09T08:18:50.297Z"
+      "updatedAt": "2026-06-10T09:29:44.182Z",
+      "reviewReason": "철학 배경지식이 필요함",
+      "reviewedAt": "2026-06-10T09:29:44.182Z"
+    },
+    {
+      "id": "ko-20260610093640-oc6jz",
+      "answer": "치약",
+      "aliases": [
+        "양치약",
+        "toothpaste",
+        "튜브형 세정제"
+      ],
+      "category": "생활/위생",
+      "difficulty": 2,
+      "clues": [
+        "아침",
+        "거품",
+        "튜브",
+        "칫솔",
+        "양치"
+      ],
+      "rationale": "아침과 거품으로 생활 위생을 열고, 칫솔과 양치로 치약에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.207Z",
+      "updatedAt": "2026-06-10T09:36:40.207Z"
+    },
+    {
+      "id": "ko-20260610093640-os5dc",
+      "answer": "세탁기",
+      "aliases": [
+        "빨래기계",
+        "washing machine",
+        "세탁 장치"
+      ],
+      "category": "생활/가전",
+      "difficulty": 2,
+      "clues": [
+        "물",
+        "회전",
+        "세제",
+        "탈수",
+        "빨래"
+      ],
+      "rationale": "물과 회전에서 가전 가능성을 열고, 탈수와 빨래로 세탁기에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.208Z",
+      "updatedAt": "2026-06-10T09:36:40.208Z"
+    },
+    {
+      "id": "ko-20260610093640-t0s8k",
+      "answer": "신호등",
+      "aliases": [
+        "교통신호등",
+        "traffic light",
+        "삼색등"
+      ],
+      "category": "교통/거리",
+      "difficulty": 2,
+      "clues": [
+        "빨강",
+        "노랑",
+        "초록",
+        "교차로",
+        "횡단"
+      ],
+      "rationale": "색 단서로 시작해 교차로와 횡단으로 길 위의 신호등에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.209Z",
+      "updatedAt": "2026-06-10T09:36:40.209Z"
+    },
+    {
+      "id": "ko-20260610093640-qup37",
+      "answer": "버스정류장",
+      "aliases": [
+        "정류소",
+        "bus stop",
+        "승차 지점"
+      ],
+      "category": "교통/거리",
+      "difficulty": 2,
+      "clues": [
+        "노선",
+        "기다림",
+        "승강장",
+        "도착 안내",
+        "승차"
+      ],
+      "rationale": "노선과 기다림으로 대중교통을 열고, 도착 안내와 승차로 버스정류장에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.209Z",
+      "updatedAt": "2026-06-10T09:36:40.209Z"
+    },
+    {
+      "id": "ko-20260610093640-3tg8s",
+      "answer": "공항",
+      "aliases": [
+        "비행장",
+        "airport",
+        "국제공항"
+      ],
+      "category": "교통/장소",
+      "difficulty": 2,
+      "clues": [
+        "탑승",
+        "수하물",
+        "활주로",
+        "여권",
+        "비행기"
+      ],
+      "rationale": "탑승과 수하물에서 여행을 열고, 활주로와 비행기로 공항에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.209Z",
+      "updatedAt": "2026-06-10T09:36:40.209Z"
+    },
+    {
+      "id": "ko-20260610093640-c0txo",
+      "answer": "편의점",
+      "aliases": [
+        "convenience store",
+        "편의점 매장",
+        "24시 매장"
+      ],
+      "category": "생활/장소",
+      "difficulty": 2,
+      "clues": [
+        "24시간",
+        "간식",
+        "계산대",
+        "도시락",
+        "삼각김밥"
+      ],
+      "rationale": "24시간과 간식으로 생활 매장을 열고, 도시락과 삼각김밥으로 편의점에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.209Z",
+      "updatedAt": "2026-06-10T09:36:40.209Z"
+    },
+    {
+      "id": "ko-20260610093640-r48hi",
+      "answer": "영화관",
+      "aliases": [
+        "극장",
+        "cinema",
+        "영화 극장"
+      ],
+      "category": "문화/장소",
+      "difficulty": 2,
+      "clues": [
+        "어둠",
+        "좌석",
+        "예매",
+        "팝콘",
+        "상영"
+      ],
+      "rationale": "어둠과 좌석으로 실내 관람을 열고, 팝콘과 상영으로 영화관에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.210Z",
+      "updatedAt": "2026-06-10T09:36:40.210Z"
+    },
+    {
+      "id": "ko-20260610093640-74ghl",
+      "answer": "놀이터",
+      "aliases": [
+        "playground",
+        "어린이 놀이터",
+        "놀이 공간"
+      ],
+      "category": "생활/장소",
+      "difficulty": 2,
+      "clues": [
+        "아이",
+        "모래",
+        "그네",
+        "미끄럼틀",
+        "공원"
+      ],
+      "rationale": "아이와 모래로 바깥 놀이를 열고, 그네와 미끄럼틀로 놀이터에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.210Z",
+      "updatedAt": "2026-06-10T09:36:40.210Z"
+    },
+    {
+      "id": "ko-20260610093640-szonf",
+      "answer": "카페",
+      "aliases": [
+        "커피숍",
+        "cafe",
+        "커피 가게"
+      ],
+      "category": "생활/장소",
+      "difficulty": 2,
+      "clues": [
+        "향",
+        "잔",
+        "주문",
+        "라떼",
+        "아메리카노"
+      ],
+      "rationale": "향과 잔으로 음료를 열고, 라떼와 아메리카노로 카페에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.210Z",
+      "updatedAt": "2026-06-10T09:36:40.210Z"
+    },
+    {
+      "id": "ko-20260610093640-z5ry8",
+      "answer": "우산",
+      "aliases": [
+        "비우산",
+        "umbrella",
+        "비 가림 도구"
+      ],
+      "category": "생활/도구",
+      "difficulty": 2,
+      "clues": [
+        "손잡이",
+        "접힘",
+        "빗방울",
+        "장마",
+        "비 오는 날"
+      ],
+      "rationale": "손잡이와 접힘으로 휴대 도구를 열고, 장마와 비 오는 날로 우산에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.210Z",
+      "updatedAt": "2026-06-10T09:36:40.210Z"
+    },
+    {
+      "id": "ko-20260610093640-4w3em",
+      "answer": "장갑",
+      "aliases": [
+        "gloves",
+        "겨울 장갑",
+        "보온 장갑"
+      ],
+      "category": "생활/의류",
+      "difficulty": 2,
+      "clues": [
+        "쌍",
+        "따뜻함",
+        "겨울",
+        "털실",
+        "손가락"
+      ],
+      "rationale": "손과 쌍으로 착용품을 열고, 겨울과 손가락으로 장갑에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.210Z",
+      "updatedAt": "2026-06-10T09:36:40.210Z"
+    },
+    {
+      "id": "ko-20260610093640-cgeyk",
+      "answer": "가위",
+      "aliases": [
+        "scissors",
+        "문구가위",
+        "자르는 도구"
+      ],
+      "category": "생활/도구",
+      "difficulty": 2,
+      "clues": [
+        "손잡이",
+        "두 날",
+        "종이",
+        "자르기",
+        "문구"
+      ],
+      "rationale": "손잡이와 두 날로 도구를 열고, 종이와 자르기로 가위에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.210Z",
+      "updatedAt": "2026-06-10T09:36:40.210Z"
+    },
+    {
+      "id": "ko-20260610093640-shrzy",
+      "answer": "연필",
+      "aliases": [
+        "pencil",
+        "필기구",
+        "나무펜"
+      ],
+      "category": "학습/도구",
+      "difficulty": 2,
+      "clues": [
+        "교실",
+        "심",
+        "지우개",
+        "깎기",
+        "필통"
+      ],
+      "rationale": "나무와 심으로 필기 도구를 열고, 깎기와 필통으로 연필에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.210Z",
+      "updatedAt": "2026-06-10T09:36:40.210Z"
+    },
+    {
+      "id": "ko-20260610093640-9n0f7",
+      "answer": "칫솔",
+      "aliases": [
+        "toothbrush",
+        "양치솔",
+        "이 닦는 도구"
+      ],
+      "category": "생활/위생",
+      "difficulty": 2,
+      "clues": [
+        "욕실",
+        "손잡이",
+        "솔",
+        "거품",
+        "양치"
+      ],
+      "rationale": "손잡이와 솔로 도구를 열고, 욕실과 양치로 칫솔에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.210Z",
+      "updatedAt": "2026-06-10T09:36:40.210Z"
+    },
+    {
+      "id": "ko-20260610093640-55jgc",
+      "answer": "달력",
+      "aliases": [
+        "calendar",
+        "캘린더",
+        "날짜표"
+      ],
+      "category": "생활/시간",
+      "difficulty": 2,
+      "clues": [
+        "숫자",
+        "칸",
+        "월요일",
+        "기념일",
+        "날짜"
+      ],
+      "rationale": "숫자와 칸으로 표를 열고, 기념일과 날짜로 달력에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.210Z",
+      "updatedAt": "2026-06-10T09:36:40.210Z"
+    },
+    {
+      "id": "ko-20260610093640-x9fam",
+      "answer": "침대",
+      "aliases": [
+        "bed",
+        "잠자리",
+        "자는 가구"
+      ],
+      "category": "생활/가구",
+      "difficulty": 2,
+      "clues": [
+        "밤",
+        "이불",
+        "베개",
+        "매트리스",
+        "잠"
+      ],
+      "rationale": "밤과 이불로 휴식을 열고, 매트리스와 잠으로 침대에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.210Z",
+      "updatedAt": "2026-06-10T09:36:40.210Z"
+    },
+    {
+      "id": "ko-20260610093640-ib4eb",
+      "answer": "냉장고",
+      "aliases": [
+        "refrigerator",
+        "냉장 기기",
+        "차가운 보관함"
+      ],
+      "category": "생활/가전",
+      "difficulty": 2,
+      "clues": [
+        "문",
+        "차가움",
+        "우유",
+        "반찬",
+        "신선 보관"
+      ],
+      "rationale": "문과 차가움으로 가전을 열고, 우유와 반찬 보관으로 냉장고에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.210Z",
+      "updatedAt": "2026-06-10T09:36:40.210Z"
+    },
+    {
+      "id": "ko-20260610093640-pdz1j",
+      "answer": "전자레인지",
+      "aliases": [
+        "microwave",
+        "전자 렌지",
+        "전자레인지 오븐"
+      ],
+      "category": "생활/가전",
+      "difficulty": 2,
+      "clues": [
+        "버튼",
+        "회전판",
+        "따뜻함",
+        "즉석밥",
+        "데우기"
+      ],
+      "rationale": "버튼과 회전판으로 주방 가전을 열고, 즉석밥과 데우기로 전자레인지에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.211Z",
+      "updatedAt": "2026-06-10T09:36:40.211Z"
+    },
+    {
+      "id": "ko-20260610093640-oijky",
+      "answer": "에어컨",
+      "aliases": [
+        "air conditioner",
+        "냉방기",
+        "에어컨디셔너"
+      ],
+      "category": "생활/가전",
+      "difficulty": 2,
+      "clues": [
+        "리모컨",
+        "바람",
+        "실외기",
+        "여름",
+        "냉방"
+      ],
+      "rationale": "리모컨과 바람으로 가전을 열고, 여름과 냉방으로 에어컨에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.211Z",
+      "updatedAt": "2026-06-10T09:36:40.211Z"
+    },
+    {
+      "id": "ko-20260610093640-mxnlf",
+      "answer": "횡단보도",
+      "aliases": [
+        "crosswalk",
+        "건널목",
+        "사람 건널목"
+      ],
+      "category": "교통/거리",
+      "difficulty": 2,
+      "clues": [
+        "줄무늬",
+        "차도",
+        "보행자",
+        "초록불",
+        "길 건너기"
+      ],
+      "rationale": "줄무늬와 차도로 길 위 공간을 열고, 보행자와 길 건너기로 횡단보도에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.211Z",
+      "updatedAt": "2026-06-10T09:36:40.211Z"
+    },
+    {
+      "id": "ko-20260610093640-he5f5",
+      "answer": "엘리베이터",
+      "aliases": [
+        "승강기",
+        "elevator",
+        "lift"
+      ],
+      "category": "생활/건물",
+      "difficulty": 2,
+      "clues": [
+        "버튼",
+        "문",
+        "층수",
+        "위아래",
+        "닫힘"
+      ],
+      "rationale": "버튼과 문으로 건물 장치를 열고, 층수와 위아래 이동으로 엘리베이터에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.211Z",
+      "updatedAt": "2026-06-10T09:36:40.211Z"
+    },
+    {
+      "id": "ko-20260610093640-1mje4",
+      "answer": "계단",
+      "aliases": [
+        "stairs",
+        "층계",
+        "계단길"
+      ],
+      "category": "생활/건물",
+      "difficulty": 2,
+      "clues": [
+        "발",
+        "오르기",
+        "내려가기",
+        "층",
+        "손잡이"
+      ],
+      "rationale": "발과 오르기로 이동을 열고, 층과 손잡이로 계단에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.211Z",
+      "updatedAt": "2026-06-10T09:36:40.211Z"
+    },
+    {
+      "id": "ko-20260610093640-y193v",
+      "answer": "택시",
+      "aliases": [
+        "taxi",
+        "영업용 승용차",
+        "호출차"
+      ],
+      "category": "교통/이동",
+      "difficulty": 2,
+      "clues": [
+        "노란등",
+        "요금",
+        "기사",
+        "호출",
+        "미터기"
+      ],
+      "rationale": "요금과 기사로 이동 수단을 열고, 호출과 미터기로 택시에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.212Z",
+      "updatedAt": "2026-06-10T09:36:40.212Z"
+    },
+    {
+      "id": "ko-20260610093640-vrfqe",
+      "answer": "기차역",
+      "aliases": [
+        "railway station",
+        "역사",
+        "열차역"
+      ],
+      "category": "교통/장소",
+      "difficulty": 2,
+      "clues": [
+        "표",
+        "승강장",
+        "선로",
+        "도착",
+        "열차"
+      ],
+      "rationale": "표와 승강장으로 교통 장소를 열고, 선로와 열차로 기차역에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.212Z",
+      "updatedAt": "2026-06-10T09:36:40.212Z"
+    },
+    {
+      "id": "ko-20260610093640-8nkcn",
+      "answer": "수영장",
+      "aliases": [
+        "pool",
+        "swimming pool",
+        "물놀이장"
+      ],
+      "category": "운동/장소",
+      "difficulty": 2,
+      "clues": [
+        "레인",
+        "수건",
+        "물",
+        "물안경",
+        "자유형"
+      ],
+      "rationale": "물과 레인으로 운동 공간을 열고, 물안경과 자유형으로 수영장에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.212Z",
+      "updatedAt": "2026-06-10T09:36:40.212Z"
+    },
+    {
+      "id": "ko-20260610093640-v6cts",
+      "answer": "축구공",
+      "aliases": [
+        "soccer ball",
+        "football",
+        "축구 볼"
+      ],
+      "category": "운동/도구",
+      "difficulty": 2,
+      "clues": [
+        "둥근",
+        "발",
+        "골대",
+        "패스",
+        "킥"
+      ],
+      "rationale": "둥근 물체와 발을 연결하고, 골대와 킥으로 축구공에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.212Z",
+      "updatedAt": "2026-06-10T09:36:40.212Z"
+    },
+    {
+      "id": "ko-20260610093640-egk5t",
+      "answer": "피아노",
+      "aliases": [
+        "piano",
+        "건반악기",
+        "검은건반 악기"
+      ],
+      "category": "음악/악기",
+      "difficulty": 2,
+      "clues": [
+        "검정",
+        "하양",
+        "건반",
+        "페달",
+        "연주"
+      ],
+      "rationale": "검정과 하양으로 색 배열을 열고, 건반과 페달로 피아노에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.212Z",
+      "updatedAt": "2026-06-10T09:36:40.212Z"
+    },
+    {
+      "id": "ko-20260610093640-lhl37",
+      "answer": "생일케이크",
+      "aliases": [
+        "birthday cake",
+        "축하 디저트",
+        "촛불 디저트"
+      ],
+      "category": "생활/기념일",
+      "difficulty": 2,
+      "clues": [
+        "초",
+        "노래",
+        "축하",
+        "촛불",
+        "소원"
+      ],
+      "rationale": "초와 노래로 기념 상황을 열고, 촛불과 소원으로 생일케이크에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.212Z",
+      "updatedAt": "2026-06-10T09:36:40.212Z"
+    },
+    {
+      "id": "ko-20260610093640-iowvb",
+      "answer": "눈사람",
+      "aliases": [
+        "snowman",
+        "눈 인형",
+        "눈 조형물"
+      ],
+      "category": "계절/놀이",
+      "difficulty": 2,
+      "clues": [
+        "겨울",
+        "하얀",
+        "동그라미",
+        "당근",
+        "목도리"
+      ],
+      "rationale": "겨울과 하얀 이미지로 시작해 당근과 목도리로 눈사람에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.212Z",
+      "updatedAt": "2026-06-10T09:36:40.212Z"
+    },
+    {
+      "id": "ko-20260610093640-jt3cg",
+      "answer": "무지개",
+      "aliases": [
+        "rainbow",
+        "일곱빛깔",
+        "하늘 색띠"
+      ],
+      "category": "날씨/자연",
+      "difficulty": 2,
+      "clues": [
+        "비",
+        "햇빛",
+        "하늘",
+        "색깔",
+        "일곱"
+      ],
+      "rationale": "비와 햇빛으로 날씨 현상을 열고, 색깔과 일곱으로 무지개에 수렴한다.",
+      "status": "generated",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": null,
+      "publishedAt": null,
+      "createdAt": "2026-06-10T09:36:40.212Z",
+      "updatedAt": "2026-06-10T09:36:40.212Z"
     }
   ]
 }
