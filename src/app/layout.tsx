@@ -57,7 +57,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
   const adsenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT ?? "ca-pub-4621241846705196";
-  const adsenseScriptEnabled = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SCRIPT_ENABLED === "true";
+  const adsenseVerificationEnabled = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_VERIFICATION_ENABLED !== "false"
+    && process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SCRIPT_ENABLED !== "false";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -73,6 +74,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="ko">
+      <head>
+        {adsenseVerificationEnabled ? (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+            crossOrigin="anonymous"
+          />
+        ) : null}
+      </head>
       <body>
         <Script
           id="website-json-ld"
@@ -80,15 +90,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        {adsenseScriptEnabled ? (
-          <Script
-            id="google-adsense"
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        ) : null}
         <AnalyticsConsent measurementId={gaMeasurementId} />
         <header className="site-header" aria-label="주요 메뉴">
           <nav className="site-nav">
