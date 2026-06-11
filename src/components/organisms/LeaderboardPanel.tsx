@@ -81,6 +81,12 @@ function RankingParticipationPanel({ participation, myRank }: { participation?: 
           message: "닉네임을 설정하면 성공 기록이 오늘의 랭킹에 표시됩니다.",
           action: <ButtonLink href="/nickname?next=/ranking" variant="secondary">닉네임 설정</ButtonLink>
         };
+      case "requires_anonymous_nickname":
+        return {
+          title: "닉네임 등록",
+          message: "결과 화면에서 닉네임을 입력하면 비로그인 상태로도 오늘의 랭킹에 기록할 수 있습니다.",
+          action: <ButtonLink href="/result" variant="secondary">결과로 이동</ButtonLink>
+        };
       case "not_completed":
         return {
           title: "오늘 문제 진행 중",

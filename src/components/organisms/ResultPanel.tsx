@@ -8,7 +8,60 @@ import { ScoreBadge } from "@/components/molecules/ScoreBadge";
 import { ShareActionGroup } from "@/components/molecules/ShareActionGroup";
 import type { DailyRankingParticipation, SubmitResult } from "@/lib/puzzle/types";
 
-function RankingRegistrationPanel({ participation }: { participation?: DailyRankingParticipation }) {
+function RankingRegistrationPanel({
+  participation,
+  onRegistered
+}: {
+  participation?: DailyRankingParticipation;
+  onRegistered: (participation: DailyRankingParticipation) => void;
+}) {
+  const [nickname, setNickname] = useState("");
+  const [message, setMessage] = useState("");
+  const [pending, setPending] = useState(false);
+
+  async function submitNickname(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!nickname.trim()) return;
+    setPending(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/leaderboard/daily", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nickname })
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? "랭킹에 등록하지 못했습니다.");
+      onRegistered(payload.participation);
+      setNickname("");
+      setMessage("랭킹에 등록했습니다.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "랭킹에 등록하지 못했습니다.");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  if (participation?.status === "requires_anonymous_nickname") {
+    return (
+      <div className="muted-surface mb-4 p-4">
+        <div className="text-sm font-semibold text-[var(--text-primary)]">랭킹 등록</div>
+        <p className="mt-2 text-sm leading-5 text-[var(--text-secondary)]">닉네임을 입력하면 오늘의 랭킹에 최초 기록으로 등록됩니다.</p>
+        <form className="mt-4 space-y-3" onSubmit={submitNickname}>
+          <TextInput
+            value={nickname}
+            maxLength={12}
+            onChange={(event) => setNickname(event.target.value)}
+            placeholder="닉네임"
+            disabled={pending}
+          />
+          {message ? <p className="text-sm text-[var(--text-secondary)]">{message}</p> : null}
+          <Button type="submit" disabled={pending || !nickname.trim()}>랭킹에 등록</Button>
+        </form>
+      </div>
+    );
+  }
+
   const content = (() => {
     switch (participation?.status) {
       case "requires_sign_in":
@@ -178,7 +231,16 @@ export function ResultPanel() {
         <div className="mt-1 text-xl font-bold">{result.answer}</div>
       </div>
 
-      {shouldShowRankingPanel ? <RankingRegistrationPanel participation={result.participation} /> : null}
+      {shouldShowRankingPanel ? (
+        <RankingRegistrationPanel
+          participation={result.participation}
+          onRegistered={(participation) => {
+            const next = { ...result, isRanked: participation.status === "ranked", participation };
+            setResult(next);
+            sessionStorage.setItem("pinpoint:last-result", JSON.stringify(next));
+          }}
+        />
+      ) : null}
 
       <ShareActionGroup onCopy={shareResult} copied={copied} />
 

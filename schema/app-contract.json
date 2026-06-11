@@ -26,7 +26,9 @@
     "post_oauth_nickname_required",
     "ranking_requires_authenticated_profile",
     "email_is_never_public",
-    "service_role_key_is_server_only"
+    "service_role_key_is_server_only",
+    "custom_game_links_are_anonymous_playable",
+    "anonymous_nickname_ranking_allowed"
   ],
   "mvpScope": {
     "included": [
@@ -38,13 +40,19 @@
       "daily_winner_message",
       "daily_puzzle_feedback",
       "group_ranking_full_flow",
-      "streak_ranking"
+      "streak_ranking",
+      "custom_game_creation",
+      "custom_game_play",
+      "custom_game_ranking",
+      "anonymous_nickname_daily_ranking"
     ],
     "deferred": [
       "admin_review_web_ui",
       "season_ranking",
-      "puzzle_generation_ui",
-      "moderation_ui"
+      "moderation_ui",
+      "custom_game_ai_quality_check",
+      "custom_game_creator_accounts",
+      "custom_game_global_ranking"
     ]
   },
   "frontend": {
@@ -54,7 +62,15 @@
         "path": "/",
         "file": "src/app/page.tsx",
         "auth": "optional",
-        "states": ["loading", "no_puzzle", "ready", "playing", "solved", "failed", "already_completed"],
+        "states": [
+          "loading",
+          "no_puzzle",
+          "ready",
+          "playing",
+          "solved",
+          "failed",
+          "already_completed"
+        ],
         "designScreen": "Today Puzzle"
       },
       {
@@ -62,23 +78,49 @@
         "path": "/result",
         "file": "src/app/result/page.tsx",
         "auth": "optional",
-        "states": ["solved", "failed", "ranking_cta", "share_ready"],
-        "designScreens": ["Solved Result", "Failed Result"]
+        "states": [
+          "solved",
+          "failed",
+          "ranking_cta",
+          "share_ready"
+        ],
+        "designScreens": [
+          "Solved Result",
+          "Failed Result"
+        ]
       },
       {
         "name": "Daily Ranking",
         "path": "/ranking",
         "file": "src/app/ranking/page.tsx",
         "auth": "optional",
-        "states": ["loading", "ready", "empty", "privacy_prompt", "feedback_locked", "feedback_ready", "group_ready", "group_join_required", "streak_ready"],
-        "designScreens": ["Daily Ranking", "Group Ranking", "Ranking Empty State"]
+        "states": [
+          "loading",
+          "ready",
+          "empty",
+          "privacy_prompt",
+          "feedback_locked",
+          "feedback_ready",
+          "group_ready",
+          "group_join_required",
+          "streak_ready"
+        ],
+        "designScreens": [
+          "Daily Ranking",
+          "Group Ranking",
+          "Ranking Empty State"
+        ]
       },
       {
         "name": "Sign In",
         "path": "/signin",
         "file": "src/app/signin/page.tsx",
         "auth": "guest",
-        "states": ["ready", "oauth_pending", "oauth_error"],
+        "states": [
+          "ready",
+          "oauth_pending",
+          "oauth_error"
+        ],
         "designScreen": "Sign In"
       },
       {
@@ -86,18 +128,111 @@
         "path": "/nickname",
         "file": "src/app/nickname/page.tsx",
         "auth": "required",
-        "states": ["ready", "validating", "invalid", "saving"],
+        "states": [
+          "ready",
+          "validating",
+          "invalid",
+          "saving"
+        ],
         "designScreen": "Nickname Setup"
+      },
+      {
+        "name": "Custom Game Create",
+        "path": "/custom/new",
+        "file": "src/app/custom/new/page.tsx",
+        "auth": "optional",
+        "states": [
+          "ready",
+          "validating",
+          "created"
+        ]
+      },
+      {
+        "name": "Custom Game Play",
+        "path": "/custom/[slug]",
+        "file": "src/app/custom/[slug]/page.tsx",
+        "auth": "optional",
+        "states": [
+          "loading",
+          "ready",
+          "playing",
+          "solved",
+          "failed",
+          "hidden",
+          "not_found"
+        ]
+      },
+      {
+        "name": "Custom Game Ranking",
+        "path": "/custom/[slug]/ranking",
+        "file": "src/app/custom/[slug]/ranking/page.tsx",
+        "auth": "optional",
+        "states": [
+          "ready",
+          "empty",
+          "not_found"
+        ]
+      },
+      {
+        "name": "Custom Game Manage",
+        "path": "/custom/manage/[token]",
+        "file": "src/app/custom/manage/[token]/page.tsx",
+        "auth": "optional",
+        "states": [
+          "ready",
+          "hidden",
+          "deleted",
+          "not_found"
+        ]
       }
     ],
     "componentLayers": {
-      "atoms": ["Button", "GoogleSignInButton", "IconButton", "TextInput", "Badge", "ClueNumber", "StatusDot", "Divider"],
-      "molecules": ["ClueRow", "GuessInputGroup", "ScoreBadge", "FeedbackMessage", "AuthStatusMessage", "ShareActionGroup", "RankingRow", "LeaderboardTabs", "GroupInviteCard"],
-      "organisms": ["PuzzleBoard", "ResultPanel", "SignInPanel", "NicknamePanel", "GameHeader", "AdminCandidateCard", "AdminReviewPanel", "LeaderboardPanel", "RankingPrivacyPrompt"],
-      "templates": ["DailyPuzzleTemplate", "AuthTemplate", "ResultTemplate", "AdminReviewTemplate", "RankingTemplate"]
+      "atoms": [
+        "Button",
+        "GoogleSignInButton",
+        "IconButton",
+        "TextInput",
+        "Badge",
+        "ClueNumber",
+        "StatusDot",
+        "Divider"
+      ],
+      "molecules": [
+        "ClueRow",
+        "GuessInputGroup",
+        "ScoreBadge",
+        "FeedbackMessage",
+        "AuthStatusMessage",
+        "ShareActionGroup",
+        "RankingRow",
+        "LeaderboardTabs",
+        "GroupInviteCard"
+      ],
+      "organisms": [
+        "PuzzleBoard",
+        "ResultPanel",
+        "SignInPanel",
+        "NicknamePanel",
+        "GameHeader",
+        "AdminCandidateCard",
+        "AdminReviewPanel",
+        "LeaderboardPanel",
+        "RankingPrivacyPrompt"
+      ],
+      "templates": [
+        "DailyPuzzleTemplate",
+        "AuthTemplate",
+        "ResultTemplate",
+        "AdminReviewTemplate",
+        "RankingTemplate"
+      ]
     },
     "figmaParity": {
-      "sourceFiles": ["design/components.json", "design/screens.json", "design/tokens.json"],
+      "sourceFiles": [
+        "design/components.json",
+        "design/screens.json",
+        "design/tokens.json"
+      ],
       "componentRoot": "src/components",
       "globalsCss": "src/app/globals.css",
       "requiredCssVariablesFromTokens": true,
@@ -132,7 +267,8 @@
       "winnerDoesNotLockPlay": true,
       "oneRankedEntryPerUserPublication": true,
       "oneDailyResultPerUserPublication": true,
-      "streakProjectionScope": "user_id"
+      "streakProjectionScope": "user_id",
+      "anonymousNicknameRankingAllowed": true
     },
     "routeHandlers": [
       {
@@ -148,7 +284,14 @@
         "path": "/api/today",
         "file": "src/app/api/today/route.ts",
         "auth": "optional",
-        "mustNotExpose": ["answer", "aliases", "rationale", "locked_clues", "submitted_answer", "normalized_answer"]
+        "mustNotExpose": [
+          "answer",
+          "aliases",
+          "rationale",
+          "locked_clues",
+          "submitted_answer",
+          "normalized_answer"
+        ]
       },
       {
         "name": "Start Attempt",
@@ -156,7 +299,11 @@
         "path": "/api/attempts/start",
         "file": "src/app/api/attempts/start/route.ts",
         "auth": "optional",
-        "serverAuthoritativeFields": ["started_at", "user_id", "anonymous_session_id"]
+        "serverAuthoritativeFields": [
+          "started_at",
+          "user_id",
+          "anonymous_session_id"
+        ]
       },
       {
         "name": "Reveal Clue",
@@ -164,7 +311,12 @@
         "path": "/api/attempts/reveal",
         "file": "src/app/api/attempts/reveal/route.ts",
         "auth": "optional",
-        "mustNotExpose": ["answer", "aliases", "rationale", "locked_clues"]
+        "mustNotExpose": [
+          "answer",
+          "aliases",
+          "rationale",
+          "locked_clues"
+        ]
       },
       {
         "name": "Submit Attempt",
@@ -172,7 +324,13 @@
         "path": "/api/attempts/submit",
         "file": "src/app/api/attempts/submit/route.ts",
         "auth": "optional",
-        "serverAuthoritativeFields": ["is_correct", "used_clue_count", "elapsed_ms", "is_ranked", "rank_status"]
+        "serverAuthoritativeFields": [
+          "is_correct",
+          "used_clue_count",
+          "elapsed_ms",
+          "is_ranked",
+          "rank_status"
+        ]
       },
       {
         "name": "Daily Leaderboard",
@@ -181,11 +339,27 @@
         "file": "src/app/api/leaderboard/daily/route.ts",
         "auth": "optional",
         "order": [
-          { "column": "used_clue_count", "direction": "asc" },
-          { "column": "elapsed_ms", "direction": "asc" },
-          { "column": "submitted_at", "direction": "asc" }
+          {
+            "column": "used_clue_count",
+            "direction": "asc"
+          },
+          {
+            "column": "elapsed_ms",
+            "direction": "asc"
+          },
+          {
+            "column": "submitted_at",
+            "direction": "asc"
+          }
         ],
-        "mustNotExpose": ["email", "submitted_answer", "normalized_answer", "device_hash", "ip_hash", "user_agent_hash"]
+        "mustNotExpose": [
+          "email",
+          "submitted_answer",
+          "normalized_answer",
+          "device_hash",
+          "ip_hash",
+          "user_agent_hash"
+        ]
       },
       {
         "name": "Streak Leaderboard",
@@ -194,12 +368,34 @@
         "file": "src/app/api/leaderboard/streak/route.ts",
         "auth": "optional",
         "order": [
-          { "column": "current_streak", "direction": "desc" },
-          { "column": "last_success_publish_date_kst", "direction": "desc" },
-          { "column": "longest_streak", "direction": "desc" },
-          { "column": "total_success_count", "direction": "desc" }
+          {
+            "column": "current_streak",
+            "direction": "desc"
+          },
+          {
+            "column": "last_success_publish_date_kst",
+            "direction": "desc"
+          },
+          {
+            "column": "longest_streak",
+            "direction": "desc"
+          },
+          {
+            "column": "total_success_count",
+            "direction": "desc"
+          }
         ],
-        "mustNotExpose": ["email", "answer", "aliases", "rationale", "submitted_answer", "normalized_answer", "device_hash", "ip_hash", "user_agent_hash"]
+        "mustNotExpose": [
+          "email",
+          "answer",
+          "aliases",
+          "rationale",
+          "submitted_answer",
+          "normalized_answer",
+          "device_hash",
+          "ip_hash",
+          "user_agent_hash"
+        ]
       },
       {
         "name": "Group Leaderboard",
@@ -207,13 +403,31 @@
         "path": "/api/leaderboard/group",
         "file": "src/app/api/leaderboard/group/route.ts",
         "auth": "optional",
-        "requires": ["invite_code"],
-        "order": [
-          { "column": "used_clue_count", "direction": "asc" },
-          { "column": "elapsed_ms", "direction": "asc" },
-          { "column": "submitted_at", "direction": "asc" }
+        "requires": [
+          "invite_code"
         ],
-        "mustNotExpose": ["email", "submitted_answer", "normalized_answer", "device_hash", "ip_hash", "user_agent_hash"]
+        "order": [
+          {
+            "column": "used_clue_count",
+            "direction": "asc"
+          },
+          {
+            "column": "elapsed_ms",
+            "direction": "asc"
+          },
+          {
+            "column": "submitted_at",
+            "direction": "asc"
+          }
+        ],
+        "mustNotExpose": [
+          "email",
+          "submitted_answer",
+          "normalized_answer",
+          "device_hash",
+          "ip_hash",
+          "user_agent_hash"
+        ]
       },
       {
         "name": "Create Ranking Group",
@@ -221,7 +435,10 @@
         "path": "/api/groups",
         "file": "src/app/api/groups/route.ts",
         "auth": "required",
-        "requires": ["profile", "active_publication"]
+        "requires": [
+          "profile",
+          "active_publication"
+        ]
       },
       {
         "name": "Join Ranking Group",
@@ -229,7 +446,11 @@
         "path": "/api/groups/join",
         "file": "src/app/api/groups/join/route.ts",
         "auth": "required",
-        "requires": ["profile", "invite_code", "active_publication"]
+        "requires": [
+          "profile",
+          "invite_code",
+          "active_publication"
+        ]
       },
       {
         "name": "Current Winner Message",
@@ -237,7 +458,11 @@
         "path": "/api/winner-message/current",
         "file": "src/app/api/winner-message/current/route.ts",
         "auth": "optional",
-        "publicFields": ["nickname_snapshot", "message", "visible_until"]
+        "publicFields": [
+          "nickname_snapshot",
+          "message",
+          "visible_until"
+        ]
       },
       {
         "name": "Write Winner Message",
@@ -245,7 +470,10 @@
         "path": "/api/winner-message",
         "file": "src/app/api/winner-message/route.ts",
         "auth": "required",
-        "requires": ["profile", "daily_rank_1"],
+        "requires": [
+          "profile",
+          "daily_rank_1"
+        ],
         "maxMessageLength": 100
       },
       {
@@ -254,10 +482,28 @@
         "path": "/api/puzzle-feedback/daily",
         "file": "src/app/api/puzzle-feedback/daily/route.ts",
         "auth": "optional",
-        "requires": ["profile", "completed_attempt"],
+        "requires": [
+          "profile",
+          "completed_attempt"
+        ],
         "requiresCompletedAttempt": true,
-        "publicFields": ["nickname_snapshot", "reaction", "comment", "created_at"],
-        "mustNotExpose": ["email", "answer", "aliases", "rationale", "submitted_answer", "normalized_answer", "device_hash", "ip_hash", "user_agent_hash"]
+        "publicFields": [
+          "nickname_snapshot",
+          "reaction",
+          "comment",
+          "created_at"
+        ],
+        "mustNotExpose": [
+          "email",
+          "answer",
+          "aliases",
+          "rationale",
+          "submitted_answer",
+          "normalized_answer",
+          "device_hash",
+          "ip_hash",
+          "user_agent_hash"
+        ]
       },
       {
         "name": "Write Puzzle Feedback",
@@ -265,10 +511,135 @@
         "path": "/api/puzzle-feedback",
         "file": "src/app/api/puzzle-feedback/route.ts",
         "auth": "required",
-        "requires": ["profile", "completed_attempt"],
+        "requires": [
+          "profile",
+          "completed_attempt"
+        ],
         "requiresCompletedAttempt": true,
         "maxCommentLength": 140,
-        "allowedReactions": ["easy", "good", "hard", "tricky", "fun"]
+        "allowedReactions": [
+          "easy",
+          "good",
+          "hard",
+          "tricky",
+          "fun"
+        ]
+      },
+      {
+        "name": "Create Custom Game",
+        "method": "POST",
+        "path": "/api/custom-games",
+        "file": "src/app/api/custom-games/route.ts",
+        "auth": "optional",
+        "requires": [
+          "answer",
+          "clues"
+        ]
+      },
+      {
+        "name": "Custom Game State",
+        "method": "GET",
+        "path": "/api/custom-games/[slug]",
+        "file": "src/app/api/custom-games/[slug]/route.ts",
+        "auth": "optional",
+        "mustNotExpose": [
+          "answer",
+          "aliases",
+          "locked_clues",
+          "submitted_answer",
+          "normalized_answer"
+        ]
+      },
+      {
+        "name": "Start Custom Game",
+        "method": "POST",
+        "path": "/api/custom-games/[slug]/start",
+        "file": "src/app/api/custom-games/[slug]/start/route.ts",
+        "auth": "optional"
+      },
+      {
+        "name": "Reveal Custom Game Clue",
+        "method": "POST",
+        "path": "/api/custom-games/[slug]/reveal",
+        "file": "src/app/api/custom-games/[slug]/reveal/route.ts",
+        "auth": "optional",
+        "mustNotExpose": [
+          "answer",
+          "aliases",
+          "locked_clues"
+        ]
+      },
+      {
+        "name": "Submit Custom Game Guess",
+        "method": "POST",
+        "path": "/api/custom-games/[slug]/submit",
+        "file": "src/app/api/custom-games/[slug]/submit/route.ts",
+        "auth": "optional",
+        "serverAuthoritativeFields": [
+          "is_correct",
+          "used_clue_count",
+          "elapsed_ms"
+        ]
+      },
+      {
+        "name": "Custom Game Ranking",
+        "method": "GET",
+        "path": "/api/custom-games/[slug]/ranking",
+        "file": "src/app/api/custom-games/[slug]/ranking/route.ts",
+        "auth": "optional",
+        "order": [
+          {
+            "column": "used_clue_count",
+            "direction": "asc"
+          },
+          {
+            "column": "elapsed_ms",
+            "direction": "asc"
+          },
+          {
+            "column": "submitted_at",
+            "direction": "asc"
+          }
+        ],
+        "mustNotExpose": [
+          "email",
+          "submitted_answer",
+          "normalized_answer",
+          "device_hash",
+          "ip_hash",
+          "user_agent_hash"
+        ]
+      },
+      {
+        "name": "Register Custom Game Ranking",
+        "method": "POST",
+        "path": "/api/custom-games/[slug]/ranking",
+        "file": "src/app/api/custom-games/[slug]/ranking/route.ts",
+        "auth": "optional",
+        "requires": [
+          "nickname"
+        ]
+      },
+      {
+        "name": "Report Custom Game",
+        "method": "POST",
+        "path": "/api/custom-games/[slug]/report",
+        "file": "src/app/api/custom-games/[slug]/report/route.ts",
+        "auth": "optional"
+      },
+      {
+        "name": "Read Custom Game Admin",
+        "method": "GET",
+        "path": "/api/custom-games/admin/[token]",
+        "file": "src/app/api/custom-games/admin/[token]/route.ts",
+        "auth": "optional"
+      },
+      {
+        "name": "Update Custom Game Admin",
+        "method": "POST",
+        "path": "/api/custom-games/admin/[token]",
+        "file": "src/app/api/custom-games/admin/[token]/route.ts",
+        "auth": "optional"
       }
     ],
     "forbiddenPublicResponseFields": [
@@ -283,16 +654,52 @@
       "user_agent_hash"
     ],
     "rankingOrder": [
-      { "column": "used_clue_count", "direction": "asc" },
-      { "column": "elapsed_ms", "direction": "asc" },
-      { "column": "submitted_at", "direction": "asc" }
+      {
+        "column": "used_clue_count",
+        "direction": "asc"
+      },
+      {
+        "column": "elapsed_ms",
+        "direction": "asc"
+      },
+      {
+        "column": "submitted_at",
+        "direction": "asc"
+      }
     ],
     "streakRankingOrder": [
-      { "column": "current_streak", "direction": "desc" },
-      { "column": "last_success_publish_date_kst", "direction": "desc" },
-      { "column": "longest_streak", "direction": "desc" },
-      { "column": "total_success_count", "direction": "desc" }
-    ]
+      {
+        "column": "current_streak",
+        "direction": "desc"
+      },
+      {
+        "column": "last_success_publish_date_kst",
+        "direction": "desc"
+      },
+      {
+        "column": "longest_streak",
+        "direction": "desc"
+      },
+      {
+        "column": "total_success_count",
+        "direction": "desc"
+      }
+    ],
+    "customGames": {
+      "anonymousCreateAllowed": true,
+      "anonymousPlayAllowed": true,
+      "creatorInput": [
+        "answer",
+        "clues"
+      ],
+      "clueCount": 5,
+      "immutableAfterCreate": true,
+      "adminActions": [
+        "hide",
+        "delete"
+      ],
+      "firstRecordOnly": true
+    }
   },
   "environment": {
     "required": [
@@ -300,12 +707,27 @@
       "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
       "SUPABASE_SERVICE_ROLE_KEY"
     ],
-    "serverOnly": ["SUPABASE_SERVICE_ROLE_KEY"],
-    "publicAllowed": ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"]
+    "serverOnly": [
+      "SUPABASE_SERVICE_ROLE_KEY"
+    ],
+    "publicAllowed": [
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
+    ]
   },
   "validation": {
-    "beforeImplementation": ["npm run db:check", "npm run figma:layout:contract", "npm run figma:composition:contract", "npm run app:contract"],
-    "beforeMerge": ["npm run db:check", "npm run figma:layout:contract", "npm run figma:composition:contract", "npm run app:check"],
+    "beforeImplementation": [
+      "npm run db:check",
+      "npm run figma:layout:contract",
+      "npm run figma:composition:contract",
+      "npm run app:contract"
+    ],
+    "beforeMerge": [
+      "npm run db:check",
+      "npm run figma:layout:contract",
+      "npm run figma:composition:contract",
+      "npm run app:check"
+    ],
     "implementationRequiredCommand": "npm run app:implementation:check"
   }
 }

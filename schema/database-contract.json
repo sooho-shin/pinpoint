@@ -14,94 +14,295 @@
     "daily_puzzle_feedback_is_completion_gated",
     "daily_success_streak_is_user_scoped_projection",
     "email_is_not_public_profile_data",
-    "one_ranked_success_per_user_per_publication"
+    "one_ranked_success_per_user_per_publication",
+    "custom_games_are_separate_from_daily_publications",
+    "anonymous_nickname_ranking_allowed"
   ],
   "enums": {
-    "puzzle_status": ["generated", "approved", "rejected", "archived"],
-    "publication_status": ["scheduled", "published", "canceled"],
-    "attempt_status": ["playing", "succeeded", "failed", "abandoned"],
-    "visibility": ["private", "daily", "group"],
-    "rank_status": ["visible", "flagged", "hidden"],
-    "winner_message_status": ["draft", "visible", "hidden"],
-    "feedback_status": ["visible", "hidden"],
-    "daily_result_status": ["succeeded", "failed"]
+    "puzzle_status": [
+      "generated",
+      "approved",
+      "rejected",
+      "archived"
+    ],
+    "publication_status": [
+      "scheduled",
+      "published",
+      "canceled"
+    ],
+    "attempt_status": [
+      "playing",
+      "succeeded",
+      "failed",
+      "abandoned"
+    ],
+    "visibility": [
+      "private",
+      "daily",
+      "group"
+    ],
+    "rank_status": [
+      "visible",
+      "flagged",
+      "hidden"
+    ],
+    "winner_message_status": [
+      "draft",
+      "visible",
+      "hidden"
+    ],
+    "feedback_status": [
+      "visible",
+      "hidden"
+    ],
+    "daily_result_status": [
+      "succeeded",
+      "failed"
+    ],
+    "custom_game_status": [
+      "active",
+      "hidden",
+      "deleted"
+    ]
   },
   "tables": {
     "profiles": {
       "description": "Google 로그인 사용자와 연결되는 공개 프로필. 이메일은 저장하지 않는다.",
       "columns": {
-        "id": { "type": "uuid", "primaryKey": true, "references": "auth.users.id" },
-        "nickname": { "type": "text", "required": true, "public": true },
-        "nickname_normalized": { "type": "text", "required": true, "public": false },
-        "avatar_url": { "type": "text", "required": false, "public": true },
-        "created_at": { "type": "timestamptz", "required": true },
-        "updated_at": { "type": "timestamptz", "required": true }
+        "id": {
+          "type": "uuid",
+          "primaryKey": true,
+          "references": "auth.users.id"
+        },
+        "nickname": {
+          "type": "text",
+          "required": true,
+          "public": true
+        },
+        "nickname_normalized": {
+          "type": "text",
+          "required": true,
+          "public": false
+        },
+        "avatar_url": {
+          "type": "text",
+          "required": false,
+          "public": true
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "updated_at": {
+          "type": "timestamptz",
+          "required": true
+        }
       },
       "constraints": [
-        { "type": "check", "name": "nickname_length", "expression": "char_length(nickname) between 2 and 12" }
+        {
+          "type": "check",
+          "name": "nickname_length",
+          "expression": "char_length(nickname) between 2 and 12"
+        }
       ],
       "indexes": [
-        { "name": "profiles_nickname_normalized_idx", "columns": ["nickname_normalized"] }
+        {
+          "name": "profiles_nickname_normalized_idx",
+          "columns": [
+            "nickname_normalized"
+          ]
+        }
       ],
       "rls": {
         "required": true,
-        "publicSelectColumns": ["id", "nickname", "avatar_url"],
+        "publicSelectColumns": [
+          "id",
+          "nickname",
+          "avatar_url"
+        ],
         "ownerWritable": true
       }
     },
     "puzzles": {
       "description": "문제 원본. 예약/공개 상태는 puzzle_publications에서 관리한다.",
       "columns": {
-        "id": { "type": "text", "primaryKey": true },
-        "locale": { "type": "text", "required": true, "default": "ko" },
-        "answer": { "type": "text", "required": true, "public": false },
-        "aliases": { "type": "text[]", "required": true, "public": false },
-        "category": { "type": "text", "required": true, "public": true },
-        "difficulty": { "type": "integer", "required": true, "public": false },
-        "clues": { "type": "jsonb", "required": true, "public": false },
-        "rationale": { "type": "text", "required": false, "public": false },
-        "status": { "type": "puzzle_status", "required": true },
-        "quality_score": { "type": "integer", "required": false },
-        "issue_flags": { "type": "text[]", "required": true },
-        "review_reason": { "type": "text", "required": false },
-        "reviewed_at": { "type": "timestamptz", "required": false },
-        "created_at": { "type": "timestamptz", "required": true },
-        "updated_at": { "type": "timestamptz", "required": true }
+        "id": {
+          "type": "text",
+          "primaryKey": true
+        },
+        "locale": {
+          "type": "text",
+          "required": true,
+          "default": "ko"
+        },
+        "answer": {
+          "type": "text",
+          "required": true,
+          "public": false
+        },
+        "aliases": {
+          "type": "text[]",
+          "required": true,
+          "public": false
+        },
+        "category": {
+          "type": "text",
+          "required": true,
+          "public": true
+        },
+        "difficulty": {
+          "type": "integer",
+          "required": true,
+          "public": false
+        },
+        "clues": {
+          "type": "jsonb",
+          "required": true,
+          "public": false
+        },
+        "rationale": {
+          "type": "text",
+          "required": false,
+          "public": false
+        },
+        "status": {
+          "type": "puzzle_status",
+          "required": true
+        },
+        "quality_score": {
+          "type": "integer",
+          "required": false
+        },
+        "issue_flags": {
+          "type": "text[]",
+          "required": true
+        },
+        "review_reason": {
+          "type": "text",
+          "required": false
+        },
+        "reviewed_at": {
+          "type": "timestamptz",
+          "required": false
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "updated_at": {
+          "type": "timestamptz",
+          "required": true
+        }
       },
       "constraints": [
-        { "type": "check", "name": "difficulty_range", "expression": "difficulty between 1 and 5" },
-        { "type": "check", "name": "quality_score_range", "expression": "quality_score is null or quality_score between 0 and 100" },
-        { "type": "check", "name": "clues_has_5_items", "expression": "jsonb_array_length(clues) = 5" }
+        {
+          "type": "check",
+          "name": "difficulty_range",
+          "expression": "difficulty between 1 and 5"
+        },
+        {
+          "type": "check",
+          "name": "quality_score_range",
+          "expression": "quality_score is null or quality_score between 0 and 100"
+        },
+        {
+          "type": "check",
+          "name": "clues_has_5_items",
+          "expression": "jsonb_array_length(clues) = 5"
+        }
       ],
       "indexes": [
-        { "name": "puzzles_status_quality_idx", "columns": ["status", "quality_score"] },
-        { "name": "puzzles_locale_answer_idx", "columns": ["locale", "answer"], "unique": true }
+        {
+          "name": "puzzles_status_quality_idx",
+          "columns": [
+            "status",
+            "quality_score"
+          ]
+        },
+        {
+          "name": "puzzles_locale_answer_idx",
+          "columns": [
+            "locale",
+            "answer"
+          ],
+          "unique": true
+        }
       ],
       "rls": {
         "required": true,
         "publicSelectWhen": "published_via_puzzle_publications",
-        "publicSelectColumns": ["id", "locale", "category", "status", "created_at", "updated_at"],
+        "publicSelectColumns": [
+          "id",
+          "locale",
+          "category",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
         "adminWritable": true
       }
     },
     "puzzle_publications": {
       "description": "특정 문제를 특정 KST 날짜에 공개하는 이벤트.",
       "columns": {
-        "id": { "type": "uuid", "primaryKey": true },
-        "puzzle_id": { "type": "text", "required": true, "references": "puzzles.id" },
-        "publish_date_kst": { "type": "date", "required": true },
-        "status": { "type": "publication_status", "required": true },
-        "scheduled_at": { "type": "timestamptz", "required": true },
-        "published_at": { "type": "timestamptz", "required": false },
-        "created_at": { "type": "timestamptz", "required": true },
-        "updated_at": { "type": "timestamptz", "required": true }
+        "id": {
+          "type": "uuid",
+          "primaryKey": true
+        },
+        "puzzle_id": {
+          "type": "text",
+          "required": true,
+          "references": "puzzles.id"
+        },
+        "publish_date_kst": {
+          "type": "date",
+          "required": true
+        },
+        "status": {
+          "type": "publication_status",
+          "required": true
+        },
+        "scheduled_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "published_at": {
+          "type": "timestamptz",
+          "required": false
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "updated_at": {
+          "type": "timestamptz",
+          "required": true
+        }
       },
       "constraints": [
-        { "type": "unique", "name": "one_publication_per_kst_date", "columns": ["publish_date_kst"] },
-        { "type": "unique", "name": "one_publication_per_puzzle", "columns": ["puzzle_id"] }
+        {
+          "type": "unique",
+          "name": "one_publication_per_kst_date",
+          "columns": [
+            "publish_date_kst"
+          ]
+        },
+        {
+          "type": "unique",
+          "name": "one_publication_per_puzzle",
+          "columns": [
+            "puzzle_id"
+          ]
+        }
       ],
       "indexes": [
-        { "name": "puzzle_publications_status_date_idx", "columns": ["status", "publish_date_kst"] }
+        {
+          "name": "puzzle_publications_status_date_idx",
+          "columns": [
+            "status",
+            "publish_date_kst"
+          ]
+        }
       ],
       "rls": {
         "required": true,
@@ -112,39 +313,159 @@
     "attempts": {
       "description": "풀이 기록 원장. 랭킹 노출 여부와 별도로 모든 시도를 기록한다.",
       "columns": {
-        "id": { "type": "uuid", "primaryKey": true },
-        "publication_id": { "type": "uuid", "required": true, "references": "puzzle_publications.id" },
-        "user_id": { "type": "uuid", "required": false, "references": "profiles.id" },
-        "anonymous_session_id": { "type": "text", "required": false },
-        "started_at": { "type": "timestamptz", "required": true },
-        "submitted_at": { "type": "timestamptz", "required": false },
-        "elapsed_ms": { "type": "integer", "required": false },
-        "used_clue_count": { "type": "integer", "required": false },
-        "submitted_answer": { "type": "text", "required": false, "public": false },
-        "normalized_answer": { "type": "text", "required": false, "public": false },
-        "is_correct": { "type": "boolean", "required": true, "default": false },
-        "status": { "type": "attempt_status", "required": true },
-        "is_ranked": { "type": "boolean", "required": true, "default": false },
-        "visibility": { "type": "visibility", "required": true, "default": "private" },
-        "flagged": { "type": "boolean", "required": true, "default": false },
-        "flag_reason": { "type": "text", "required": false },
-        "device_hash": { "type": "text", "required": false },
-        "ip_hash": { "type": "text", "required": false },
-        "user_agent_hash": { "type": "text", "required": false },
-        "created_at": { "type": "timestamptz", "required": true }
+        "id": {
+          "type": "uuid",
+          "primaryKey": true
+        },
+        "publication_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "puzzle_publications.id"
+        },
+        "user_id": {
+          "type": "uuid",
+          "required": false,
+          "references": "profiles.id"
+        },
+        "anonymous_session_id": {
+          "type": "text",
+          "required": false
+        },
+        "started_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "submitted_at": {
+          "type": "timestamptz",
+          "required": false
+        },
+        "elapsed_ms": {
+          "type": "integer",
+          "required": false
+        },
+        "used_clue_count": {
+          "type": "integer",
+          "required": false
+        },
+        "submitted_answer": {
+          "type": "text",
+          "required": false,
+          "public": false
+        },
+        "normalized_answer": {
+          "type": "text",
+          "required": false,
+          "public": false
+        },
+        "is_correct": {
+          "type": "boolean",
+          "required": true,
+          "default": false
+        },
+        "status": {
+          "type": "attempt_status",
+          "required": true
+        },
+        "is_ranked": {
+          "type": "boolean",
+          "required": true,
+          "default": false
+        },
+        "visibility": {
+          "type": "visibility",
+          "required": true,
+          "default": "private"
+        },
+        "flagged": {
+          "type": "boolean",
+          "required": true,
+          "default": false
+        },
+        "flag_reason": {
+          "type": "text",
+          "required": false
+        },
+        "device_hash": {
+          "type": "text",
+          "required": false
+        },
+        "ip_hash": {
+          "type": "text",
+          "required": false
+        },
+        "user_agent_hash": {
+          "type": "text",
+          "required": false
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        }
       },
       "constraints": [
-        { "type": "check", "name": "used_clue_count_range", "expression": "used_clue_count is null or used_clue_count between 1 and 5" },
-        { "type": "check", "name": "elapsed_ms_non_negative", "expression": "elapsed_ms is null or elapsed_ms >= 0" },
-        { "type": "check", "name": "user_or_anonymous_session_required", "expression": "user_id is not null or anonymous_session_id is not null" }
+        {
+          "type": "check",
+          "name": "used_clue_count_range",
+          "expression": "used_clue_count is null or used_clue_count between 1 and 5"
+        },
+        {
+          "type": "check",
+          "name": "elapsed_ms_non_negative",
+          "expression": "elapsed_ms is null or elapsed_ms >= 0"
+        },
+        {
+          "type": "check",
+          "name": "user_or_anonymous_session_required",
+          "expression": "user_id is not null or anonymous_session_id is not null"
+        }
       ],
       "indexes": [
-        { "name": "attempts_publication_user_idx", "columns": ["publication_id", "user_id"] },
-        { "name": "attempts_publication_anonymous_session_idx", "columns": ["publication_id", "anonymous_session_id"] },
-        { "name": "attempts_one_user_attempt_per_publication", "columns": ["publication_id", "user_id"], "unique": true, "partialWhere": "user_id is not null" },
-        { "name": "attempts_one_anonymous_attempt_per_publication", "columns": ["publication_id", "anonymous_session_id"], "unique": true, "partialWhere": "anonymous_session_id is not null" },
-        { "name": "attempts_flagged_idx", "columns": ["flagged", "created_at"] },
-        { "name": "attempts_device_publication_idx", "columns": ["publication_id", "device_hash"] }
+        {
+          "name": "attempts_publication_user_idx",
+          "columns": [
+            "publication_id",
+            "user_id"
+          ]
+        },
+        {
+          "name": "attempts_publication_anonymous_session_idx",
+          "columns": [
+            "publication_id",
+            "anonymous_session_id"
+          ]
+        },
+        {
+          "name": "attempts_one_user_attempt_per_publication",
+          "columns": [
+            "publication_id",
+            "user_id"
+          ],
+          "unique": true,
+          "partialWhere": "user_id is not null"
+        },
+        {
+          "name": "attempts_one_anonymous_attempt_per_publication",
+          "columns": [
+            "publication_id",
+            "anonymous_session_id"
+          ],
+          "unique": true,
+          "partialWhere": "anonymous_session_id is not null"
+        },
+        {
+          "name": "attempts_flagged_idx",
+          "columns": [
+            "flagged",
+            "created_at"
+          ]
+        },
+        {
+          "name": "attempts_device_publication_idx",
+          "columns": [
+            "publication_id",
+            "device_hash"
+          ]
+        }
       ],
       "rls": {
         "required": true,
@@ -157,32 +478,121 @@
     "leaderboard_entries": {
       "description": "오늘의 랭킹 조회용 projection. 성공했고 등록 조건을 만족한 기록만 생성한다.",
       "columns": {
-        "id": { "type": "uuid", "primaryKey": true },
-        "publication_id": { "type": "uuid", "required": true, "references": "puzzle_publications.id" },
-        "user_id": { "type": "uuid", "required": true, "references": "profiles.id" },
-        "attempt_id": { "type": "uuid", "required": true, "references": "attempts.id" },
-        "nickname_snapshot": { "type": "text", "required": true, "public": true },
-        "used_clue_count": { "type": "integer", "required": true, "public": true },
-        "elapsed_ms": { "type": "integer", "required": true, "public": true },
-        "submitted_at": { "type": "timestamptz", "required": true, "public": true },
-        "rank_status": { "type": "rank_status", "required": true, "default": "visible", "public": true },
-        "created_at": { "type": "timestamptz", "required": true }
+        "id": {
+          "type": "uuid",
+          "primaryKey": true
+        },
+        "publication_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "puzzle_publications.id"
+        },
+        "user_id": {
+          "type": "uuid",
+          "required": false,
+          "references": "profiles.id"
+        },
+        "attempt_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "attempts.id"
+        },
+        "nickname_snapshot": {
+          "type": "text",
+          "required": true,
+          "public": true
+        },
+        "used_clue_count": {
+          "type": "integer",
+          "required": true,
+          "public": true
+        },
+        "elapsed_ms": {
+          "type": "integer",
+          "required": true,
+          "public": true
+        },
+        "submitted_at": {
+          "type": "timestamptz",
+          "required": true,
+          "public": true
+        },
+        "rank_status": {
+          "type": "rank_status",
+          "required": true,
+          "default": "visible",
+          "public": true
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "anonymous_session_id": {
+          "type": "text",
+          "required": false,
+          "public": false
+        }
       },
       "constraints": [
-        { "type": "unique", "name": "one_leaderboard_entry_per_user_publication", "columns": ["publication_id", "user_id"] },
-        { "type": "check", "name": "leaderboard_used_clue_count_range", "expression": "used_clue_count between 1 and 5" },
-        { "type": "check", "name": "leaderboard_elapsed_ms_non_negative", "expression": "elapsed_ms >= 0" }
-      ],
-      "indexes": [
-        { "name": "leaderboard_sort_idx", "columns": ["publication_id", "rank_status", "used_clue_count", "elapsed_ms", "submitted_at"] },
         {
-          "name": "one_visible_or_flagged_ranked_success_per_user",
-          "columns": ["publication_id", "user_id"],
-          "unique": true,
-          "partialWhere": "rank_status in ('visible', 'flagged')"
+          "type": "unique",
+          "name": "one_leaderboard_entry_per_user_publication",
+          "columns": [
+            "publication_id",
+            "user_id"
+          ]
+        },
+        {
+          "type": "check",
+          "name": "leaderboard_used_clue_count_range",
+          "expression": "used_clue_count between 1 and 5"
+        },
+        {
+          "type": "check",
+          "name": "leaderboard_elapsed_ms_non_negative",
+          "expression": "elapsed_ms >= 0"
+        },
+        {
+          "type": "check",
+          "name": "leaderboard_user_or_anonymous_required",
+          "expression": "user_id is not null or anonymous_session_id is not null"
         }
       ],
-      "rankingSort": ["used_clue_count", "elapsed_ms", "submitted_at"],
+      "indexes": [
+        {
+          "name": "leaderboard_sort_idx",
+          "columns": [
+            "publication_id",
+            "rank_status",
+            "used_clue_count",
+            "elapsed_ms",
+            "submitted_at"
+          ]
+        },
+        {
+          "name": "one_visible_or_flagged_ranked_success_per_user",
+          "columns": [
+            "publication_id",
+            "user_id"
+          ],
+          "unique": true,
+          "partialWhere": "rank_status in ('visible', 'flagged')"
+        },
+        {
+          "name": "one_visible_or_flagged_ranked_success_per_anonymous_session",
+          "columns": [
+            "publication_id",
+            "anonymous_session_id"
+          ],
+          "unique": true,
+          "partialWhere": "anonymous_session_id is not null and rank_status in ('visible', 'flagged')"
+        }
+      ],
+      "rankingSort": [
+        "used_clue_count",
+        "elapsed_ms",
+        "submitted_at"
+      ],
       "rls": {
         "required": true,
         "publicSelectWhen": "rank_status = visible",
@@ -192,36 +602,112 @@
     "daily_winner_messages": {
       "description": "오늘의 랭킹 1등이 다음 문제 공개 전까지 메인 최상단에 노출할 수 있는 100자 확성기 메시지.",
       "columns": {
-        "id": { "type": "uuid", "primaryKey": true },
-        "publication_id": { "type": "uuid", "required": true, "references": "puzzle_publications.id" },
-        "leaderboard_entry_id": { "type": "uuid", "required": true, "references": "leaderboard_entries.id" },
-        "user_id": { "type": "uuid", "required": true, "references": "profiles.id" },
-        "nickname_snapshot": { "type": "text", "required": true, "public": true },
-        "message": { "type": "text", "required": true, "public": true, "maxLength": 100 },
-        "message_status": { "type": "winner_message_status", "required": true, "default": "draft", "public": true },
-        "visible_from": { "type": "timestamptz", "required": true, "public": true },
-        "visible_until": { "type": "timestamptz", "required": true, "public": true },
-        "created_at": { "type": "timestamptz", "required": true },
-        "updated_at": { "type": "timestamptz", "required": true }
+        "id": {
+          "type": "uuid",
+          "primaryKey": true
+        },
+        "publication_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "puzzle_publications.id"
+        },
+        "leaderboard_entry_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "leaderboard_entries.id"
+        },
+        "user_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "profiles.id"
+        },
+        "nickname_snapshot": {
+          "type": "text",
+          "required": true,
+          "public": true
+        },
+        "message": {
+          "type": "text",
+          "required": true,
+          "public": true,
+          "maxLength": 100
+        },
+        "message_status": {
+          "type": "winner_message_status",
+          "required": true,
+          "default": "draft",
+          "public": true
+        },
+        "visible_from": {
+          "type": "timestamptz",
+          "required": true,
+          "public": true
+        },
+        "visible_until": {
+          "type": "timestamptz",
+          "required": true,
+          "public": true
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "updated_at": {
+          "type": "timestamptz",
+          "required": true
+        }
       },
       "constraints": [
-        { "type": "unique", "name": "one_winner_message_per_publication", "columns": ["publication_id"] },
-        { "type": "unique", "name": "one_winner_message_per_leaderboard_entry", "columns": ["leaderboard_entry_id"] },
-        { "type": "check", "name": "winner_message_length", "expression": "char_length(message) between 1 and 100" },
-        { "type": "check", "name": "winner_message_visible_window", "expression": "visible_until > visible_from" }
+        {
+          "type": "unique",
+          "name": "one_winner_message_per_publication",
+          "columns": [
+            "publication_id"
+          ]
+        },
+        {
+          "type": "unique",
+          "name": "one_winner_message_per_leaderboard_entry",
+          "columns": [
+            "leaderboard_entry_id"
+          ]
+        },
+        {
+          "type": "check",
+          "name": "winner_message_length",
+          "expression": "char_length(message) between 1 and 100"
+        },
+        {
+          "type": "check",
+          "name": "winner_message_visible_window",
+          "expression": "visible_until > visible_from"
+        }
       ],
       "indexes": [
-        { "name": "daily_winner_messages_current_idx", "columns": ["message_status", "visible_from", "visible_until"] },
+        {
+          "name": "daily_winner_messages_current_idx",
+          "columns": [
+            "message_status",
+            "visible_from",
+            "visible_until"
+          ]
+        },
         {
           "name": "one_visible_winner_message_per_publication",
-          "columns": ["publication_id"],
+          "columns": [
+            "publication_id"
+          ],
           "unique": true,
           "partialWhere": "message_status = 'visible'"
         }
       ],
       "rankAuthorization": {
         "requiresLeaderboardRank": 1,
-        "rankOrder": ["used_clue_count", "elapsed_ms", "submitted_at"],
+        "rankOrder": [
+          "used_clue_count",
+          "elapsed_ms",
+          "submitted_at"
+        ],
         "enforcedBy": "trigger:daily_winner_message_requires_rank_one"
       },
       "rls": {
@@ -235,29 +721,100 @@
     "daily_puzzle_feedback": {
       "description": "오늘 문제를 완료한 로그인 사용자가 랭킹 화면에서 남기는 평가와 한마디.",
       "columns": {
-        "id": { "type": "uuid", "primaryKey": true },
-        "publication_id": { "type": "uuid", "required": true, "references": "puzzle_publications.id" },
-        "user_id": { "type": "uuid", "required": true, "references": "profiles.id" },
-        "attempt_id": { "type": "uuid", "required": true, "references": "attempts.id" },
-        "nickname_snapshot": { "type": "text", "required": true, "public": true },
-        "reaction": { "type": "text", "required": true, "public": true },
-        "comment": { "type": "text", "required": true, "public": true, "maxLength": 140 },
-        "feedback_status": { "type": "feedback_status", "required": true, "default": "visible", "public": true },
-        "created_at": { "type": "timestamptz", "required": true, "public": true },
-        "updated_at": { "type": "timestamptz", "required": true }
+        "id": {
+          "type": "uuid",
+          "primaryKey": true
+        },
+        "publication_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "puzzle_publications.id"
+        },
+        "user_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "profiles.id"
+        },
+        "attempt_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "attempts.id"
+        },
+        "nickname_snapshot": {
+          "type": "text",
+          "required": true,
+          "public": true
+        },
+        "reaction": {
+          "type": "text",
+          "required": true,
+          "public": true
+        },
+        "comment": {
+          "type": "text",
+          "required": true,
+          "public": true,
+          "maxLength": 140
+        },
+        "feedback_status": {
+          "type": "feedback_status",
+          "required": true,
+          "default": "visible",
+          "public": true
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true,
+          "public": true
+        },
+        "updated_at": {
+          "type": "timestamptz",
+          "required": true
+        }
       },
       "constraints": [
-        { "type": "unique", "name": "one_feedback_per_user_publication", "columns": ["publication_id", "user_id"] },
-        { "type": "unique", "name": "one_feedback_per_attempt", "columns": ["attempt_id"] },
-        { "type": "check", "name": "feedback_comment_length", "expression": "char_length(comment) between 1 and 140" },
-        { "type": "check", "name": "feedback_reaction_allowed", "expression": "reaction in ('easy', 'good', 'hard', 'tricky', 'fun')" }
+        {
+          "type": "unique",
+          "name": "one_feedback_per_user_publication",
+          "columns": [
+            "publication_id",
+            "user_id"
+          ]
+        },
+        {
+          "type": "unique",
+          "name": "one_feedback_per_attempt",
+          "columns": [
+            "attempt_id"
+          ]
+        },
+        {
+          "type": "check",
+          "name": "feedback_comment_length",
+          "expression": "char_length(comment) between 1 and 140"
+        },
+        {
+          "type": "check",
+          "name": "feedback_reaction_allowed",
+          "expression": "reaction in ('easy', 'good', 'hard', 'tricky', 'fun')"
+        }
       ],
       "indexes": [
-        { "name": "daily_puzzle_feedback_publication_status_idx", "columns": ["publication_id", "feedback_status", "created_at"] }
+        {
+          "name": "daily_puzzle_feedback_publication_status_idx",
+          "columns": [
+            "publication_id",
+            "feedback_status",
+            "created_at"
+          ]
+        }
       ],
       "completionAuthorization": {
         "requiresCompletedAttempt": true,
-        "terminalStatuses": ["succeeded", "failed"],
+        "terminalStatuses": [
+          "succeeded",
+          "failed"
+        ],
         "enforcedBy": "trigger:daily_puzzle_feedback_requires_completed_attempt"
       },
       "rls": {
@@ -271,26 +828,96 @@
     "user_daily_results": {
       "description": "로그인 사용자의 공개일별 최종 완료 결과 원장. 연승 계산의 기준이며 오늘 랭킹과 분리한다.",
       "columns": {
-        "id": { "type": "uuid", "primaryKey": true },
-        "publication_id": { "type": "uuid", "required": true, "references": "puzzle_publications.id" },
-        "publish_date_kst": { "type": "date", "required": true },
-        "user_id": { "type": "uuid", "required": true, "references": "profiles.id" },
-        "attempt_id": { "type": "uuid", "required": true, "references": "attempts.id" },
-        "result_status": { "type": "daily_result_status", "required": true },
-        "succeeded": { "type": "boolean", "required": true, "public": false },
-        "submitted_at": { "type": "timestamptz", "required": true },
-        "created_at": { "type": "timestamptz", "required": true },
-        "updated_at": { "type": "timestamptz", "required": true }
+        "id": {
+          "type": "uuid",
+          "primaryKey": true
+        },
+        "publication_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "puzzle_publications.id"
+        },
+        "publish_date_kst": {
+          "type": "date",
+          "required": true
+        },
+        "user_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "profiles.id"
+        },
+        "attempt_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "attempts.id"
+        },
+        "result_status": {
+          "type": "daily_result_status",
+          "required": true
+        },
+        "succeeded": {
+          "type": "boolean",
+          "required": true,
+          "public": false
+        },
+        "submitted_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "updated_at": {
+          "type": "timestamptz",
+          "required": true
+        }
       },
       "constraints": [
-        { "type": "unique", "name": "one_daily_result_per_user_publication", "columns": ["publication_id", "user_id"] },
-        { "type": "unique", "name": "one_daily_result_per_user_date", "columns": ["user_id", "publish_date_kst"] },
-        { "type": "check", "name": "daily_result_status_succeeded_consistency", "expression": "result_status and succeeded agree" }
+        {
+          "type": "unique",
+          "name": "one_daily_result_per_user_publication",
+          "columns": [
+            "publication_id",
+            "user_id"
+          ]
+        },
+        {
+          "type": "unique",
+          "name": "one_daily_result_per_user_date",
+          "columns": [
+            "user_id",
+            "publish_date_kst"
+          ]
+        },
+        {
+          "type": "check",
+          "name": "daily_result_status_succeeded_consistency",
+          "expression": "result_status and succeeded agree"
+        }
       ],
       "indexes": [
-        { "name": "user_daily_results_publication_idx", "columns": ["publication_id"] },
-        { "name": "user_daily_results_user_date_idx", "columns": ["user_id", "publish_date_kst"] },
-        { "name": "user_daily_results_user_success_date_idx", "columns": ["user_id", "succeeded", "publish_date_kst"] }
+        {
+          "name": "user_daily_results_publication_idx",
+          "columns": [
+            "publication_id"
+          ]
+        },
+        {
+          "name": "user_daily_results_user_date_idx",
+          "columns": [
+            "user_id",
+            "publish_date_kst"
+          ]
+        },
+        {
+          "name": "user_daily_results_user_success_date_idx",
+          "columns": [
+            "user_id",
+            "succeeded",
+            "publish_date_kst"
+          ]
+        }
       ],
       "rls": {
         "required": true,
@@ -301,48 +928,146 @@
     "user_streaks": {
       "description": "사용자별 현재 연승, 최고 연승, 누적 성공 횟수 projection. 연승 랭킹 API는 이 테이블만 공개 필드로 읽는다.",
       "columns": {
-        "user_id": { "type": "uuid", "primaryKey": true, "references": "profiles.id", "public": true },
-        "current_streak": { "type": "integer", "required": true, "default": 0, "public": true },
-        "longest_streak": { "type": "integer", "required": true, "default": 0, "public": true },
-        "total_success_count": { "type": "integer", "required": true, "default": 0, "public": true },
-        "last_success_publish_date_kst": { "type": "date", "required": false, "public": true },
-        "last_result_publish_date_kst": { "type": "date", "required": false, "public": false },
-        "updated_at": { "type": "timestamptz", "required": true }
+        "user_id": {
+          "type": "uuid",
+          "primaryKey": true,
+          "references": "profiles.id",
+          "public": true
+        },
+        "current_streak": {
+          "type": "integer",
+          "required": true,
+          "default": 0,
+          "public": true
+        },
+        "longest_streak": {
+          "type": "integer",
+          "required": true,
+          "default": 0,
+          "public": true
+        },
+        "total_success_count": {
+          "type": "integer",
+          "required": true,
+          "default": 0,
+          "public": true
+        },
+        "last_success_publish_date_kst": {
+          "type": "date",
+          "required": false,
+          "public": true
+        },
+        "last_result_publish_date_kst": {
+          "type": "date",
+          "required": false,
+          "public": false
+        },
+        "updated_at": {
+          "type": "timestamptz",
+          "required": true
+        }
       },
       "constraints": [
-        { "type": "primary", "name": "user_streaks_pk", "columns": ["user_id"] },
-        { "type": "check", "name": "user_streaks_non_negative", "expression": "current_streak >= 0 and longest_streak >= 0 and total_success_count >= 0" }
+        {
+          "type": "primary",
+          "name": "user_streaks_pk",
+          "columns": [
+            "user_id"
+          ]
+        },
+        {
+          "type": "check",
+          "name": "user_streaks_non_negative",
+          "expression": "current_streak >= 0 and longest_streak >= 0 and total_success_count >= 0"
+        }
       ],
       "indexes": [
         {
           "name": "user_streaks_current_rank_idx",
-          "columns": ["current_streak", "last_success_publish_date_kst", "longest_streak", "total_success_count"]
+          "columns": [
+            "current_streak",
+            "last_success_publish_date_kst",
+            "longest_streak",
+            "total_success_count"
+          ]
         }
       ],
-      "rankingSort": ["current_streak", "last_success_publish_date_kst", "longest_streak", "total_success_count"],
+      "rankingSort": [
+        "current_streak",
+        "last_success_publish_date_kst",
+        "longest_streak",
+        "total_success_count"
+      ],
       "rls": {
         "required": true,
-        "publicSelectColumns": ["user_id", "current_streak", "longest_streak", "total_success_count", "last_success_publish_date_kst"],
+        "publicSelectColumns": [
+          "user_id",
+          "current_streak",
+          "longest_streak",
+          "total_success_count",
+          "last_success_publish_date_kst"
+        ],
         "adminWritable": true
       }
     },
     "groups": {
       "description": "공유 링크 또는 초대 코드로 만들어지는 그룹 랭킹 컨테이너.",
       "columns": {
-        "id": { "type": "uuid", "primaryKey": true },
-        "owner_user_id": { "type": "uuid", "required": false, "references": "profiles.id" },
-        "publication_id": { "type": "uuid", "required": true, "references": "puzzle_publications.id" },
-        "name": { "type": "text", "required": false, "public": true },
-        "invite_code": { "type": "text", "required": true, "public": false },
-        "created_at": { "type": "timestamptz", "required": true },
-        "expires_at": { "type": "timestamptz", "required": false }
+        "id": {
+          "type": "uuid",
+          "primaryKey": true
+        },
+        "owner_user_id": {
+          "type": "uuid",
+          "required": false,
+          "references": "profiles.id"
+        },
+        "publication_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "puzzle_publications.id"
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "public": true
+        },
+        "invite_code": {
+          "type": "text",
+          "required": true,
+          "public": false
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "expires_at": {
+          "type": "timestamptz",
+          "required": false
+        }
       },
       "constraints": [
-        { "type": "unique", "name": "groups_invite_code_unique", "columns": ["invite_code"] }
+        {
+          "type": "unique",
+          "name": "groups_invite_code_unique",
+          "columns": [
+            "invite_code"
+          ]
+        }
       ],
       "indexes": [
-        { "name": "groups_publication_idx", "columns": ["publication_id"] },
-        { "name": "groups_owner_idx", "columns": ["owner_user_id"] }
+        {
+          "name": "groups_publication_idx",
+          "columns": [
+            "publication_id"
+          ]
+        },
+        {
+          "name": "groups_owner_idx",
+          "columns": [
+            "owner_user_id"
+          ]
+        }
       ],
       "rls": {
         "required": true,
@@ -353,15 +1078,38 @@
     "group_members": {
       "description": "그룹 참여자 목록.",
       "columns": {
-        "group_id": { "type": "uuid", "primaryKey": true, "references": "groups.id" },
-        "user_id": { "type": "uuid", "primaryKey": true, "references": "profiles.id" },
-        "joined_at": { "type": "timestamptz", "required": true }
+        "group_id": {
+          "type": "uuid",
+          "primaryKey": true,
+          "references": "groups.id"
+        },
+        "user_id": {
+          "type": "uuid",
+          "primaryKey": true,
+          "references": "profiles.id"
+        },
+        "joined_at": {
+          "type": "timestamptz",
+          "required": true
+        }
       },
       "constraints": [
-        { "type": "primary", "name": "group_members_pk", "columns": ["group_id", "user_id"] }
+        {
+          "type": "primary",
+          "name": "group_members_pk",
+          "columns": [
+            "group_id",
+            "user_id"
+          ]
+        }
       ],
       "indexes": [
-        { "name": "group_members_user_idx", "columns": ["user_id"] }
+        {
+          "name": "group_members_user_idx",
+          "columns": [
+            "user_id"
+          ]
+        }
       ],
       "rls": {
         "required": true,
@@ -372,30 +1120,365 @@
     "group_leaderboard_entries": {
       "description": "그룹 랭킹에 포함되는 leaderboard_entries 연결 테이블.",
       "columns": {
-        "group_id": { "type": "uuid", "primaryKey": true, "references": "groups.id" },
-        "leaderboard_entry_id": { "type": "uuid", "primaryKey": true, "references": "leaderboard_entries.id" },
-        "created_at": { "type": "timestamptz", "required": true }
+        "group_id": {
+          "type": "uuid",
+          "primaryKey": true,
+          "references": "groups.id"
+        },
+        "leaderboard_entry_id": {
+          "type": "uuid",
+          "primaryKey": true,
+          "references": "leaderboard_entries.id"
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        }
       },
       "constraints": [
-        { "type": "primary", "name": "group_leaderboard_entries_pk", "columns": ["group_id", "leaderboard_entry_id"] }
+        {
+          "type": "primary",
+          "name": "group_leaderboard_entries_pk",
+          "columns": [
+            "group_id",
+            "leaderboard_entry_id"
+          ]
+        }
       ],
       "indexes": [
-        { "name": "group_leaderboard_entries_entry_idx", "columns": ["leaderboard_entry_id"] }
+        {
+          "name": "group_leaderboard_entries_entry_idx",
+          "columns": [
+            "leaderboard_entry_id"
+          ]
+        }
       ],
       "rls": {
         "required": true,
         "memberSelect": true,
         "serviceInsert": true
       }
+    },
+    "custom_games": {
+      "description": "로그인 없이 생성 가능한 링크 공유형 커스텀 Pinpoint 게임 원본.",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "primaryKey": true
+        },
+        "play_slug": {
+          "type": "text",
+          "required": true,
+          "public": true
+        },
+        "admin_token_hash": {
+          "type": "text",
+          "required": true,
+          "public": false
+        },
+        "answer": {
+          "type": "text",
+          "required": true,
+          "public": false
+        },
+        "aliases": {
+          "type": "text[]",
+          "required": true,
+          "public": false
+        },
+        "clues": {
+          "type": "jsonb",
+          "required": true,
+          "public": false
+        },
+        "normalized_answer": {
+          "type": "text",
+          "required": true,
+          "public": false
+        },
+        "status": {
+          "type": "custom_game_status",
+          "required": true,
+          "default": "active",
+          "public": true
+        },
+        "report_count": {
+          "type": "integer",
+          "required": true,
+          "default": 0,
+          "public": false
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "updated_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "creator_anonymous_session_id": {
+          "type": "text",
+          "required": true,
+          "public": false
+        }
+      },
+      "constraints": [
+        {
+          "type": "unique",
+          "name": "custom_games_play_slug_unique",
+          "columns": [
+            "play_slug"
+          ]
+        },
+        {
+          "type": "unique",
+          "name": "custom_games_admin_token_hash_unique",
+          "columns": [
+            "admin_token_hash"
+          ]
+        },
+        {
+          "type": "check",
+          "name": "custom_games_answer_length",
+          "expression": "char_length(answer) between 1 and 40"
+        },
+        {
+          "type": "check",
+          "name": "custom_games_clues_has_5_items",
+          "expression": "jsonb_array_length(clues) = 5"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "custom_games_status_created_idx",
+          "columns": [
+            "status",
+            "created_at"
+          ]
+        },
+        {
+          "name": "custom_games_creator_created_idx",
+          "columns": [
+            "creator_anonymous_session_id",
+            "created_at"
+          ]
+        }
+      ],
+      "rls": {
+        "required": true,
+        "publicSelectWhen": "status = active",
+        "routeHandlerWritableOnly": true,
+        "adminWritable": true
+      }
+    },
+    "custom_game_attempts": {
+      "description": "커스텀 게임 익명 플레이 원장과 랭킹 기록. 같은 브라우저/게임은 최초 완료 기록만 랭킹에 인정한다.",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "primaryKey": true
+        },
+        "custom_game_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "custom_games.id"
+        },
+        "anonymous_session_id": {
+          "type": "text",
+          "required": true
+        },
+        "started_at": {
+          "type": "timestamptz",
+          "required": true
+        },
+        "submitted_at": {
+          "type": "timestamptz",
+          "required": false
+        },
+        "elapsed_ms": {
+          "type": "integer",
+          "required": false
+        },
+        "used_clue_count": {
+          "type": "integer",
+          "required": false
+        },
+        "submitted_answer": {
+          "type": "text",
+          "required": false,
+          "public": false
+        },
+        "normalized_answer": {
+          "type": "text",
+          "required": false,
+          "public": false
+        },
+        "is_correct": {
+          "type": "boolean",
+          "required": true,
+          "default": false
+        },
+        "status": {
+          "type": "attempt_status",
+          "required": true,
+          "default": "playing"
+        },
+        "is_ranked": {
+          "type": "boolean",
+          "required": true,
+          "default": false
+        },
+        "nickname_snapshot": {
+          "type": "text",
+          "required": false,
+          "public": true
+        },
+        "rank_status": {
+          "type": "rank_status",
+          "required": true,
+          "default": "visible",
+          "public": true
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        }
+      },
+      "constraints": [
+        {
+          "type": "unique",
+          "name": "one_custom_attempt_per_anonymous_session",
+          "columns": [
+            "custom_game_id",
+            "anonymous_session_id"
+          ]
+        },
+        {
+          "type": "check",
+          "name": "custom_attempt_used_clue_count_range",
+          "expression": "used_clue_count is null or used_clue_count between 1 and 5"
+        },
+        {
+          "type": "check",
+          "name": "custom_attempt_elapsed_ms_non_negative",
+          "expression": "elapsed_ms is null or elapsed_ms >= 0"
+        },
+        {
+          "type": "check",
+          "name": "custom_attempt_nickname_length",
+          "expression": "nickname_snapshot is null or char_length(nickname_snapshot) between 2 and 12"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "custom_attempts_lookup_idx",
+          "columns": [
+            "custom_game_id",
+            "anonymous_session_id"
+          ]
+        },
+        {
+          "name": "custom_attempts_rank_sort_idx",
+          "columns": [
+            "custom_game_id",
+            "rank_status",
+            "used_clue_count",
+            "elapsed_ms",
+            "submitted_at"
+          ]
+        }
+      ],
+      "rankingSort": [
+        "used_clue_count",
+        "elapsed_ms",
+        "submitted_at"
+      ],
+      "rls": {
+        "required": true,
+        "routeHandlerWritableOnly": true,
+        "publicSelectWhen": "rank_status = visible and is_ranked = true"
+      }
+    },
+    "custom_game_reports": {
+      "description": "커스텀 게임 신고 원장.",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "primaryKey": true
+        },
+        "custom_game_id": {
+          "type": "uuid",
+          "required": true,
+          "references": "custom_games.id"
+        },
+        "anonymous_session_id": {
+          "type": "text",
+          "required": true
+        },
+        "reason": {
+          "type": "text",
+          "required": true,
+          "public": false
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "required": true
+        }
+      },
+      "constraints": [
+        {
+          "type": "unique",
+          "name": "one_custom_report_per_session",
+          "columns": [
+            "custom_game_id",
+            "anonymous_session_id"
+          ]
+        },
+        {
+          "type": "check",
+          "name": "custom_report_reason_length",
+          "expression": "char_length(reason) between 1 and 160"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "custom_reports_game_idx",
+          "columns": [
+            "custom_game_id",
+            "created_at"
+          ]
+        }
+      ],
+      "rls": {
+        "required": true,
+        "routeHandlerWritableOnly": true,
+        "adminSelect": true
+      }
     }
   },
   "apiRequirements": {
     "beforeBackendWorkRun": "npm run db:contract",
-    "publicRankingMustNotExposeColumns": ["email", "submitted_answer", "normalized_answer", "ip_hash", "device_hash", "user_agent_hash"],
+    "publicRankingMustNotExposeColumns": [
+      "email",
+      "submitted_answer",
+      "normalized_answer",
+      "ip_hash",
+      "device_hash",
+      "user_agent_hash"
+    ],
     "dailyRankingOrder": [
-      { "column": "used_clue_count", "direction": "asc" },
-      { "column": "elapsed_ms", "direction": "asc" },
-      { "column": "submitted_at", "direction": "asc" }
+      {
+        "column": "used_clue_count",
+        "direction": "asc"
+      },
+      {
+        "column": "elapsed_ms",
+        "direction": "asc"
+      },
+      {
+        "column": "submitted_at",
+        "direction": "asc"
+      }
     ],
     "anonymousPlayAllowed": true,
     "dailyPublicationScope": "one_published_puzzle_per_kst_date",
@@ -411,14 +1494,19 @@
     "streakProjectionScope": "user_id",
     "resetTodayPuzzleDeletesTodayDailyResults": true,
     "resetTodayPuzzleRecomputesUserStreaks": true,
-    "rankingRequiresAuthenticatedProfile": true,
+    "rankingRequiresAuthenticatedProfile": false,
     "groupParticipationRequiresAuthenticatedProfile": true,
     "groupRanking": {
       "requiresAuthenticatedProfile": true,
       "shareCreatesInviteWithoutProfile": true,
       "inviteCodeLink": true,
       "scopedToActivePublication": true,
-      "publicFields": ["nickname_snapshot", "used_clue_count", "elapsed_ms", "submitted_at"],
+      "publicFields": [
+        "nickname_snapshot",
+        "used_clue_count",
+        "elapsed_ms",
+        "submitted_at"
+      ],
       "hiddenWhenEmpty": false
     },
     "dailyWinnerMessage": {
@@ -427,7 +1515,11 @@
       "requiresDailyRank": 1,
       "currentRankOneCanReplaceExisting": true,
       "visibleUntilNextPublication": true,
-      "publicFields": ["nickname_snapshot", "message", "visible_until"],
+      "publicFields": [
+        "nickname_snapshot",
+        "message",
+        "visible_until"
+      ],
       "hiddenWhenEmpty": true
     },
     "dailyPuzzleFeedback": {
@@ -435,20 +1527,87 @@
       "requiresAuthenticatedProfile": true,
       "requiresCompletedAttemptToRead": true,
       "requiresCompletedAttemptToWrite": true,
-      "publicFields": ["nickname_snapshot", "reaction", "comment", "created_at"],
+      "publicFields": [
+        "nickname_snapshot",
+        "reaction",
+        "comment",
+        "created_at"
+      ],
       "hiddenWhenEmpty": false
     },
     "streakRanking": {
       "requiresAuthenticatedProfile": true,
-      "sourceTables": ["user_daily_results", "user_streaks"],
-      "order": [
-        { "column": "current_streak", "direction": "desc" },
-        { "column": "last_success_publish_date_kst", "direction": "desc" },
-        { "column": "longest_streak", "direction": "desc" },
-        { "column": "total_success_count", "direction": "desc" }
+      "sourceTables": [
+        "user_daily_results",
+        "user_streaks"
       ],
-      "publicFields": ["nickname", "current_streak", "longest_streak", "total_success_count", "last_success_publish_date_kst"],
+      "order": [
+        {
+          "column": "current_streak",
+          "direction": "desc"
+        },
+        {
+          "column": "last_success_publish_date_kst",
+          "direction": "desc"
+        },
+        {
+          "column": "longest_streak",
+          "direction": "desc"
+        },
+        {
+          "column": "total_success_count",
+          "direction": "desc"
+        }
+      ],
+      "publicFields": [
+        "nickname",
+        "current_streak",
+        "longest_streak",
+        "total_success_count",
+        "last_success_publish_date_kst"
+      ],
       "hiddenWhenEmpty": false
+    },
+    "anonymousNicknameRankingAllowed": true,
+    "customGames": {
+      "anonymousCreateAllowed": true,
+      "anonymousPlayAllowed": true,
+      "creatorInput": [
+        "answer",
+        "clues"
+      ],
+      "clueCount": 5,
+      "immutableAfterCreate": [
+        "answer",
+        "clues"
+      ],
+      "adminActions": [
+        "hide",
+        "delete"
+      ],
+      "rankingOrder": [
+        {
+          "column": "used_clue_count",
+          "direction": "asc"
+        },
+        {
+          "column": "elapsed_ms",
+          "direction": "asc"
+        },
+        {
+          "column": "submitted_at",
+          "direction": "asc"
+        }
+      ],
+      "firstRecordOnly": true,
+      "reportAllowed": true,
+      "mustNotExposeBeforeTerminal": [
+        "answer",
+        "aliases",
+        "locked_clues",
+        "submitted_answer",
+        "normalized_answer"
+      ]
     }
   }
 }

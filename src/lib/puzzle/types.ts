@@ -86,6 +86,7 @@ export type StreakLeaderboardState = {
 export type DailyRankingParticipation =
   | { status: "requires_sign_in" }
   | { status: "requires_nickname" }
+  | { status: "requires_anonymous_nickname" }
   | { status: "not_completed" }
   | { status: "failed" }
   | { status: "ranked" }

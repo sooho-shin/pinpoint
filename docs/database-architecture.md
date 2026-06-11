@@ -34,6 +34,10 @@ puzzle_publications
   -> leaderboard_entries
   -> daily_winner_messages
 
+custom_games
+  -> custom_game_attempts
+  -> custom_game_reports
+
 groups
   -> group_members
   -> group_leaderboard_entries
@@ -126,6 +130,8 @@ scheduled -> published
 
 랭킹 조회용 데이터다. 성공했고 랭킹 등록 조건을 만족한 기록만 생성한다. 화면 표시에는 현재 `profiles.nickname`을 기본 사용하되, 공유/감사를 위해 `nickname_snapshot`도 저장한다.
 
+로그인하지 않은 사용자가 닉네임으로 오늘 랭킹에 등록하는 경우 `user_id`는 비어 있을 수 있고, `anonymous_session_id`와 `nickname_snapshot`으로 표시한다. 같은 `publication_id + anonymous_session_id` 조합은 최초 랭킹 기록 하나만 허용한다. 로그인 사용자는 기존처럼 `publication_id + user_id` 조합으로 하나만 허용한다.
+
 정렬 기준:
 
 ```text
@@ -133,6 +139,63 @@ scheduled -> published
 2순위: elapsed_ms asc
 3순위: submitted_at asc
 ```
+
+### custom_games
+
+사용자 제작 커스텀 Pinpoint 게임 원본이다. 데일리 문제용 `puzzles`와 분리한다.
+
+주요 컬럼:
+
+- `id`
+- `play_slug`: 공유 플레이 링크에 쓰는 추측 어려운 slug
+- `admin_token_hash`: 비밀 관리 링크 토큰의 해시
+- `answer`
+- `aliases`
+- `clues`
+- `normalized_answer`
+- `status`: `active`, `hidden`, `deleted`
+- `created_at`, `updated_at`
+
+정책:
+
+- 생성자는 로그인하지 않아도 된다.
+- 정답과 단서 5개는 생성 후 수정하지 않는다.
+- 관리 링크는 숨김과 삭제만 허용한다.
+- public API는 terminal result 전 정답과 잠긴 단서를 반환하지 않는다.
+
+### custom_game_attempts
+
+커스텀 게임 플레이 원장과 랭킹 projection을 겸한다. 한 커스텀 게임에서 같은 브라우저는 최초 완료 기록만 랭킹에 인정한다.
+
+주요 컬럼:
+
+- `id`
+- `custom_game_id`
+- `anonymous_session_id`
+- `started_at`
+- `submitted_at`
+- `elapsed_ms`
+- `used_clue_count`
+- `submitted_answer`
+- `normalized_answer`
+- `is_correct`
+- `status`
+- `is_ranked`
+- `nickname_snapshot`
+- `rank_status`
+- `created_at`
+
+정렬 기준:
+
+```text
+1순위: used_clue_count asc
+2순위: elapsed_ms asc
+3순위: submitted_at asc
+```
+
+### custom_game_reports
+
+커스텀 게임 신고 원장이다. 플레이어가 부적절한 게임을 신고할 수 있고, 신고 누적 또는 운영자 판단으로 `custom_games.status`를 `hidden` 또는 `deleted`로 바꿀 수 있다.
 
 ### daily_winner_messages
 

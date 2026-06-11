@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, ButtonLink } from "@/components/atoms/Button";
+import { Button } from "@/components/atoms/Button";
 import { ClueRow } from "@/components/molecules/ClueRow";
 import { FeedbackMessage } from "@/components/molecules/FeedbackMessage";
 import { GuessInputGroup } from "@/components/molecules/GuessInputGroup";
@@ -74,20 +74,6 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
     event.preventDefault();
     const submittedGuess = guess.trim();
     if (!submittedGuess) return;
-    if (state.status === "ready" && state.requiresSignInForRanking) {
-      const promptKey = `pinpoint:anonymous-ranking-confirmed:${state.publicationId}`;
-      if (!sessionStorage.getItem(promptKey)) {
-        const shouldContinue = window.confirm(
-          "비로그인 상태에서는 오늘의 랭킹 등록과 1등 확성기 메시지를 사용할 수 없습니다.\n\n정답 후 기록을 올리려면 로그인과 닉네임 설정이 필요합니다. 그대로 비로그인으로 진행할까요?"
-        );
-        if (!shouldContinue) {
-          const next = `${window.location.pathname}${window.location.search}`;
-          window.location.assign(`${window.location.origin}/signin?next=${encodeURIComponent(next)}`);
-          return;
-        }
-        sessionStorage.setItem(promptKey, "1");
-      }
-    }
     setPendingAction("submit");
     setFeedback("");
     try {
@@ -113,7 +99,7 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
           lockedCount: payload.lockedCount,
           attempt: null,
           winnerMessage: state.status === "ready" ? state.winnerMessage : null,
-          requiresSignInForRanking: state.status === "ready" ? state.requiresSignInForRanking : true
+          requiresSignInForRanking: state.status === "ready" ? state.requiresSignInForRanking : false
         });
         return;
       }
@@ -152,11 +138,6 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
         <div className="text-xs font-semibold text-[var(--text-secondary)]">{formatKoreanDate(state.publishDateKst)}</div>
         <h2 className="mt-1 text-[22px] font-bold leading-[30px]">{state.category}</h2>
         <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">문제와 1등 확성기는 매일 오후 5시에 새로 시작합니다.</p>
-        {state.requiresSignInForRanking ? (
-          <div className="mt-3">
-            <ButtonLink href="/signin?next=/" variant="secondary" className="h-10 text-xs">로그인하고 랭킹 참여</ButtonLink>
-          </div>
-        ) : null}
       </div>
 
       <div className="mb-6 rounded-md border border-[var(--border)] px-4">
