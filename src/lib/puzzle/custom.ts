@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getActor } from "@/lib/puzzle/api";
+import { getActor } from "@/lib/puzzle/actor";
 import { isAcceptedAnswer, normalizeAnswer } from "@/lib/puzzle/normalize";
 import { validateCustomGameInput, validatePublicNickname } from "@/lib/puzzle/validation";
 

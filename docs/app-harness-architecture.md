@@ -14,6 +14,23 @@
 - `design/components.json`: 컴포넌트 계약
 - `design/screens.json`: 화면 계약
 
+## 서버 모듈 경계
+
+Route Handler는 계속 `src/lib/puzzle/api.ts`의 공개 함수를 import할 수 있다. 단, `api.ts`는 route-facing facade와 데일리 플레이 orchestration에 가깝게 유지하고, 기능별 책임은 아래 모듈에 둔다.
+
+- `src/lib/puzzle/actor.ts`: Supabase Auth user와 httpOnly 익명 세션 cookie를 합친 actor 식별
+- `src/lib/puzzle/publication.ts`: 활성 KST 공개일 publication과 puzzle 조회, cron 지연 보완 publish
+- `src/lib/puzzle/attempts.ts`: attempt 원장 조회와 공통 select/status 상수
+- `src/lib/puzzle/attempt-claim.ts`: 익명 attempt의 로그인 계정 승계와 승계 후 projection 동기화
+- `src/lib/puzzle/leaderboard.ts`: daily leaderboard projection 생성, ranking participation, group projection sync
+- `src/lib/puzzle/groups.ts`: 공유 그룹 생성, 참여, 그룹 랭킹 조회
+- `src/lib/puzzle/streaks.ts`: `user_daily_results` 기록과 `user_streaks` 재계산
+- `src/lib/puzzle/winner-message.ts`: 1등 확성기 조회와 작성 권한 확인
+- `src/lib/puzzle/server-format.ts`: public response shape 변환과 스포일러 검사 보조
+- `src/lib/puzzle/server-types.ts`: Supabase row type과 server-only domain type
+
+새 API 기능을 추가할 때는 route handler가 곧바로 Supabase query를 반복하지 않게 위 경계 중 하나에 넣는다. 새 경계가 필요하면 문서와 계약을 먼저 갱신한다.
+
 ## 검증 단계
 
 ### 1. 계약 검증
@@ -113,6 +130,5 @@ npm run puzzles:test
 - Playwright 기반 모바일/데스크톱 화면 검증
 - API fixture 테스트
 - Supabase local database seed 검증
-- 그룹 랭킹 계약 추가
 - 관리자 화면 계약 추가
 - Code Connect 매핑 검증

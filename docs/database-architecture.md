@@ -111,6 +111,13 @@ scheduled -> published
 - 서비스 role key는 서버 스크립트와 cron route에서만 사용하고 client component 또는 public env로 노출하지 않는다.
 - 브라우저 Supabase 권한으로 `puzzles.clues`, `puzzles.answer`, `puzzles.aliases`, `puzzles.difficulty`를 직접 읽을 수 있게 하지 않는다. 오늘 문제와 아카이브는 서버 API 또는 서버 컴포넌트가 service role로 읽고 필요한 시점에만 값을 반환한다.
 
+운영 상태 보고:
+
+- 오늘 문제, 랭킹, 그룹, 리셋 대상 상태는 로컬 JSON이 아니라 Supabase live DB를 먼저 조회한다.
+- 표준 점검 명령은 `npm run db:status`다.
+- 기본 리포트는 정답과 단서 본문을 숨긴다. 운영상 필요할 때만 `npm run db:status -- --show-answer`를 사용한다.
+- reset/dev reset 전에는 `db:status` 결과의 `activePublication`, attempts, leaderboard, feedback, groups 집계를 먼저 확인해 삭제 범위를 확정한다.
+
 ### attempts
 
 풀이 기록 원장이다. 실패, 비공개, 로그인 사용자 세션, 익명 세션, flagged 상태를 포함한다. 랭킹 노출 여부와 별개로 운영 분석과 부정 방지에 사용한다. MVP 플레이 흐름은 익명 시작을 허용하므로 새 attempt는 `user_id` 또는 `anonymous_session_id` 중 하나를 반드시 가진다.

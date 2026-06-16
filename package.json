@@ -18,6 +18,7 @@
     "db:check": "npm run db:contract && npm run db:migration:check",
     "db:sync-puzzles": "node --env-file=.env.local scripts/db-sync-puzzles.js",
     "db:publish-daily": "node --env-file=.env.local scripts/db-publish-daily.js",
+    "db:status": "node --env-file=.env.local scripts/check-live-status.js",
     "db:seed:today": "node --env-file=.env.local scripts/seed-today-puzzle.js",
     "db:reset:today": "node --env-file=.env.local scripts/reset-today-puzzle.js",
     "dev:reset-puzzle": "node --env-file=.env.local scripts/dev-reset-puzzle.js",

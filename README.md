@@ -13,13 +13,16 @@ Narrow는 매일 한 문제씩 공개되는 한국어 연상 퍼즐 게임이다
 - 로그인 사용자의 연속 정답일은 `연승 랭킹`으로 별도 표시한다.
 - 오늘의 랭킹 1등은 다음 문제가 공개될 때까지 메인 최상단에 100자 메시지를 고정할 수 있다.
 - 오늘 문제 풀이, 결과 확인, 랭킹 조회는 로그인 없이 시작할 수 있다.
-- 랭킹 등록, 그룹 참여, 1등 메시지는 Google 로그인 후 닉네임을 연결한다.
+- 성공한 비로그인 사용자는 닉네임을 입력해 오늘의 랭킹에 등록할 수 있다.
+- 그룹 참여, 1등 메시지, 문제 평가는 Google 로그인 후 닉네임을 연결한다.
+- 로그인 없이 커스텀 Pinpoint 게임을 만들고 링크로 공유할 수 있다.
 - 이메일은 랭킹/그룹/공유 화면에 노출하지 않는다.
 
 관련 문서:
 
 - `docs/product-plan.md`
 - `docs/design-plan.md`
+- `docs/app-architecture.md`
 
 ### Figma 디자인
 
@@ -41,6 +44,10 @@ https://www.figma.com/design/2ItGTte1dpGtKzTjCOQFhW
 - Admin Review
 - Sign In
 - Nickname Setup
+- Custom Game Create
+- Custom Game Play
+- Custom Game Ranking
+- Custom Game Manage
 
 로그인 기반 화면도 추가되어 있다.
 
@@ -83,6 +90,9 @@ project url: https://ktbwxwzxsljjhtallios.supabase.co
 - `groups`
 - `group_members`
 - `group_leaderboard_entries`
+- `custom_games`
+- `custom_game_attempts`
+- `custom_game_reports`
 
 RLS는 위 테이블 모두 활성화되어 있다.
 
@@ -91,8 +101,13 @@ Migration 파일:
 ```text
 supabase/migrations/20260510190000_initial_pinpoint_schema.sql
 supabase/migrations/20260511120000_add_daily_winner_messages.sql
+supabase/migrations/20260515183000_add_anonymous_attempt_lookup_index.sql
+supabase/migrations/20260517100000_add_attempt_uniqueness_for_claiming.sql
 supabase/migrations/20260517143000_add_daily_puzzle_feedback.sql
 supabase/migrations/20260518120000_add_user_streaks.sql
+supabase/migrations/20260523180500_harden_public_table_grants.sql
+supabase/migrations/20260523190000_allow_anonymous_share_groups.sql
+supabase/migrations/20260611132000_add_custom_games.sql
 ```
 
 DB 설계 원칙:
@@ -102,6 +117,8 @@ DB 설계 원칙:
 - 풀이 기록과 랭킹 노출 데이터를 분리한다.
 - 일일 완료 결과와 연승 projection을 분리한다.
 - 같은 공개 문제에서 사용자별 랭킹 기록은 하나만 허용한다.
+- 비로그인 랭킹은 `anonymous_session_id`와 닉네임 snapshot으로 분리한다.
+- 커스텀 게임은 일일 publication과 별도 테이블에서 관리한다.
 - 공개 문제별 1등 확성기 메시지는 하나만 노출한다.
 - 이메일, 제출 답안, device/ip/user-agent hash는 공개 API에 노출하지 않는다.
 
@@ -111,11 +128,31 @@ DB 설계 원칙:
 - `docs/database-setup.md`
 - `schema/database-contract.json`
 
-## 다음에 필요한 작업
+### 앱 구현
+
+현재 Next.js App Router 구현은 다음 범위를 포함한다.
+
+- 오늘 문제 플레이: `/`, `/api/today`, `/api/attempts/*`
+- 결과와 랭킹: `/result`, `/ranking`, `/api/leaderboard/*`
+- Google 로그인과 닉네임 설정: `/signin`, `/auth/callback`, `/nickname`
+- 오늘의 1등 확성기: `/api/winner-message/*`
+- 문제 평가와 한마디: `/api/puzzle-feedback/*`
+- 그룹 공유 랭킹: `/api/groups`, `/api/groups/join`, `/api/leaderboard/group`
+- 커스텀 게임 생성/플레이/랭킹/관리: `/custom/*`, `/api/custom-games/*`
+- 게시자 콘텐츠와 SEO/광고 보조 route: `/about`, `/how-to-play`, `/archive`, `/privacy`, `/terms`, `/robots.txt`, `/sitemap.xml`, `/ads.txt`
+
+앱 구현 기준:
+
+- `docs/app-architecture.md`
+- `docs/app-harness-architecture.md`
+- `schema/app-contract.json`
+- `.agents/skills/make-pinpoint-app/SKILL.md`
+
+## 남은 운영 설정
 
 ### 1. Google OAuth 설정
 
-DB는 만들어졌지만 Google 로그인은 아직 Supabase Auth Provider 설정이 필요하다.
+DB와 앱 코드는 준비되어 있지만, 운영 환경에서는 Supabase Auth Provider 설정이 별도로 필요하다.
 
 해야 할 일:
 
@@ -153,25 +190,17 @@ NEXT_PUBLIC_CONTACT_EMAIL=contact@example.com
 
 `NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT`는 `/ads.txt`와 사이트 확인용 publisher 스크립트에 사용한다. `NEXT_PUBLIC_GOOGLE_ADSENSE_SCRIPT_ENABLED=false`로 두면 긴급하게 전역 스크립트를 끌 수 있다. AdSense 콘솔에서는 승인 전후 모두 Auto ads를 별도로 켜지 않는다. 광고 슬롯은 플레이, 로그인, 랭킹 같은 상호작용 중심 화면이 아니라 `/about`, `/how-to-play`, `/archive`처럼 게시자 콘텐츠가 충분한 화면부터 제한적으로 붙인다.
 
-### 2. 프론트엔드 구현
+### 2. 운영 데이터 관리
 
-Figma 기준으로 다음 화면을 구현한다.
+새 문제 후보, 오늘 문제 공개, 리셋은 로컬 JSON만 바꾸는 방식이 아니라 하네스와 Supabase 동기화 절차를 따른다.
 
-- Today Puzzle
-- Result
-- Ranking
-- Sign In
-- Nickname Setup
+- 후보 생성과 저장은 `puzzles:harness`를 사용한다.
+- 예약 문제는 `db:sync-puzzles`로 Supabase에 반영한다.
+- KST 17:00 공개는 Vercel cron 또는 `db:publish-daily`가 처리한다.
+- 오늘 공개 문제를 바꾸거나 풀이 상태를 초기화할 때는 reset/dev reset 스크립트를 사용한다.
+- 현재 라이브 상태 보고가 필요하면 `puzzle_publications`와 `puzzles`를 먼저 조회한다.
 
-로그인/익명 플레이 구현 기준:
-
-- Supabase Auth Google OAuth 사용
-- 첫 플레이와 랭킹 조회는 익명 세션으로 허용
-- 로그인 후 `profiles`의 닉네임 확인
-- 닉네임이 없거나 수정이 필요하면 Nickname Setup으로 이동
-- 랭킹 등록과 그룹 참여는 로그인 + 닉네임이 필요하다
-
-### 3. 백엔드/API 구현
+### 3. 큰 변경 전 검증
 
 API 구현 전 반드시 DB 계약을 확인한다.
 
@@ -184,21 +213,6 @@ npm run db:check
 ```bash
 npm run app:contract
 ```
-
-앱 구현 기준:
-
-- `docs/app-architecture.md`
-- `docs/app-harness-architecture.md`
-- `schema/app-contract.json`
-- `.agents/skills/make-pinpoint-app/SKILL.md`
-
-API는 다음 DB 구조를 기준으로 만든다.
-
-- 문제 조회: `puzzle_publications` + `puzzles`
-- 풀이 기록: `attempts`
-- 오늘의 랭킹: `leaderboard_entries`
-- 오늘의 1등 확성기: `daily_winner_messages`
-- 그룹 랭킹: `groups`, `group_members`, `group_leaderboard_entries`
 
 ## 명령어
 
@@ -253,6 +267,25 @@ npm run db:publish-daily
 ```
 
 배포 환경에서는 `vercel.json`의 cron이 UTC 08:00, 즉 KST 오후 5시에 `/api/cron/publish-daily`를 호출한다. 오늘 예약 row가 없으면 미사용 generated 후보를 자동으로 공개한다. 별도 상주 프로세스를 계속 실행하지 않는다.
+
+라이브 운영 상태 점검:
+
+```bash
+npm run db:status
+```
+
+이 명령은 Supabase를 읽기 전용으로 조회해 활성 공개일, publication 상태, attempt/leaderboard/feedback/group/winner message 집계, 다음 7일 예약, 커스텀 게임 상태를 JSON으로 출력한다. 기본 출력은 오늘 정답과 단서 본문을 숨긴다. 운영상 정답 확인이 꼭 필요하면 다음처럼 명시적으로 실행한다.
+
+```bash
+npm run db:status -- --show-answer
+```
+
+특정 KST 공개일 또는 테스트 시각 기준으로 확인:
+
+```bash
+npm run db:status -- --date 2026-06-16
+npm run db:status -- --now 2026-06-16T08:10:00.000Z
+```
 
 ### DB 하네스
 

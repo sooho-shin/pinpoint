@@ -160,6 +160,49 @@ $make-figma-design
 
 ## 매일 운영 루틴
 
+### 라이브 상태 점검
+
+운영 상태를 보고하거나 reset/dev reset 전에 반드시 Supabase 기준 상태를 먼저 확인한다. 로컬 JSON은 후보/예약 원장이지만 앱 노출의 source of truth는 Supabase `puzzle_publications`와 관련 projection 테이블이다.
+
+기본 점검:
+
+```bash
+npm run db:status
+```
+
+이 명령은 읽기 전용으로 다음 항목을 JSON 리포트로 출력한다.
+
+- 활성 KST 공개일과 해당 publication 상태
+- 연결된 puzzle의 id, category, difficulty, clue count
+- 오늘 publication의 attempts 상태별 수, ranked 수, 로그인/익명 분포
+- leaderboard visible/flagged/hidden 수와 로그인/익명 분포
+- winner message, daily feedback, group/member/group leaderboard 집계
+- 다음 7일 publication queue
+- quality 70 이상 unused generated/approved 후보 수
+- custom game active/hidden/deleted 집계
+
+기본 출력은 오늘 정답과 단서 본문을 숨긴다. 정답 확인이 운영상 꼭 필요할 때만 명시적으로 실행한다.
+
+```bash
+npm run db:status -- --show-answer
+```
+
+특정 공개일이나 테스트 시각을 기준으로 볼 수 있다.
+
+```bash
+npm run db:status -- --date 2026-06-16
+npm run db:status -- --now 2026-06-16T08:10:00.000Z
+```
+
+점검 결과 해석 기준:
+
+- `activePublication`이 `null`이면 오늘 활성 공개일의 앱 노출 문제가 먼저다. `publicationQueue.nextSevenDays`와 `unusedGeneratedOrApprovedCandidatesOverQuality70`를 확인한 뒤 `npm run db:publish-daily` 또는 cron 로그를 본다.
+- `activePublication.status`가 `scheduled`이면 아직 공개 전이거나 publish job이 돌지 않은 상태다.
+- attempts는 있는데 leaderboard가 비어 있으면 사용자가 성공하지 않았거나 닉네임 등록/flagged 상태를 확인한다.
+- leaderboard는 있는데 group leaderboard가 비어 있으면 그룹 참여와 projection 동기화 경로를 본다.
+- winner message가 visible인데 화면에 보이지 않으면 `visibleUntil`과 현재 active publication이 맞는지 확인한다.
+- reset 전에는 이 리포트를 먼저 저장하거나 요약해 삭제 범위를 명확히 한다.
+
 1. 오후 5시 공개분이 충분한지 확인한다.
 2. 부족하면 후보 문제를 생성하고 dry-run 검증한다.
 3. 통과한 후보를 저장한다.
