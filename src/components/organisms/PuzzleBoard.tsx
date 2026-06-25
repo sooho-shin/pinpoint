@@ -136,7 +136,7 @@ export function PuzzleBoard({ groupCode }: { groupCode?: string }) {
     <section className="surface min-h-[590px] p-6">
       <div className="mb-5">
         <div className="text-xs font-semibold text-[var(--text-secondary)]">{formatKoreanDate(state.publishDateKst)}</div>
-        <h2 className="mt-1 text-[22px] font-bold leading-[30px]">{state.category}</h2>
+        <h2 className="mt-1 text-[22px] font-bold leading-[30px]">오늘의 문제</h2>
         <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">문제와 1등 확성기는 매일 오후 5시에 새로 시작합니다.</p>
       </div>
 
