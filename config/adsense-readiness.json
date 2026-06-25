@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "policyReferences": [
+    {
+      "label": "AdSense program policies",
+      "url": "https://support.google.com/adsense/answer/10502938?hl=ko"
+    },
+    {
+      "label": "Minimum content requirements",
+      "url": "https://support.google.com/adsense/answer/10502938#minimum_content_requirements"
+    },
+    {
+      "label": "Unique content and good user experience",
+      "url": "https://support.google.com/adsense/answer/10015918"
+    },
+    {
+      "label": "Thin content guidance",
+      "url": "https://support.google.com/webmasters/answer/9044175#thin-content"
+    },
+    {
+      "label": "Publisher webmaster quality guidance",
+      "url": "https://support.google.com/publisherpolicies/answer/11035931"
+    }
+  ],
+  "thresholds": {
+    "siteScoreReviewReady": 85,
+    "siteScoreWarning": 70,
+    "requiredMinVisibleText": 300,
+    "uniqueContentRatioReviewNotReady": 0.5,
+    "privacyTermsMinVisibleText": 900,
+    "aboutArchiveGuideMinVisibleText": 700,
+    "dailyPuzzleMinVisibleText": 450,
+    "customPublicGameMinVisibleText": 450,
+    "maxBrokenInternalLinks": 0,
+    "maxRequiredApiErrors": 0
+  },
+  "contentCategories": {
+    "daily-puzzle": {
+      "minVisibleText": 450,
+      "required": true
+    },
+    "custom-public-game": {
+      "minVisibleText": 450,
+      "required": true
+    },
+    "guide": {
+      "minVisibleText": 700,
+      "required": true
+    },
+    "archive": {
+      "minVisibleText": 700,
+      "required": true
+    },
+    "legal": {
+      "minVisibleText": 900,
+      "required": true
+    },
+    "support": {
+      "minVisibleText": 300,
+      "required": false
+    },
+    "ranking": {
+      "minVisibleText": 300,
+      "required": false
+    },
+    "seo-support": {
+      "minVisibleText": 500,
+      "required": false
+    }
+  },
+  "requiredPages": [
+    {
+      "path": "/",
+      "label": "daily puzzle home",
+      "category": "daily-puzzle"
+    },
+    {
+      "path": "/about",
+      "label": "about",
+      "category": "guide"
+    },
+    {
+      "path": "/how-to-play",
+      "label": "how to play",
+      "category": "guide"
+    },
+    {
+      "path": "/archive",
+      "label": "archive",
+      "category": "archive"
+    },
+    {
+      "path": "/privacy",
+      "label": "privacy policy",
+      "category": "legal"
+    },
+    {
+      "path": "/terms",
+      "label": "terms",
+      "category": "legal"
+    },
+    {
+      "pathTemplate": "/custom/{slug}",
+      "label": "custom game public page",
+      "category": "custom-public-game",
+      "slugEnv": "ADSENSE_READINESS_CUSTOM_GAME_SLUG",
+      "defaultSlug": "sample-custom-game"
+    }
+  ],
+  "excludedPatterns": [
+    {
+      "pattern": "^/api/",
+      "reason": "API route, not an AdSense review page"
+    },
+    {
+      "pattern": "^/auth/",
+      "reason": "OAuth callback flow"
+    },
+    {
+      "pattern": "^/signin$",
+      "reason": "authenticated entry page"
+    },
+    {
+      "pattern": "^/nickname$",
+      "reason": "authenticated onboarding page"
+    },
+    {
+      "pattern": "^/custom/manage/",
+      "reason": "custom game owner token page"
+    }
+  ],
+  "requiredApis": [
+    {
+      "method": "GET",
+      "path": "/api/today"
+    }
+  ],
+  "riskPatterns": {
+    "reviewNotReady": [
+      {
+        "code": "unavailable_feature_claim",
+        "pattern": "준비 중|곧 제공|coming soon|under construction",
+        "message": "Unavailable feature or unfinished-page wording is visible."
+      },
+      {
+        "code": "placeholder_content",
+        "pattern": "lorem ipsum|placeholder|TODO|샘플 텍스트",
+        "message": "Placeholder text is visible."
+      },
+      {
+        "code": "empty_error_state",
+        "pattern": "문제를 찾을 수 없습니다|공유 링크가 잘못됐거나 삭제된 게임",
+        "message": "A required public page is rendering an empty or missing-content state."
+      }
+    ],
+    "warning": [
+      {
+        "code": "loading_copy",
+        "pattern": "불러오는 중|loading",
+        "message": "Loading copy remains in the rendered HTML."
+      },
+      {
+        "code": "ads_claim",
+        "pattern": "광고",
+        "message": "Advertising-related copy should be reviewed for policy context."
+      }
+    ]
+  },
+  "baseline": {
+    "path": "reports/adsense-readiness-baseline.json",
+    "regressionScoreTolerance": 0
+  }
+}

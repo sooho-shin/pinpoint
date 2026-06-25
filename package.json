@@ -26,6 +26,8 @@
     "figma:layout:check": "node scripts/validate-figma-layout-report.js",
     "figma:composition:contract": "node scripts/validate-figma-composition-report.js --contract-only",
     "figma:composition:check": "node scripts/validate-figma-composition-report.js",
+    "adsense:check": "node scripts/check-adsense-readiness.js",
+    "adsense:test": "node scripts/test-adsense-readiness.js",
     "app:contract": "node scripts/validate-app-contract.js --contract-only",
     "app:check": "node scripts/validate-app-contract.js",
     "app:implementation:check": "node scripts/validate-app-contract.js --require-implementation",
