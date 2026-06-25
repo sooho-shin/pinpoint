@@ -8,9 +8,14 @@ export function DailyPuzzleTemplate({ groupCode }: { groupCode?: string }) {
     <main className="app-shell">
       <div className="screen-frame">
         <GameHeader showGuide showShare />
-        <section className="surface mb-4 p-6">
+        <DailyWinnerBanner />
+        <PuzzleBoard groupCode={groupCode} />
+        <div className="mt-4">
+          <ButtonLink href="/custom/new" variant="secondary">내 문제 만들기</ButtonLink>
+        </div>
+        <section className="surface mt-6 p-5">
           <div className="text-xs font-semibold text-[var(--text-secondary)]">Daily Korean word puzzle</div>
-          <h1 className="mt-1 text-[24px] font-bold leading-8">오늘의 한국어 연상 퍼즐</h1>
+          <h2 className="mt-1 text-[20px] font-bold leading-7">오늘의 한국어 연상 퍼즐</h2>
           <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
             Narrow는 매일 오후 5시에 하나의 정답을 공개하는 한국어 단서 추론 게임입니다. 처음에는 가장 넓은 단서 하나만 보고 답을 예상하고,
             오답을 제출하거나 다음 단서를 열 때마다 후보를 좁힐 수 있는 힌트가 추가됩니다. 단서가 적을 때 맞힐수록 더 좋은 기록으로 남습니다.
@@ -27,11 +32,6 @@ export function DailyPuzzleTemplate({ groupCode }: { groupCode?: string }) {
             지난 문제는 아카이브에서 정답과 단서 흐름을 다시 읽을 수 있어, 오늘의 풀이 감각을 연습하는 자료로도 사용할 수 있습니다.
           </p>
         </section>
-        <DailyWinnerBanner />
-        <PuzzleBoard groupCode={groupCode} />
-        <div className="mt-4">
-          <ButtonLink href="/custom/new" variant="secondary">내 문제 만들기</ButtonLink>
-        </div>
       </div>
     </main>
   );
