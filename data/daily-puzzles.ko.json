@@ -1,4 +1,1505 @@
 {
   "version": 1,
-  "items": []
+  "items": [
+    {
+      "id": "ko-20260710123846-ycr8i",
+      "answer": "도서관",
+      "aliases": [
+        "library",
+        "공공도서관"
+      ],
+      "category": "생활/시설",
+      "difficulty": 3,
+      "clues": [
+        "조용함",
+        "대출",
+        "서가",
+        "사서",
+        "책 빌리기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 사서과 책 빌리기로 도서관에 수렴한다.",
+      "status": "published",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-10T08:00:00.000Z",
+      "publishedAt": "2026-07-10T12:38:47.111Z",
+      "createdAt": "2026-07-10T12:38:46.914Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-0oha6",
+      "answer": "병원",
+      "aliases": [
+        "hospital",
+        "의료기관"
+      ],
+      "category": "생활/시설",
+      "difficulty": 2,
+      "clues": [
+        "번호표",
+        "대기",
+        "진료",
+        "의사",
+        "입원"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 의사과 입원로 병원에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-11T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.916Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-ezyiz",
+      "answer": "약국",
+      "aliases": [
+        "pharmacy",
+        "약방"
+      ],
+      "category": "생활/시설",
+      "difficulty": 2,
+      "clues": [
+        "초록 십자",
+        "처방전",
+        "약사",
+        "복약 안내",
+        "조제"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 복약 안내과 조제로 약국에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-12T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.916Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-hdex0",
+      "answer": "우체국",
+      "aliases": [
+        "post office",
+        "우편국"
+      ],
+      "category": "생활/시설",
+      "difficulty": 2,
+      "clues": [
+        "번호표",
+        "창구",
+        "소포",
+        "우표",
+        "등기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 우표과 등기로 우체국에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-13T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.916Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-hsrqb",
+      "answer": "은행",
+      "aliases": [
+        "bank",
+        "금융기관"
+      ],
+      "category": "생활/시설",
+      "difficulty": 3,
+      "clues": [
+        "번호표",
+        "창구",
+        "통장",
+        "이자",
+        "예금"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 이자과 예금로 은행에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-14T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.916Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-u9tv7",
+      "answer": "대형마트",
+      "aliases": [
+        "hypermarket",
+        "할인점"
+      ],
+      "category": "생활/시설",
+      "difficulty": 2,
+      "clues": [
+        "카트",
+        "진열대",
+        "시식",
+        "계산대",
+        "장보기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 계산대과 장보기로 대형마트에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-15T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.916Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-w1td8",
+      "answer": "교실",
+      "aliases": [
+        "classroom",
+        "학급방"
+      ],
+      "category": "학교/공간",
+      "difficulty": 2,
+      "clues": [
+        "줄",
+        "자리",
+        "칠판",
+        "선생님",
+        "수업"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 선생님과 수업로 교실에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-16T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.916Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-jjt3i",
+      "answer": "칠판",
+      "aliases": [
+        "blackboard",
+        "수업판"
+      ],
+      "category": "학교/도구",
+      "difficulty": 2,
+      "clues": [
+        "앞쪽",
+        "가루",
+        "분필",
+        "지우개",
+        "판서"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 지우개과 판서로 칠판에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-17T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.917Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-gql21",
+      "answer": "책가방",
+      "aliases": [
+        "school bag",
+        "학생가방"
+      ],
+      "category": "학교/도구",
+      "difficulty": 3,
+      "clues": [
+        "어깨",
+        "지퍼",
+        "교과서",
+        "필통",
+        "등교"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 필통과 등교로 책가방에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-18T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.917Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-gzfwv",
+      "answer": "운동화",
+      "aliases": [
+        "sneakers",
+        "스니커즈"
+      ],
+      "category": "생활/의류",
+      "difficulty": 2,
+      "clues": [
+        "끈",
+        "바닥",
+        "발",
+        "달리기",
+        "체육 시간"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 달리기과 체육 시간로 운동화에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-19T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.917Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-zrtx8",
+      "answer": "자전거",
+      "aliases": [
+        "bicycle",
+        "바이크"
+      ],
+      "category": "교통/이동",
+      "difficulty": 2,
+      "clues": [
+        "두 개",
+        "균형",
+        "페달",
+        "핸들",
+        "체인"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 핸들과 체인로 자전거에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-20T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.917Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-ox4q0",
+      "answer": "지하철",
+      "aliases": [
+        "subway",
+        "도시철도"
+      ],
+      "category": "교통/이동",
+      "difficulty": 2,
+      "clues": [
+        "출퇴근",
+        "환승",
+        "개찰구",
+        "노선도",
+        "전동차"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 노선도과 전동차로 지하철에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-21T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.918Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-ro4vz",
+      "answer": "주차장",
+      "aliases": [
+        "parking lot",
+        "자동차보관소"
+      ],
+      "category": "교통/공간",
+      "difficulty": 3,
+      "clues": [
+        "선",
+        "빈자리",
+        "차단기",
+        "주차권",
+        "자동차 세우기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 주차권과 자동차 세우기로 주차장에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-22T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.918Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-54hw5",
+      "answer": "주유소",
+      "aliases": [
+        "gas station",
+        "충전 주유점"
+      ],
+      "category": "교통/시설",
+      "difficulty": 2,
+      "clues": [
+        "가격판",
+        "노즐",
+        "가득",
+        "휘발유",
+        "기름 넣기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 휘발유과 기름 넣기로 주유소에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-23T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.918Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-w1sex",
+      "answer": "세차장",
+      "aliases": [
+        "car wash",
+        "자동차세척장"
+      ],
+      "category": "교통/시설",
+      "difficulty": 2,
+      "clues": [
+        "거품",
+        "솔",
+        "물줄기",
+        "자동차",
+        "외부 세척"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 자동차과 외부 세척로 세차장에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-24T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.918Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-euqve",
+      "answer": "미용실",
+      "aliases": [
+        "hair salon",
+        "헤어숍"
+      ],
+      "category": "생활/시설",
+      "difficulty": 2,
+      "clues": [
+        "거울",
+        "의자",
+        "가운",
+        "머리카락",
+        "커트"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 머리카락과 커트로 미용실에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-25T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.918Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-tc2mk",
+      "answer": "세탁소",
+      "aliases": [
+        "laundry shop",
+        "드라이클리닝점"
+      ],
+      "category": "생활/시설",
+      "difficulty": 3,
+      "clues": [
+        "옷걸이",
+        "비닐",
+        "얼룩",
+        "다림질",
+        "드라이클리닝"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 다림질과 드라이클리닝로 세탁소에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-26T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.918Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-4rd77",
+      "answer": "식당",
+      "aliases": [
+        "restaurant",
+        "음식점"
+      ],
+      "category": "생활/시설",
+      "difficulty": 2,
+      "clues": [
+        "자리",
+        "주문",
+        "메뉴",
+        "주방",
+        "외식"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 주방과 외식로 식당에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-27T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.918Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-xf89t",
+      "answer": "메뉴판",
+      "aliases": [
+        "menu",
+        "차림표"
+      ],
+      "category": "생활/도구",
+      "difficulty": 2,
+      "clues": [
+        "목록",
+        "사진",
+        "가격",
+        "주문",
+        "음식 고르기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 주문과 음식 고르기로 메뉴판에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-28T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.918Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-5i3ry",
+      "answer": "숟가락",
+      "aliases": [
+        "spoon",
+        "수저"
+      ],
+      "category": "생활/주방",
+      "difficulty": 2,
+      "clues": [
+        "손잡이",
+        "오목함",
+        "국물",
+        "밥",
+        "떠먹기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 밥과 떠먹기로 숟가락에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-29T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.918Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-iozd6",
+      "answer": "젓가락",
+      "aliases": [
+        "chopsticks",
+        "젓가락 한 쌍"
+      ],
+      "category": "생활/주방",
+      "difficulty": 3,
+      "clues": [
+        "두 짝",
+        "가늘다",
+        "반찬",
+        "집기",
+        "짝 맞추기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 집기과 짝 맞추기로 젓가락에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-30T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.918Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-zlfhz",
+      "answer": "냄비",
+      "aliases": [
+        "pot",
+        "조리용 솥"
+      ],
+      "category": "생활/주방",
+      "difficulty": 2,
+      "clues": [
+        "손잡이",
+        "뚜껑",
+        "불",
+        "국",
+        "끓이기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 국과 끓이기로 냄비에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-07-31T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-r3b4z",
+      "answer": "프라이팬",
+      "aliases": [
+        "frying pan",
+        "후라이팬"
+      ],
+      "category": "생활/주방",
+      "difficulty": 2,
+      "clues": [
+        "넓적함",
+        "손잡이",
+        "기름",
+        "달걀",
+        "부치기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 달걀과 부치기로 프라이팬에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-01T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-jw2jf",
+      "answer": "밥솥",
+      "aliases": [
+        "rice cooker",
+        "전기밥솥"
+      ],
+      "category": "생활/가전",
+      "difficulty": 2,
+      "clues": [
+        "뚜껑",
+        "버튼",
+        "쌀",
+        "보온",
+        "취사"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 보온과 취사로 밥솥에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-02T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-e4kdt",
+      "answer": "청소기",
+      "aliases": [
+        "vacuum cleaner",
+        "진공청소기"
+      ],
+      "category": "생활/가전",
+      "difficulty": 3,
+      "clues": [
+        "바퀴",
+        "소리",
+        "먼지",
+        "흡입",
+        "바닥 청소"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 흡입과 바닥 청소로 청소기에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-03T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-bojov",
+      "answer": "리모컨",
+      "aliases": [
+        "remote control",
+        "원격조종기"
+      ],
+      "category": "생활/가전",
+      "difficulty": 2,
+      "clues": [
+        "손바닥",
+        "버튼",
+        "채널",
+        "건전지",
+        "원격 조작"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 건전지과 원격 조작로 리모컨에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-04T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-k12xr",
+      "answer": "텔레비전",
+      "aliases": [
+        "television",
+        "TV"
+      ],
+      "category": "생활/가전",
+      "difficulty": 2,
+      "clues": [
+        "화면",
+        "소리",
+        "채널",
+        "방송",
+        "거실 시청"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 방송과 거실 시청로 텔레비전에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-05T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-83yrj",
+      "answer": "선풍기",
+      "aliases": [
+        "electric fan",
+        "전기부채"
+      ],
+      "category": "생활/가전",
+      "difficulty": 2,
+      "clues": [
+        "회전",
+        "날개",
+        "바람",
+        "여름",
+        "시원하게"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 여름과 시원하게로 선풍기에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-06T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-pt4lq",
+      "answer": "보일러",
+      "aliases": [
+        "boiler",
+        "난방기"
+      ],
+      "category": "생활/가전",
+      "difficulty": 3,
+      "clues": [
+        "온도",
+        "배관",
+        "온수",
+        "겨울",
+        "바닥 난방"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 겨울과 바닥 난방로 보일러에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-07T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-wu23j",
+      "answer": "창문",
+      "aliases": [
+        "window",
+        "유리창"
+      ],
+      "category": "생활/주거",
+      "difficulty": 2,
+      "clues": [
+        "네모",
+        "햇빛",
+        "바깥",
+        "환기",
+        "커튼 옆"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 환기과 커튼 옆로 창문에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-08T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-juwzd",
+      "answer": "커튼",
+      "aliases": [
+        "curtain",
+        "창가림막"
+      ],
+      "category": "생활/주거",
+      "difficulty": 2,
+      "clues": [
+        "천",
+        "주름",
+        "햇빛",
+        "가리기",
+        "창가"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 가리기과 창가로 커튼에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-09T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-y5ohr",
+      "answer": "거울",
+      "aliases": [
+        "mirror",
+        "반사경"
+      ],
+      "category": "생활/도구",
+      "difficulty": 2,
+      "clues": [
+        "평평함",
+        "빛",
+        "얼굴",
+        "반사",
+        "내 모습"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 반사과 내 모습로 거울에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-10T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-i98tb",
+      "answer": "수건",
+      "aliases": [
+        "towel",
+        "타월"
+      ],
+      "category": "생활/욕실",
+      "difficulty": 3,
+      "clues": [
+        "천",
+        "걸이",
+        "물기",
+        "샤워",
+        "닦기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 샤워과 닦기로 수건에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-11T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.919Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-461yf",
+      "answer": "비누",
+      "aliases": [
+        "soap",
+        "세정비누"
+      ],
+      "category": "생활/욕실",
+      "difficulty": 2,
+      "clues": [
+        "미끄러움",
+        "향기",
+        "거품",
+        "손 씻기",
+        "때 제거"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 손 씻기과 때 제거로 비누에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-12T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.920Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-oy93f",
+      "answer": "샴푸",
+      "aliases": [
+        "shampoo",
+        "머리세정제"
+      ],
+      "category": "생활/욕실",
+      "difficulty": 2,
+      "clues": [
+        "용기",
+        "향기",
+        "거품",
+        "두피",
+        "머리 감기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 두피과 머리 감기로 샴푸에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-13T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.920Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-151kq",
+      "answer": "세면대",
+      "aliases": [
+        "washbasin",
+        "세면기"
+      ],
+      "category": "생활/욕실",
+      "difficulty": 2,
+      "clues": [
+        "그릇 모양",
+        "수도꼭지",
+        "배수구",
+        "양치",
+        "얼굴 씻기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 양치과 얼굴 씻기로 세면대에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-14T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.920Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-kwejg",
+      "answer": "변기",
+      "aliases": [
+        "toilet bowl",
+        "좌변기"
+      ],
+      "category": "생활/욕실",
+      "difficulty": 3,
+      "clues": [
+        "뚜껑",
+        "물",
+        "레버",
+        "화장실",
+        "배수"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 화장실과 배수로 변기에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-15T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.920Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-gqcnn",
+      "answer": "열쇠",
+      "aliases": [
+        "key",
+        "키"
+      ],
+      "category": "생활/도구",
+      "difficulty": 2,
+      "clues": [
+        "작은 금속",
+        "톱니",
+        "구멍",
+        "자물쇠",
+        "문 열기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 자물쇠과 문 열기로 열쇠에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-16T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.920Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-hzwml",
+      "answer": "문고리",
+      "aliases": [
+        "door handle",
+        "손잡이쇠"
+      ],
+      "category": "생활/주거",
+      "difficulty": 2,
+      "clues": [
+        "잡기",
+        "돌리기",
+        "출입",
+        "잠금",
+        "문에 달림"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 잠금과 문에 달림로 문고리에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-17T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.920Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-l5ouw",
+      "answer": "초인종",
+      "aliases": [
+        "doorbell",
+        "현관벨"
+      ],
+      "category": "생활/주거",
+      "difficulty": 2,
+      "clues": [
+        "누르기",
+        "소리",
+        "방문객",
+        "현관",
+        "딩동"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 현관과 딩동로 초인종에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-18T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.920Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-ens0r",
+      "answer": "택배",
+      "aliases": [
+        "parcel delivery",
+        "배송물"
+      ],
+      "category": "생활/서비스",
+      "difficulty": 3,
+      "clues": [
+        "상자",
+        "주소",
+        "기사",
+        "배송",
+        "문 앞 도착"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 배송과 문 앞 도착로 택배에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-19T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.920Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-u370k",
+      "answer": "자동문",
+      "aliases": [
+        "automatic door",
+        "자동 출입문"
+      ],
+      "category": "생활/시설",
+      "difficulty": 2,
+      "clues": [
+        "센서",
+        "다가가기",
+        "양쪽",
+        "열림",
+        "손 없이 통과"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 열림과 손 없이 통과로 자동문에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-20T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.920Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-6pnrr",
+      "answer": "계산대",
+      "aliases": [
+        "checkout counter",
+        "결제대"
+      ],
+      "category": "생활/시설",
+      "difficulty": 2,
+      "clues": [
+        "줄",
+        "바코드",
+        "직원",
+        "결제",
+        "물건값"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 결제과 물건값로 계산대에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-21T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.920Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-mahyp",
+      "answer": "영수증",
+      "aliases": [
+        "receipt",
+        "구매전표"
+      ],
+      "category": "생활/금융",
+      "difficulty": 2,
+      "clues": [
+        "얇은 종이",
+        "날짜",
+        "금액",
+        "결제 뒤",
+        "구매 내역"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 결제 뒤과 구매 내역로 영수증에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-22T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.920Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-uzjia",
+      "answer": "동전",
+      "aliases": [
+        "coin",
+        "주화"
+      ],
+      "category": "생활/금융",
+      "difficulty": 3,
+      "clues": [
+        "둥글다",
+        "금속",
+        "앞뒷면",
+        "자판기",
+        "잔돈"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 자판기과 잔돈로 동전에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-23T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.921Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-t89vu",
+      "answer": "지갑",
+      "aliases": [
+        "wallet",
+        "돈지갑"
+      ],
+      "category": "생활/소지품",
+      "difficulty": 2,
+      "clues": [
+        "접기",
+        "주머니",
+        "카드",
+        "현금",
+        "신분증 보관"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 현금과 신분증 보관로 지갑에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-24T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.921Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-k14v8",
+      "answer": "신용카드",
+      "aliases": [
+        "credit card",
+        "결제카드"
+      ],
+      "category": "생활/금융",
+      "difficulty": 2,
+      "clues": [
+        "얇다",
+        "번호",
+        "서명",
+        "한도",
+        "후불 결제"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 한도과 후불 결제로 신용카드에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-25T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.921Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-wo6kl",
+      "answer": "휴대폰",
+      "aliases": [
+        "mobile phone",
+        "핸드폰"
+      ],
+      "category": "생활/전자",
+      "difficulty": 2,
+      "clues": [
+        "주머니",
+        "화면",
+        "통화",
+        "앱",
+        "충전"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 앱과 충전로 휴대폰에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-26T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.921Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-vw1zn",
+      "answer": "충전기",
+      "aliases": [
+        "charger",
+        "전원충전기"
+      ],
+      "category": "생활/전자",
+      "difficulty": 3,
+      "clues": [
+        "선",
+        "콘센트",
+        "배터리",
+        "전원",
+        "잔량 채우기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 전원과 잔량 채우기로 충전기에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-27T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.921Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-vvjiz",
+      "answer": "이어폰",
+      "aliases": [
+        "earphones",
+        "이어버드"
+      ],
+      "category": "생활/전자",
+      "difficulty": 2,
+      "clues": [
+        "두 쪽",
+        "귀",
+        "음악",
+        "통화",
+        "개인 청취"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 통화과 개인 청취로 이어폰에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-28T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.921Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-ak2em",
+      "answer": "노트북",
+      "aliases": [
+        "laptop",
+        "랩톱"
+      ],
+      "category": "생활/전자",
+      "difficulty": 2,
+      "clues": [
+        "접기",
+        "화면",
+        "자판",
+        "휴대",
+        "컴퓨터"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 휴대과 컴퓨터로 노트북에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-29T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.921Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-o50du",
+      "answer": "마우스",
+      "aliases": [
+        "computer mouse",
+        "컴퓨터마우스"
+      ],
+      "category": "생활/전자",
+      "difficulty": 2,
+      "clues": [
+        "손바닥",
+        "클릭",
+        "휠",
+        "포인터",
+        "커서 이동"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 포인터과 커서 이동로 마우스에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-30T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.921Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-111zj",
+      "answer": "키보드",
+      "aliases": [
+        "keyboard",
+        "컴퓨터자판"
+      ],
+      "category": "생활/전자",
+      "difficulty": 3,
+      "clues": [
+        "여러 칸",
+        "손가락",
+        "문자",
+        "스페이스바",
+        "타이핑"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 스페이스바과 타이핑로 키보드에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-08-31T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.921Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-58arq",
+      "answer": "프린터",
+      "aliases": [
+        "printer",
+        "인쇄기"
+      ],
+      "category": "생활/전자",
+      "difficulty": 2,
+      "clues": [
+        "종이",
+        "잉크",
+        "출력",
+        "문서",
+        "인쇄"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 문서과 인쇄로 프린터에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-09-01T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.921Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-w6tbm",
+      "answer": "사진관",
+      "aliases": [
+        "photo studio",
+        "사진스튜디오"
+      ],
+      "category": "생활/시설",
+      "difficulty": 2,
+      "clues": [
+        "배경",
+        "조명",
+        "자세",
+        "증명사진",
+        "촬영"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 증명사진과 촬영로 사진관에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-09-02T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.921Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-3fgbm",
+      "answer": "우편함",
+      "aliases": [
+        "mailbox",
+        "편지함"
+      ],
+      "category": "생활/시설",
+      "difficulty": 2,
+      "clues": [
+        "작은 문",
+        "주소",
+        "봉투",
+        "고지서",
+        "편지 받기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 고지서과 편지 받기로 우편함에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-09-03T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.922Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-7xioa",
+      "answer": "쓰레기통",
+      "aliases": [
+        "trash can",
+        "휴지통"
+      ],
+      "category": "생활/도구",
+      "difficulty": 3,
+      "clues": [
+        "뚜껑",
+        "봉투",
+        "버리기",
+        "폐기물",
+        "수거"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 폐기물과 수거로 쓰레기통에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-09-04T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.922Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-qx4ox",
+      "answer": "분리수거",
+      "aliases": [
+        "recycling separation",
+        "재활용 분류"
+      ],
+      "category": "생활/환경",
+      "difficulty": 2,
+      "clues": [
+        "요일",
+        "종류",
+        "라벨",
+        "재활용",
+        "따로 버리기"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 재활용과 따로 버리기로 분리수거에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-09-05T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.922Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-u03go",
+      "answer": "소화기",
+      "aliases": [
+        "fire extinguisher",
+        "불끄는통"
+      ],
+      "category": "생활/안전",
+      "difficulty": 2,
+      "clues": [
+        "빨간색",
+        "안전핀",
+        "분사",
+        "화재",
+        "초기 진압"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 화재과 초기 진압로 소화기에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-09-06T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.922Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    },
+    {
+      "id": "ko-20260710123846-woyxb",
+      "answer": "비상구",
+      "aliases": [
+        "emergency exit",
+        "긴급출구"
+      ],
+      "category": "생활/안전",
+      "difficulty": 2,
+      "clues": [
+        "초록 표지",
+        "사람 그림",
+        "대피",
+        "화재",
+        "긴급 탈출"
+      ],
+      "rationale": "초반의 일반적인 특징에서 시작해 화재과 긴급 탈출로 비상구에 수렴한다.",
+      "status": "scheduled",
+      "qualityScore": 100,
+      "issueFlags": [],
+      "scheduledAt": "2026-09-07T08:00:00.000Z",
+      "publishedAt": null,
+      "createdAt": "2026-07-10T12:38:46.922Z",
+      "updatedAt": "2026-07-10T12:38:47.111Z"
+    }
+  ]
 }
