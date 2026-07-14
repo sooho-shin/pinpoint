@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Button, ButtonLink } from "@/components/atoms/Button";
 import { TextInput } from "@/components/atoms/TextInput";
 import { ClueRow } from "@/components/molecules/ClueRow";
+import { FeedbackToast } from "@/components/molecules/FeedbackMessage";
 import { ScoreBadge } from "@/components/molecules/ScoreBadge";
 import { ShareActionGroup } from "@/components/molecules/ShareActionGroup";
 import type { DailyRankingParticipation, SubmitResult } from "@/lib/puzzle/types";
@@ -114,6 +115,12 @@ export function ResultPanel() {
   const [winnerMessage, setWinnerMessage] = useState("");
   const [winnerFeedback, setWinnerFeedback] = useState("");
   const [winnerPending, setWinnerPending] = useState(false);
+
+  useEffect(() => {
+    if (!winnerFeedback) return;
+    const timeout = window.setTimeout(() => setWinnerFeedback(""), 3500);
+    return () => window.clearTimeout(timeout);
+  }, [winnerFeedback]);
 
   useEffect(() => {
     let mounted = true;
@@ -260,7 +267,6 @@ export function ResultPanel() {
                 autoFocus
               />
               <div className="text-right text-xs font-semibold text-[var(--text-secondary)]">{winnerMessage.length}/100</div>
-              {winnerFeedback ? <p className="text-sm text-[var(--danger)]">{winnerFeedback}</p> : null}
               <div className="grid grid-cols-2 gap-2">
                 <Button type="button" variant="secondary" disabled={winnerPending} onClick={() => setWinnerPromptOpen(false)}>나중에</Button>
                 <Button type="submit" disabled={winnerPending || !winnerMessage.trim()}>등록</Button>
@@ -269,6 +275,7 @@ export function ResultPanel() {
           </div>
         </div>
       ) : null}
+      {winnerFeedback ? <FeedbackToast>{winnerFeedback}</FeedbackToast> : null}
     </section>
   );
 }

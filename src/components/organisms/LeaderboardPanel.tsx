@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 import { FormEvent, useEffect, useState } from "react";
 import { Button, ButtonLink } from "@/components/atoms/Button";
 import { TextInput } from "@/components/atoms/TextInput";
+import { FeedbackToast } from "@/components/molecules/FeedbackMessage";
 import { LeaderboardTabs } from "@/components/molecules/LeaderboardTabs";
 import { LoadingSurface } from "@/components/molecules/LoadingSurface";
 import { RankingRow, type RankingRowData } from "@/components/molecules/RankingRow";
@@ -128,12 +129,19 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
   const [groupState, setGroupState] = useState<GroupLeaderboardState>({ status: "loading" });
   const [message, setMessage] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [messageError, setMessageError] = useState("");
   const [feedbackReaction, setFeedbackReaction] = useState<PuzzleFeedbackReaction>("good");
   const [feedbackComment, setFeedbackComment] = useState("");
   const [feedbackSubmitMessage, setFeedbackSubmitMessage] = useState("");
   const [groupMessage, setGroupMessage] = useState("");
   const [pending, setPending] = useState(false);
   const [feedbackPending, setFeedbackPending] = useState(false);
+
+  useEffect(() => {
+    if (!messageError) return;
+    const timeout = window.setTimeout(() => setMessageError(""), 3500);
+    return () => window.clearTimeout(timeout);
+  }, [messageError]);
 
   async function load() {
     if (isGroupMode) {
@@ -177,6 +185,7 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
     if (!message.trim()) return;
     setPending(true);
     setFeedback("");
+    setMessageError("");
     try {
       await getJson("/api/winner-message", {
         method: "POST",
@@ -186,7 +195,7 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
       setFeedback("메시지를 등록했습니다.");
       await load();
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : "메시지를 등록하지 못했습니다.");
+      setMessageError(error instanceof Error ? error.message : "메시지를 등록하지 못했습니다.");
     } finally {
       setPending(false);
     }
@@ -449,6 +458,7 @@ export function LeaderboardPanel({ groupCode, activeTab = "daily" }: { groupCode
           </div>
         )}
       </div>
+      {messageError ? <FeedbackToast>{messageError}</FeedbackToast> : null}
     </section>
   );
 }
