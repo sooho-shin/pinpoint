@@ -7,6 +7,46 @@ export function normalizeAnswer(value: string) {
     .replace(/[.,!?'"`~\-_/\\()[\]{}:;·•]/g, "");
 }
 
+const HANGUL_INITIALS = [
+  "ㄱ",
+  "ㄲ",
+  "ㄴ",
+  "ㄷ",
+  "ㄸ",
+  "ㄹ",
+  "ㅁ",
+  "ㅂ",
+  "ㅃ",
+  "ㅅ",
+  "ㅆ",
+  "ㅇ",
+  "ㅈ",
+  "ㅉ",
+  "ㅊ",
+  "ㅋ",
+  "ㅌ",
+  "ㅍ",
+  "ㅎ"
+];
+
+export function hangulInitials(value: string) {
+  const initials = Array.from(normalizeAnswer(value), (char) => {
+    const code = char.charCodeAt(0);
+    if (code < 0xac00 || code > 0xd7a3) return char;
+    return HANGUL_INITIALS[Math.floor((code - 0xac00) / 588)];
+  }).join("");
+  return normalizeAnswer(initials);
+}
+
+export function isAnswerSpoilerMessage(message: string, acceptedAnswers: string[]) {
+  const normalizedMessage = normalizeAnswer(message);
+  const forbiddenTerms = acceptedAnswers
+    .flatMap((term) => [normalizeAnswer(term), hangulInitials(term)])
+    .filter((term) => term.length >= 2);
+
+  return forbiddenTerms.some((term) => normalizedMessage.includes(term));
+}
+
 function levenshteinDistance(a: string, b: string) {
   if (a === b) return 0;
   if (!a) return b.length;

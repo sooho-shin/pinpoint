@@ -1,4 +1,4 @@
-import { normalizeAnswer } from "@/lib/puzzle/normalize";
+import { isAnswerSpoilerMessage, normalizeAnswer } from "@/lib/puzzle/normalize";
 import type { PublicAttempt, PuzzleFeedbackItem } from "@/lib/puzzle/types";
 import type { AttemptRow, PuzzleFeedbackRow, PuzzleRow } from "@/lib/puzzle/server-types";
 
@@ -45,4 +45,8 @@ export function containsSpoilerText(comment: string, puzzle: PuzzleRow) {
     .filter((term) => term.length >= 2);
 
   return forbiddenTerms.some((term) => normalizedComment.includes(term));
+}
+
+export function containsAnswerSpoilerText(message: string, puzzle: PuzzleRow) {
+  return isAnswerSpoilerMessage(message, [puzzle.answer, ...(puzzle.aliases ?? [])]);
 }

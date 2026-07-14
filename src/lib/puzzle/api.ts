@@ -8,7 +8,7 @@ import { ATTEMPT_SELECT, getAttempt, TERMINAL_STATUSES } from "@/lib/puzzle/atte
 import { createLeaderboardEntry, getDailyRankingParticipation, syncUserGroupLeaderboardEntries } from "@/lib/puzzle/leaderboard";
 import { getTodayPublication } from "@/lib/puzzle/publication";
 import { getProfile } from "@/lib/puzzle/profiles";
-import { containsSpoilerText, publicAttempt, publicFeedback } from "@/lib/puzzle/server-format";
+import { containsAnswerSpoilerText, containsSpoilerText, publicAttempt, publicFeedback } from "@/lib/puzzle/server-format";
 import type { Actor, AttemptRow, LeaderboardEntryRow, PublicationRow, PuzzleFeedbackRow, PuzzleRow, StreakLeaderboardRow } from "@/lib/puzzle/server-types";
 import { addKstDate, recordDailyResult } from "@/lib/puzzle/streaks";
 import { canWriteWinnerMessage, getWinnerMessage } from "@/lib/puzzle/winner-message";
@@ -389,8 +389,11 @@ export async function writeWinnerMessage(message: string) {
 
   const actor = await getActor();
   if (!actor.userId) return { ok: false, error: "로그인이 필요합니다." };
-  const { publication } = await getTodayPublication();
-  if (!publication) return { ok: false, error: "오늘 공개된 문제가 없습니다." };
+  const { publication, puzzle } = await getTodayPublication();
+  if (!publication || !puzzle) return { ok: false, error: "오늘 공개된 문제가 없습니다." };
+  if (containsAnswerSpoilerText(trimmed, puzzle)) {
+    return { ok: false, error: "정답이나 정답 초성이 포함된 메시지는 등록할 수 없습니다." };
+  }
 
   const profile = await getProfile(actor.userId);
   if (!profile) return { ok: false, error: "닉네임 설정이 필요합니다." };
