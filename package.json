@@ -30,6 +30,7 @@
     "adsense:test": "node scripts/test-adsense-readiness.js",
     "winner-message:test": "node --experimental-strip-types scripts/test-winner-message-spoiler.ts",
     "answer-matching:test": "node --experimental-strip-types scripts/test-answer-matching.ts",
+    "actor-session:test": "node --experimental-strip-types scripts/test-actor-session.ts",
     "app:contract": "node scripts/validate-app-contract.js --contract-only",
     "app:check": "node scripts/validate-app-contract.js",
     "app:implementation:check": "node scripts/validate-app-contract.js --require-implementation",

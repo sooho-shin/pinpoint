@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { ensureAnonymousSessionId } from "@/lib/puzzle/actor-session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Actor } from "@/lib/puzzle/server-types";
 
@@ -18,17 +19,15 @@ function anonymousCookieOptions() {
 export async function getActor(): Promise<Actor> {
   const cookieStore = await cookies();
   const existing = cookieStore.get(ANONYMOUS_SESSION_COOKIE)?.value;
-  const existingAnonymousSessionId = existing && existing.length >= 16 ? existing : null;
+  const anonymousSessionId = ensureAnonymousSessionId(existing);
+  if (anonymousSessionId !== existing) {
+    cookieStore.set(ANONYMOUS_SESSION_COOKIE, anonymousSessionId, anonymousCookieOptions());
+  }
   const hasSupabaseAuthCookie = cookieStore
     .getAll()
     .some((cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("auth-token"));
 
   if (!hasSupabaseAuthCookie) {
-    const anonymousSessionId = existingAnonymousSessionId ?? crypto.randomUUID();
-    if (!existingAnonymousSessionId) {
-      cookieStore.set(ANONYMOUS_SESSION_COOKIE, anonymousSessionId, anonymousCookieOptions());
-    }
-
     return {
       userId: null,
       anonymousSessionId
@@ -43,13 +42,8 @@ export async function getActor(): Promise<Actor> {
   if (user) {
     return {
       userId: user.id,
-      anonymousSessionId: existingAnonymousSessionId
+      anonymousSessionId
     };
-  }
-
-  const anonymousSessionId = existingAnonymousSessionId ?? crypto.randomUUID();
-  if (!existingAnonymousSessionId) {
-    cookieStore.set(ANONYMOUS_SESSION_COOKIE, anonymousSessionId, anonymousCookieOptions());
   }
 
   return {
