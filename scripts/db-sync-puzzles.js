@@ -92,7 +92,7 @@ async function main() {
     const existingByDate = new Map((existingPublications ?? []).map((publication) => [String(publication.publish_date_kst), publication]));
     const safePublications = publications.filter((publication) => {
       const existing = existingByDate.get(publication.publish_date_kst);
-      return !existing || existing.status !== "published" || existing.puzzle_id === publication.puzzle_id;
+      return !existing || existing.status !== "published";
     });
     const skippedPublished = publications.length - safePublications.length;
 
