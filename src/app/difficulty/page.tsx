@@ -48,6 +48,15 @@ export default function DifficultyPage() {
             </ol>
           </section>
 
+          <section className="mt-6">
+            <h2 className="text-base font-bold">난이도는 어떻게 조정하나요?</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              정답 자체가 낯설다는 이유만으로 난이도를 높이지 않습니다. 초반 단서에서 가능한 후보가 몇 개인지, 3번 단서가 분야를 제대로 좁히는지,
+              마지막 단서가 다른 답과 혼동되지 않는지를 함께 봅니다. 공개 후에는 사용자가 실제로 사용한 단서 수와 평가도 참고하지만,
+              단순 정답률 하나만으로 다음 문제의 난이도를 결정하지 않습니다.
+            </p>
+          </section>
+
           <Link className="focus-ring mt-8 inline-flex h-10 items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--accent)]" href="/categories">
             카테고리별 문제 보기
           </Link>

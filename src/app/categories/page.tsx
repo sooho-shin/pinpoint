@@ -38,6 +38,15 @@ export default function CategoriesPage() {
             ))}
           </div>
 
+          <section className="mt-6">
+            <h2 className="text-base font-bold">플레이 중에는 카테고리를 숨깁니다</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              카테고리를 먼저 보여주면 첫 단서가 가진 여러 해석 가능성이 크게 줄어듭니다. 그래서 오늘 문제를 푸는 동안에는 분야를 공개하지 않고,
+              풀이가 끝난 결과와 지난 문제에서만 확인할 수 있게 합니다. 같은 단어가 역사에서는 사건을, 과학에서는 현상을 가리킬 수 있다는 점이
+              연상 퍼즐의 핵심이기 때문입니다. 지난 문제에서는 카테고리별 단서 흐름을 비교하며 같은 표현이 분야에 따라 어떻게 달라지는지 복기할 수 있습니다.
+            </p>
+          </section>
+
           <div className="mt-8 grid gap-3">
             <Link className="focus-ring inline-flex h-10 items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--accent)]" href="/archive">
               지난 문제 보기

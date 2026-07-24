@@ -45,6 +45,15 @@ export default function KoreanWordAssociationPage() {
             </p>
           </section>
 
+          <section className="mt-6">
+            <h2 className="text-base font-bold">정답 표현과 별칭</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              하나의 개념도 한국어 이름, 원어 표기, 널리 쓰이는 줄임말이 함께 존재할 수 있습니다. 그래서 출제할 때는 같은 대상을 가리키는
+              자연스러운 표현을 별칭으로 검토합니다. 다만 비슷해 보이지만 범위가 다른 상위 개념이나 관련 인물 이름까지 정답으로 넓히지는 않습니다.
+              이 원칙은 입력 편의와 문제의 정확성을 함께 지키기 위한 기준입니다.
+            </p>
+          </section>
+
           <Link className="focus-ring mt-8 inline-flex h-10 items-center justify-center rounded-md border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--accent)]" href="/puzzle-strategy">
             풀이 전략 읽기
           </Link>
