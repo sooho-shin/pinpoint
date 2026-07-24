@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getActivePublicationDateKst } from "@/lib/puzzle/time";
 import { formatKoreanDate } from "@/lib/format";
+import { hasPuzzleArticle } from "@/lib/puzzle/content";
 
 type ArchiveRow = {
   id: string;
@@ -100,12 +101,14 @@ export default async function ArchivePage() {
                         </li>
                       ))}
                     </ol>
-                    <Link
-                      className="focus-ring mt-4 inline-flex h-9 items-center justify-center rounded-md border border-[var(--border)] bg-white px-3 text-sm font-semibold text-[var(--accent)]"
-                      href={`/archive/${row.id}`}
-                    >
-                      단서 해설 읽기
-                    </Link>
+                    {hasPuzzleArticle(puzzle?.answer) ? (
+                      <Link
+                        className="focus-ring mt-4 inline-flex h-9 items-center justify-center rounded-md border border-[var(--border)] bg-white px-3 text-sm font-semibold text-[var(--accent)]"
+                        href={`/archive/${row.id}`}
+                      >
+                        단서 해설 읽기
+                      </Link>
+                    ) : null}
                   </section>
                 );
               })

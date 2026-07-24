@@ -106,6 +106,10 @@ export const puzzleArticles: Record<string, PuzzleArticle> = {
   }
 };
 
+export function hasPuzzleArticle(answer: string | null | undefined) {
+  return Boolean(answer && Object.hasOwn(puzzleArticles, answer));
+}
+
 export function getPuzzleArticle(answer: string | null | undefined) {
   if (!answer) return defaultArticle;
   return puzzleArticles[answer] ?? defaultArticle;

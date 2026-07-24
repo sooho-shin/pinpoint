@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { RankingTemplate } from "@/components/templates/RankingTemplate";
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ group?: string }> }): Promise<Metadata> {
-  const params = await searchParams;
-  const hasGroupInvite = Boolean(params.group);
+  await searchParams;
 
   return {
     title: "오늘의 랭킹",
@@ -11,9 +10,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     alternates: {
       canonical: "/ranking"
     },
-    robots: hasGroupInvite
-      ? { index: false, follow: false }
-      : { index: true, follow: true }
+    robots: { index: false, follow: true }
   };
 }
 

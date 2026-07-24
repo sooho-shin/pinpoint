@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatKoreanDate } from "@/lib/format";
-import { getPuzzleArticle } from "@/lib/puzzle/content";
+import { getPuzzleArticle, hasPuzzleArticle } from "@/lib/puzzle/content";
 import { getActivePublicationDateKst } from "@/lib/puzzle/time";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -73,7 +73,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     description: `${formatKoreanDate(detail.publishDateKst)} 공개 문제 ${detail.puzzle.answer}의 단서 흐름과 배경 지식을 정리했습니다.`,
     alternates: {
       canonical: `/archive/${id}`
-    }
+    },
+    robots: hasPuzzleArticle(detail.puzzle.answer)
+      ? { index: true, follow: true }
+      : { index: false, follow: true }
   };
 }
 

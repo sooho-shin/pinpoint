@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/lib/site";
 import { getActivePublicationDateKst } from "@/lib/puzzle/time";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { hasPuzzleArticle } from "@/lib/puzzle/content";
 
 export const revalidate = 86400;
 
@@ -10,20 +11,25 @@ async function getArchiveUrls(siteUrl: string): Promise<MetadataRoute.Sitemap> {
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from("puzzle_publications")
-      .select("id,publish_date_kst")
+      .select("id,publish_date_kst,puzzles(answer)")
       .eq("status", "published")
       .lt("publish_date_kst", getActivePublicationDateKst())
       .order("publish_date_kst", { ascending: false })
-      .limit(100);
+      .limit(500);
 
     if (error) throw error;
 
-    return (data ?? []).map((row) => ({
-      url: `${siteUrl}/archive/${row.id}`,
-      lastModified: new Date(row.publish_date_kst),
-      changeFrequency: "monthly" as const,
-      priority: 0.5
-    }));
+    return (data ?? [])
+      .filter((row) => {
+        const puzzle = Array.isArray(row.puzzles) ? row.puzzles[0] : row.puzzles;
+        return hasPuzzleArticle(puzzle?.answer);
+      })
+      .map((row) => ({
+        url: `${siteUrl}/archive/${row.id}`,
+        lastModified: new Date(row.publish_date_kst),
+        changeFrequency: "monthly" as const,
+        priority: 0.5
+      }));
   } catch {
     return [];
   }
@@ -34,7 +40,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const routes = [
     { path: "/", changeFrequency: "daily" as const, priority: 1 },
-    { path: "/ranking", changeFrequency: "daily" as const, priority: 0.8 },
     { path: "/about", changeFrequency: "monthly" as const, priority: 0.6 },
     { path: "/how-to-play", changeFrequency: "monthly" as const, priority: 0.6 },
     { path: "/archive", changeFrequency: "daily" as const, priority: 0.6 },
